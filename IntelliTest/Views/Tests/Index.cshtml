@@ -1,0 +1,169 @@
+﻿@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+@{
+    ViewBag.Title = "Tests Blog";
+}
+
+<div>
+    <main class="cd-main-content">
+        <section class="cd-gallery">
+            <ul>
+                @foreach (var test in Model)
+                {
+                    <div class="container">
+                        <div class="row">
+                            <div class="card card-margin">
+                                <div class="card-header no-border">
+                                    <h5 class="card-title">@test.Title - @test.Grade</h5>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="widget-49">
+                                        <div class="widget-49-title-wrapper">
+                                            <div class="widget-49-date-primary">
+                                                <span class="widget-49-date-day">@test.AverageScore</span>
+                                                <span class="widget-49-date-month">score</span>
+                                            </div>
+                                            <div class="widget-49-meeting-info">
+                                                <span class="widget-49-pro-title">@test.Description</span>
+                                                <span class="widget-49-meeting-time">@test.CreatedOn</span>
+                                            </div>
+                                        </div>
+                                        <ol class="widget-49-meeting-points">
+                                            <li class="widget-49-meeting-item"><span>Въпроси: @(test.OpenQuestions.Count() + test.ClosedQuestions.Count())</span></li>
+                                            <li class="widget-49-meeting-item"><span>Време: @test.Time мин</span></li>
+                                            <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
+                                        </ol>
+                                        <div class="widget-49-meeting-action">
+                                            <a href="#" class="btn btn-sm btn-primary back-col">View All</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </ul>
+            <div class="cd-fail-message">Няма резултати</div>
+        </section>
+        <div class="cd-filter">
+            <form>
+                <div class="cd-filter-block">
+                    <h4 onclick="OnCloseOpen(this)">Подредба</h4>
+                    <div class="cd-filter-content">
+                        <div class="cd-select cd-filters">
+                            <select class="filter" name="selectThis" id="selectThis">
+                                <option value=".option1">Харесвания</option>
+                                <option value=".option2">Изпитници</option>
+                                <option value=".option3">Ср. Рез.</option>
+                                <option value=".option4">Въпроси</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cd-filter-block">
+                    <h4 onclick="OnCloseOpen(this)">Потърси</h4>
+
+                    <div class="cd-filter-content">
+                        <input type="search" placeholder="Потърси..."/>
+                    </div>
+                </div>
+
+                <div class="cd-filter-block">
+                    <h4 onclick="OnCloseOpen(this)">Предмет</h4>
+
+                    <div class="cd-filter-content">
+                        <div class="cd-select cd-filters">
+                            <select class="filter" name="selectThis" id="selectThis">
+                                <option value=".option1">Математика</option>
+                                <option value=".option2">БЕЛ</option>
+                                <option value=".option3">АЕ</option>
+                                <option value=".option4">Физика</option>
+                                <option value=".option4">Химия</option>
+                                <option value=".option4">Биология</option>
+                                <option value=".option4">История</option>
+                                <option value=".option4">География</option>
+                                <option value=".option4">Музика</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cd-filter-block">
+                    <h4 onclick="OnCloseOpen(this)">Клас</h4>
+
+                    <div class="cd-filter-content">
+                        <div class="cd-select cd-filters">
+                            <select class="filter" name="selectThis" id="selectThis">
+                                <option value=".option1">1 клас</option>
+                                <option value=".option2">2 клас</option>
+                                <option value=".option3">3 клас</option>
+                                <option value=".option4">4 клас</option>
+                                <option value=".option4">5 клас</option>
+                                <option value=".option4">6 клас</option>
+                                <option value=".option4">7 клас</option>
+                                <option value=".option4">8 клас</option>
+                                <option value=".option4">9 клас</option>
+                                <option value=".option4">10 клас</option>
+                                <option value=".option4">11 клас</option>
+                                <option value=".option4">12 клас</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <a href="#0" class="cd-close" onclick=OnTrigger() >X</a>
+        </div>
+
+        <a href="#0" id = "trigger" class="cd-filter-trigger" onClick="OnTrigger()">Филтри</a>
+    </main>
+</div>
+@section Scripts
+    {
+        <script>
+            const trigger = document.getElementById("trigger")
+            const filter = document.getElementsByClassName("cd-filter")[0]
+            const gallery = document.getElementsByClassName("cd-gallery")[0]
+
+            function toggleClass( ref, className){
+                if (ref.classList.contains(className))
+                    ref.classList.remove(className);
+                else
+                    ref.classList.add(className);
+            }
+
+            function OnTrigger(){
+                toggleClass(trigger, "filter-is-visible");
+                toggleClass(filter, "filter-is-visible");
+                toggleClass(gallery, "filter-is-visible");
+            }
+
+            function OnCloseOpen(e){
+                toggleClass(e, "closed")
+                toggleClass(e.parentNode.children[1], "hide")
+            }
+            function onHover(e){
+                timeout = setTimeout(function(){
+                    console.log(e.children[0].children[0].children[2])
+                        e.children[0].children[1].style.display = "block";
+                        e.children[0].children[0].children[2].style.display = "block";
+                }, 290);
+            }
+            function onLeave(e){
+                window.clearTimeout(timeout)
+                    e.children[0].children[1].style.display = "none";
+                    e.children[0].children[0].children[2].style.display = "none";
+            }
+
+            function onLike(e){
+                if (e.target.style.backgroundPositionX === "-2800px"){
+                    e.target.style.transitionDuration = "0s";
+                    e.target.style.backgroundPosition = '0 0';
+                }
+                else{
+                    e.target.style.transitionDuration = "1s";
+                    e.target.style.backgroundPosition = '-2800px 0';
+                }
+            }
+        </script>
+}

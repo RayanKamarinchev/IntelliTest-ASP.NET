@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title = "Classes";
+}
+<div class="container d-flex flex-row">
+            <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 200px; background-color: white;height: 100vh">
+                <a class="d-flex align-items-center justify-content-center btn mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
+                    <h3 class="fs-4">Всички</h3>
+                </a>
+                <hr style="margin-top: 0">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li>
+                        <a href="#" class="nav-link text-start">
+                            8а
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link link-dark text-start">
+                            8б
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link link-dark text-start">
+                            8в
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link link-dark text-start">
+                            8д
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="d-flex ml-5 pt-3">
+                <ul class="d-flex flex-wrap" style="align-content: flex-start">
+                    <li class="card card-chart mr-5">
+                        <div class="card-header">
+                            <h3>Оценки</h3>
+                            <button onclick="ToggleChartGrades(this)" class="btn btn-primary back-col p-1 position-absolute" style="right: 10px">Блок</button>
+                        </div>
+                        <div class="card-body chart">
+                            <canvas id="allClass"></canvas>
+                        </div>
+                    </li>
+                    <li class="card card-chart mr-5">
+                        <div class="card-header">
+                            <h3>Тестове</h3>
+                            <button onclick="ToggleChartTestGrades(this)" class="btn btn-primary back-col p-1 position-absolute" style="right: 10px">Блок</button>
+                        </div>
+                        <div class="card-body chart">
+                            <canvas id="allTest"></canvas>
+                        </div>
+                    </li>
+                    <li class="card card-chart mr-5">
+                        <div class="card-header">
+                            <h3>Брой Оценки</h3>
+                        </div>
+                        <div class="card-body chart">
+                            <canvas id="pie-chart"></canvas>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <script >
+            const options = {
+                plugins: {
+                    datalabels: {
+                        display: false
+                    }
+                }
+            };
+            function initGrades() {
+                // Chart declaration:
+                myBarGradeChart = new Chart(ctx, {
+                    type: gradeChartType,
+                    data: data,
+                    options: options
+                });
+            }
+            function ToggleChartGrades(e){
+                //destroy chart:
+                myBarGradeChart.destroy();
+                //change chart type:
+                e.innerHTML = (gradeChartType == 'bar') ? 'Линия' : 'Блок';
+                gradeChartType = (gradeChartType == 'bar') ? 'line' : 'bar';
+                //restart chart:
+                initGrades();
+            }
+            const ctx =  document.getElementById('allClass');
+            let gradeChartType = 'bar';
+            let myBarGradeChart;
+
+            const data = {
+                labels: ['Сеп', 'Окт', 'Нов', 'Дек', 'Ян', 'Фев'],
+                datasets: [{
+                    label: "Клас 8а",
+                    data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
+                    fill: true,
+                    lineTension: 0.1,
+                    borderCapStyle: 'square',
+                    pointBorderColor: "white",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 8,
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHitRadius: 10,
+                    spanGaps: true,
+                    backgroundColor:colors[0],
+                },
+                    {
+                        label: "Клас 8в",
+                        data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
+                        fill: true,
+                        lineTension: 0.1,
+                        borderCapStyle: 'square',
+                        pointBorderColor: "white",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 8,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHitRadius: 10,
+                        spanGaps: true,
+                        backgroundColor:colors[1],
+                    }]
+            };
+            initGrades();
+
+
+
+            function initTestGrades() {
+                // Chart declaration:
+                myBarTestGradeChart = new Chart(ctx2, {
+                    type: testGradeChartType,
+                    data: dataTest,
+                    options: options
+                });
+            }
+            function ToggleChartTestGrades(e){
+                //destroy chart:
+                myBarTestGradeChart.destroy();
+                //change chart type:
+                e.innerHTML = (testGradeChartType == 'bar') ? 'Линия' : 'Блок';
+                testGradeChartType = (testGradeChartType == 'bar') ? 'line' : 'bar';
+                //restart chart:
+                initTestGrades();
+            }
+            const ctx2 = document.getElementById('allTest');
+            let testGradeChartType = "bar";
+            let myBarTestGradeChart;
+
+            const dataTest = {
+                labels: ['Тест 1', 'Тест 2', '5 минутка', 'Тест 3', 'Изпитване', 'Класна'],
+                datasets: [{
+                    label: "Клас 8а",
+                    data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
+                    fill: true,
+                    lineTension: 0.1,
+                    borderCapStyle: 'square',
+                    pointBorderColor: "white",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 8,
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHitRadius: 10,
+                    spanGaps: true,
+                    backgroundColor:colors[0],
+                },
+                    {
+                        label: "Клас 8в",
+                        data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
+                        fill: true,
+                        lineTension: 0.1,
+                        borderCapStyle: 'square',
+                        pointBorderColor: "white",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 8,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHitRadius: 10,
+                        spanGaps: true,
+                        backgroundColor:colors[1],
+                    }]
+            };
+            initTestGrades();
+        </script>

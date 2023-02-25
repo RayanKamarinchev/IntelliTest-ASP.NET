@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Watchlist</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/0.4.0/chartjs-plugin-datalabels.min.js"></script>
+    <script>
+        const colors = ["#4797f2", "#ECA400", "#47f2a2", "#a247f2", "#D81159", "#493B2A", "#BF3100"]
+        const gradeColors = ["#2CE574", "#CDF03A", "#FFE500", "#FF9600", "#FF3924"]
+        const gradeContrastColors = ["#26C282","#309CD7", "#F6CC17", "#F57455", "#EB4E5D"]
+        window.onload=function(){/*  ww  w  .j a va2s . com*/
+            let ctx3 = document.getElementById("pie-chart");
+            var data3 = [{
+                data: [3, 1, 4, 12, 6],
+                backgroundColor: gradeContrastColors.slice(0, 5).reverse(),
+                borderColor: "#fff"
+            }];
+            var options = {
+                plugins: {
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            let datasets = ctx.chart.data.datasets;
+                            if (datasets.indexOf(ctx.dataset) === datasets.length - 1) {
+                                let sum = datasets[0].data.reduce((a, b) => a + b, 0);
+                                let percentage = Math.round((value / sum) * 100) + '%';
+                                return ("lol", percentage);
+                            } else {
+                                return percentage;
+                            }
+                        },
+                        color: '#fff',
+                    }
+                }
+            };
+            var myChart = new Chart(ctx3, {
+                type: 'pie',
+                data: {
+                    labels: ["Слаб", "Мн. Добър", "Добър", "Среден", "Отличен"],
+                    datasets: data3
+                },
+                options: options
+            });
+        }
+
+    </script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="navbar-brand logo" asp-area="" asp-controller="Home" asp-action="Index"><span class="logoCol1">Intelli</span><span class="logoCol2">Test</span></a>
+                    </li>
+                    @if (User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
+                        </li>
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
+                        </li>
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
+                            </li>
+                    }
+                </ul>
+                <partial name="_LoginPartial"/>
+            </div>
+        </div>
+    </nav>
+</header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container  text-center">
+            &copy; 2022 - IntelliTest
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

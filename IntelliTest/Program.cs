@@ -1,0 +1,55 @@
+using IntelliTest.Contracts;
+using IntelliTest.Data;
+using IntelliTest.Data.Entities;
+using IntelliTest.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration["ConnectionString"];
+builder.Services.AddDbContext<IntelliTestDbContext>(options =>
+                                                        options.UseSqlServer(connectionString));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddDefaultIdentity<User>(options =>
+       {
+           options.SignIn.RequireConfirmedAccount = false;
+           options.Password.RequiredLength = 5;
+       })
+       .AddEntityFrameworkStores<IntelliTestDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/User/Login";
+});
+
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ITestService, TestService>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseMigrationsEndPoint();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
+
+app.Run();
