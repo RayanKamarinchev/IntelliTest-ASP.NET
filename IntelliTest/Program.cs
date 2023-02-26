@@ -1,9 +1,11 @@
-using IntelliTest.Contracts;
+using IntelliTest.Core.Contracts;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
-using IntelliTest.Services;
+using IntelliTest.Core.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -14,9 +16,17 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<User>(options =>
        {
            options.SignIn.RequireConfirmedAccount = false;
-           options.Password.RequiredLength = 5;
+           options.Password.RequireLowercase = false;
+           options.Password.RequireNonAlphanumeric = false;
+           options.Password.RequireUppercase = false;
+           options.Password.RequireDigit = false;
        })
+       .AddRoles<IdentityRole>()
        .AddEntityFrameworkStores<IntelliTestDbContext>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -26,6 +36,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+});
+
+
 
 var app = builder.Build();
 

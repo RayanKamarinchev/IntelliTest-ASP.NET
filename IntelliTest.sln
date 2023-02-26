@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntelliTest", "IntelliTest\IntelliTest.csproj", "{16AEDB60-6433-4855-AFAF-FF8BCE9092E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntelliTest", "IntelliTest\IntelliTest.csproj", "{16AEDB60-6433-4855-AFAF-FF8BCE9092E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntelliTest.Core", "IntelliTest.Services\IntelliTest.Core.csproj", "{456412BC-1402-4E65-9E19-4F92FF4081AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntelliTest.Data", "IntelliTest.Data\IntelliTest.Data.csproj", "{43331D89-EBB1-48DC-8862-A9FCF6908A80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{16AEDB60-6433-4855-AFAF-FF8BCE9092E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16AEDB60-6433-4855-AFAF-FF8BCE9092E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16AEDB60-6433-4855-AFAF-FF8BCE9092E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{456412BC-1402-4E65-9E19-4F92FF4081AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{456412BC-1402-4E65-9E19-4F92FF4081AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{456412BC-1402-4E65-9E19-4F92FF4081AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{456412BC-1402-4E65-9E19-4F92FF4081AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43331D89-EBB1-48DC-8862-A9FCF6908A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43331D89-EBB1-48DC-8862-A9FCF6908A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43331D89-EBB1-48DC-8862-A9FCF6908A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43331D89-EBB1-48DC-8862-A9FCF6908A80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

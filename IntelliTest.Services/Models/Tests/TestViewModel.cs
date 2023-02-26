@@ -6,6 +6,8 @@ namespace IntelliTest.Models.Tests
     public class TestViewModel
     {
         [Required]
+        public int Id { get; set; }
+        [Required]
         [StringLength(30)]
         public string Title { get; set; }
         [Required]

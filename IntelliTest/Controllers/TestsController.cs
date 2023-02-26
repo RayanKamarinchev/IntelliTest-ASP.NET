@@ -1,25 +1,41 @@
 ﻿using System.Security.Claims;
-using IntelliTest.Contracts;
-using IntelliTest.Services;
+using IntelliTest.Core.Contracts;
+using IntelliTest.Infrastructure;
+using IntelliTest.Models.Tests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 
-namespace IntelliTestWeb.Controllers
+namespace IntelliTest.Controllers
 {
     [Authorize]
     public class TestsController : Controller
     {
         private readonly ITestService testService;
+        private readonly IDistributedCache cache;
 
-        public TestsController(ITestService _testService)
+        public TestsController(ITestService _testService, IDistributedCache _cache)
         {
             testService = _testService;
+            cache = _cache;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var model = await testService.GetAll();
+            if (cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
+            {
+                
+            }
+            else
+            {
+                model = await testService.GetAll();
+                var cacheEntryOptions = new DistributedCacheEntryOptions()
+                                        .SetSlidingExpiration(TimeSpan.FromSeconds(60))
+                                        .SetAbsoluteExpiration(TimeSpan.FromSeconds(3600));
+                await cache.SetAsync("tests", model, cacheEntryOptions);
+            }
             return View(model);
         }
 
@@ -29,6 +45,12 @@ namespace IntelliTestWeb.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var model = await testService.GetMy(userId);
             return View("Index", model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Details(int testId)
+        {
+            return View(new TestViewModel());
         }
     }
 }

@@ -1,0 +1,31 @@
+﻿@using IntelliTest.Services.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model TestViewModel
+@{
+    ViewBag.Title = "House Details";
+}
+
+<h2 class="text-center">@ViewBag.Title</h2>
+<hr />
+
+<div class="container" style="display:inline">
+    <div class="row">
+        <div class="card col-8 border-0">
+            <p style="font-size:25px;"><u>@Model.Title</u></p>
+            <p>Училище: <b>@Model.School</b></p>
+            <p>Дата на създаване: <b>@Model.CreatedOn</b></p>
+            <p>Среден резултат: @Model.AverageScore</p>
+            <p>Изпитници: @Model.Students</p>
+            <p>Време в минути: @Model.Time</p>
+            <p>@Model.Description</p>
+            <p></p>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Информация</h5>
+                    @*<p class="card-text">Email:  @Model.Email</p>
+                    <p class="card-text">Phone Number: @Model.Agent.PhoneNumber</p>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
