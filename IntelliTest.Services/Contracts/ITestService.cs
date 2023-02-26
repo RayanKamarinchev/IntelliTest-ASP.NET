@@ -7,5 +7,6 @@ namespace IntelliTest.Core.Contracts
         Task<IEnumerable<TestViewModel>> GetAll();
         Task<IEnumerable<TestViewModel>> GetMy(string userId);
         Task<TestViewModel> GetById(int id);
+        bool ExistsbyId(int id);
     }
 }

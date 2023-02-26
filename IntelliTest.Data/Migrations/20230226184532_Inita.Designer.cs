@@ -12,14 +12,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    [Migration("20230220120707_Desc")]
-    partial class Desc
+    [Migration("20230226184532_Inita")]
+    partial class Inita
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "6.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -45,7 +45,7 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TestId")
+                    b.Property<int>("TestId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
@@ -77,7 +77,7 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TestId")
+                    b.Property<int>("TestId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
@@ -102,7 +102,11 @@ namespace IntelliTest.Data.Migrations
                     b.Property<decimal>("AverageScore")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Color")
+                    b.Property<string>("Color1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color2")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -144,14 +148,28 @@ namespace IntelliTest.Data.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Tests");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AverageScore = 67.5m,
+                            Color1 = "#358DF1",
+                            Color2 = "#2383f0",
+                            CreatedOn = new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307),
+                            Description = "Просто тест",
+                            Grade = 10,
+                            IsDeleted = false,
+                            MaxScore = 20,
+                            School = "ППМГ Добри Чинтулов",
+                            Students = 15,
+                            Subject = "Физика",
+                            Time = 30,
+                            Title = "Електромагнитни вълни"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -371,23 +389,24 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestion", b =>
                 {
-                    b.HasOne("IntelliTest.Data.Entities.Test", null)
+                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
                         .WithMany("ClosedQuestions")
-                        .HasForeignKey("TestId");
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
                 {
-                    b.HasOne("IntelliTest.Data.Entities.Test", null)
+                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
                         .WithMany("OpenQuestions")
-                        .HasForeignKey("TestId");
-                });
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
-                {
-                    b.HasOne("IntelliTest.Data.Entities.User", null)
-                        .WithMany("Tests")
-                        .HasForeignKey("UserId");
+                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -446,11 +465,6 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("ClosedQuestions");
 
                     b.Navigation("OpenQuestions");
-                });
-
-            modelBuilder.Entity("IntelliTest.Data.Entities.User", b =>
-                {
-                    b.Navigation("Tests");
                 });
 #pragma warning restore 612, 618
         }

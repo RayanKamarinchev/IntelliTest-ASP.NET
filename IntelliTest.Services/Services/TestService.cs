@@ -1,8 +1,7 @@
-﻿using System.Linq.Expressions;
-using IntelliTest.Data;
-using IntelliTest.Data.Entities;
+﻿using IntelliTest.Data;
 using IntelliTest.Models.Tests;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntelliTest.Core.Services
@@ -16,14 +15,53 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        public static TestViewModel ToTestViewModel(Test t)
+        public async Task<IEnumerable<TestViewModel>> GetAll()
         {
+            return await context.Tests.Where(t=>!t.IsDeleted)
+                                .Select(t=> new TestViewModel()
+                                {
+                                    AverageScore = t.AverageScore,
+                                    ClosedQuestions = t.ClosedQuestions,
+                                    Color1 = t.Color1,
+                                    Color2 = t.Color2,
+                                    CreatedOn = t.CreatedOn,
+                                    Description = t.Description,
+                                    Grade = t.Grade,
+                                    Id = t.Id,
+                                    MaxScore = t.MaxScore,
+                                    OpenQuestions = t.OpenQuestions,
+                                    Time = t.Time,
+                                    Title = t.Title
+                                })
+                           .ToListAsync();
+        }
+
+        public async Task<IEnumerable<TestViewModel>> GetMy(string userId)
+        {
+            return await context.Tests
+                                .Select(t=> new TestViewModel()
+                                {
+                                    AverageScore = t.AverageScore,
+                                    ClosedQuestions = t.ClosedQuestions,
+                                    Color1 = t.Color1,
+                                    Color2 = t.Color2,
+                                    CreatedOn = t.CreatedOn,
+                                    Description = t.Description,
+                                    Grade = t.Grade,
+                                    Id = t.Id,
+                                    MaxScore = t.MaxScore,
+                                    OpenQuestions = t.OpenQuestions,
+                                    Time = t.Time,
+                                    Title = t.Title
+                                })
+                                .ToListAsync();
+        }
+
+        public async Task<TestViewModel> GetById(int id)
+        {
+            var t = await context.Tests.FirstOrDefaultAsync(t=>t.Id == id);
             return new TestViewModel()
             {
-                Id = t.Id,
-                School = t.School,
-                Time = t.Time,
-                Title = t.Title,
                 AverageScore = t.AverageScore,
                 ClosedQuestions = t.ClosedQuestions,
                 Color1 = t.Color1,
@@ -31,46 +69,18 @@ namespace IntelliTest.Core.Services
                 CreatedOn = t.CreatedOn,
                 Description = t.Description,
                 Grade = t.Grade,
+                Id = t.Id,
                 MaxScore = t.MaxScore,
-                OpenQuestions = t.OpenQuestions
+                OpenQuestions = t.OpenQuestions,
+                Time = t.Time,
+                Title = t.Title
             };
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetAll()
+        public bool ExistsbyId(int id)
         {
-            return await context.Tests.Where(t=>!t.IsDeleted)
-                           .Select(t=> new TestViewModel()
-                           {
-                               Id = t.Id,
-                               School = t.School,
-                               Time = t.Time,
-                               Title = t.Title,
-                               AverageScore = t.AverageScore,
-                               ClosedQuestions = t.ClosedQuestions,
-                               Color1 = t.Color1,
-                               Color2 = t.Color2,
-                               CreatedOn = t.CreatedOn,
-                               Description = t.Description,
-                               Grade = t.Grade,
-                               MaxScore = t.MaxScore,
-                               OpenQuestions = t.OpenQuestions
-                           })
-                           .ToListAsync();
-        }
-
-        public async Task<IEnumerable<TestViewModel>> GetMy(string userId)
-        {
-            return await context.Tests
-                                .Where(t=>t.User.Id == userId)
-                                .Select(y => ToTestViewModel(y))
-                                .ToListAsync();
-        }
-
-        public async Task<TestViewModel> GetById(int id)
-        {
-            var test = await context.Tests.FindAsync();
-            
-            return ToTestViewModel(test);
+            var all = context.Tests.ToList();
+            return all.Any(t=>t.Id == id);
         }
     }
 }

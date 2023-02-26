@@ -1,3 +1,4 @@
+using Ganss.Xss;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -35,14 +36,18 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "localhost:6379";
 });
 
-
+//against CSRF Cross-Site Request Forgery
+//builder.Services.AddMvc(options =>
+//{
+//    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+//});
 
 var app = builder.Build();
 
@@ -70,3 +75,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+///anti XSS cross site scripting
+//var sanitizer = new HtmlSanitizer();
+//sanitizer.Sanitize("");

@@ -5,10 +5,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IntelliTest.Data.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Inita : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<string>(
+                name: "Discriminator",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
 
             migrationBuilder.CreateTable(
                 name: "Tests",
@@ -26,18 +32,13 @@ namespace IntelliTest.Data.Migrations
                     Students = table.Column<int>(type: "int", nullable: false),
                     Time = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Color1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Color2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Tests_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -51,7 +52,7 @@ namespace IntelliTest.Data.Migrations
                     Answers = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    TestId = table.Column<int>(type: "int", nullable: true)
+                    TestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,7 +61,8 @@ namespace IntelliTest.Data.Migrations
                         name: "FK_ClosedQuestions_Tests_TestId",
                         column: x => x.TestId,
                         principalTable: "Tests",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,7 +75,7 @@ namespace IntelliTest.Data.Migrations
                     Answer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    TestId = table.Column<int>(type: "int", nullable: true)
+                    TestId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,8 +84,14 @@ namespace IntelliTest.Data.Migrations
                         name: "FK_OpenQuestions_Tests_TestId",
                         column: x => x.TestId,
                         principalTable: "Tests",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Tests",
+                columns: new[] { "Id", "AverageScore", "Color1", "Color2", "CreatedOn", "Description", "Grade", "IsDeleted", "MaxScore", "School", "Students", "Subject", "Time", "Title" },
+                values: new object[] { 1, 67.5m, "#358DF1", "#2383f0", new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307), "Просто тест", 10, false, 20, "ППМГ Добри Чинтулов", 15, "Физика", 30, "Електромагнитни вълни" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClosedQuestions_TestId",
@@ -94,11 +102,6 @@ namespace IntelliTest.Data.Migrations
                 name: "IX_OpenQuestions_TestId",
                 table: "OpenQuestions",
                 column: "TestId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tests_UserId",
-                table: "Tests",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -114,10 +117,6 @@ namespace IntelliTest.Data.Migrations
 
             migrationBuilder.DropColumn(
                 name: "Discriminator",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "IsDeleted",
                 table: "AspNetUsers");
         }
     }

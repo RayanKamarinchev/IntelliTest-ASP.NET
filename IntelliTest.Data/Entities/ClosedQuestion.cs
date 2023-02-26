@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IntelliTest.Data.Entities
 {
@@ -16,5 +17,9 @@ namespace IntelliTest.Data.Entities
         public int Order { get; set; }
 
         public bool IsDeleted { get; set; }
+        [Required]
+        public int TestId { get; set; }
+        [ForeignKey(nameof(TestId))]
+        public Test Test { get; set; }
     }
 }

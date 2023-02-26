@@ -4,6 +4,5 @@ namespace IntelliTest.Data.Entities
 {
     public class User : IdentityUser
     {
-        public List<Test> Tests { get; set; } = new List<Test>();
     }
 }

@@ -36,11 +36,10 @@ namespace IntelliTest.Data.Entities
         public string Color1 { get; set; }
         [Required]
         public string Color2 { get; set; }
-        public IList<OpenQuestion> OpenQuestions { get; set; }
-        public IList<ClosedQuestion> ClosedQuestions { get; set; }
+
+        public IList<OpenQuestion> OpenQuestions { get; set; } = new List<OpenQuestion>();
+        public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
+        [Required]
         public bool IsDeleted { get; set; }
-        public string UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
     }
 }

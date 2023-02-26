@@ -24,16 +24,15 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            cache.Remove("tests");
             if (cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
             {
-                
             }
             else
             {
                 model = await testService.GetAll();
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
-                                        .SetSlidingExpiration(TimeSpan.FromSeconds(60))
-                                        .SetAbsoluteExpiration(TimeSpan.FromSeconds(3600));
+                                        .SetSlidingExpiration(TimeSpan.FromSeconds(60));
                 await cache.SetAsync("tests", model, cacheEntryOptions);
             }
             return View(model);
@@ -50,7 +49,12 @@ namespace IntelliTest.Controllers
         [Authorize]
         public async Task<IActionResult> Details(int testId)
         {
-            return View(new TestViewModel());
+            if (!testService.ExistsbyId(testId+1))
+            {
+                return BadRequest();
+            }
+            var model = await testService.GetById(testId+1);
+            return View(model);
         }
     }
 }
