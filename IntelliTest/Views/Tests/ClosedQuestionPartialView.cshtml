@@ -1,0 +1,36 @@
+﻿@model ClosedQuestionViewModel
+
+
+<div class="questBox">
+    <div class="row">
+        <div class="questBox">
+            <input onFocus="onFocus(this)" onBlur=onFocusOut(this) id="input0" type="text"/>
+            <label htmlFor="input0">Въпрос</label>
+            <span class="underline"></span>
+        </div>
+        <div class="select">
+            <select id="standard-select" onFocus="onFocus(this)" onBlur="onFocusOut(this)" defaultValue="text"
+                    onChange="handleChange(this)">
+                <option value="text">Кратък отговор</option>
+                <option value="option">Избираем</option>
+            </select>
+            <span class="focus"></span>
+        </div>
+    </div>
+    <div className={style.choice} onFocus={onFocus} onBlur={onFocusOut}>
+        @for (int i = 0; i < @Model.Answers.Count(); i++)
+        {
+            <div class="questTextBox option">
+                <div>
+                    <input type="checkbox"/>
+                </div>
+                <input onFocus={onFocus} onBlur={onFocusOut} id="input0" type="text"/>
+                <label htmlFor="input0">Опция</label>
+                <span className={style.underline}></span>
+            </div>
+        }
+        @*<div className={style.floatingContainer}>
+            <div onClick={() => {count++; setOptions([...options, option])}} className={style.floatingButton}>+</div>
+        </div>*@
+    </div>
+</div>

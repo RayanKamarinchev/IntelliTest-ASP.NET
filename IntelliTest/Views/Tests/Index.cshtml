@@ -33,7 +33,7 @@
                                             <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
                                         </ol>
                                         <div class="widget-49-meeting-action">
-                                                <form asp-controller="Tests" asp-action="Details" asp-route-id="@test.Id">
+                                                <form asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id">
                                                 <button class="btn btn-sm btn-primary back-col">Виж повече</button>
                                             </form>
                                         </div>
@@ -122,7 +122,7 @@
 </div>
 @section Scripts
     {
-        <script>
+    <script>
             const trigger = document.getElementById("trigger")
             const filter = document.getElementsByClassName("cd-filter")[0]
             const gallery = document.getElementsByClassName("cd-gallery")[0]
@@ -167,5 +167,6 @@
                     e.target.style.backgroundPosition = '-2800px 0';
                 }
             }
-        </script>
+        
+    </script>
 }

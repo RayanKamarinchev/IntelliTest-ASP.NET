@@ -33,10 +33,35 @@ namespace IntelliTest.Data
             };
             builder.Entity<Test>()
                    .HasData(FirstTest);
+            OpenQuestion = new OpenQuestion()
+            {
+                Answer = "Az",
+                Id = 1,
+                IsDeleted = false,
+                Order = 0,
+                Text = "Koi suzdade testut",
+                TestId = 1
+            };
+            builder.Entity<OpenQuestion>()
+                   .HasData(OpenQuestion);
+            ClosedQuestion = new ClosedQuestion()
+            {
+                AnswerIndex = 1,
+                Answers = "Ti&Az&dvamata&nikoi",
+                Id = 2,
+                IsDeleted = false,
+                Order = 1,
+                Text = "Koi suzdade testut",
+                TestId = 1 
+            };
+            builder.Entity<ClosedQuestion>()
+                   .HasData(ClosedQuestion);
             base.OnModelCreating(builder);
         }
 
         public Test FirstTest { get; set; }
+        public OpenQuestion OpenQuestion { get; set; }
+        public ClosedQuestion ClosedQuestion { get; set; }
 
         public DbSet<Test> Tests { get; set; }
         public DbSet<OpenQuestion> OpenQuestions { get; set; }

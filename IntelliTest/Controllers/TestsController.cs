@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Infrastructure;
 using IntelliTest.Models.Tests;
 using Microsoft.AspNetCore.Authorization;
@@ -45,15 +46,31 @@ namespace IntelliTest.Controllers
             var model = await testService.GetMy(userId);
             return View("Index", model);
         }
-
-        [Authorize]
-        public async Task<IActionResult> Details(int testId)
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (!testService.ExistsbyId(testId+1))
+            if (!testService.ExistsbyId(id))
             {
                 return BadRequest();
             }
-            var model = await testService.GetById(testId+1);
+
+            var model = await testService.GetById(id);
+            var testEdit = testService.ToEdit(model);
+            return View(testEdit);
+        }
+        public async Task<IActionResult> Edit(int id, TestEditViewModel model)
+        {
+            if (!testService.ExistsbyId(id))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            
             return View(model);
         }
     }

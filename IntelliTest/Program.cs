@@ -44,10 +44,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 //against CSRF Cross-Site Request Forgery
-//builder.Services.AddMvc(options =>
-//{
-//    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-//});
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
 
 var app = builder.Build();
 

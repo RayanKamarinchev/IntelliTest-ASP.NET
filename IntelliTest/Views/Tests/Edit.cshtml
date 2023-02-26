@@ -1,0 +1,60 @@
+﻿@model TestEditViewModel
+@{
+    ViewBag.Title = "Edit Test";
+}
+<h2>Hallo guys</h2>
+<div class="row">
+    <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
+        <form method="post">
+        </form>
+    </div>
+</div>
+
+<div class="editMain">
+    @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+    {
+        if (Model.ClosedQuestions.Any(q=>q.Order==i))
+        {
+            var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+            <partial name="ClosedQuestionPartialView" model="question"/>
+        }
+        else
+        {
+            var question = @Model.OpenQuestions.FirstOrDefault(q => q.Order == i);
+            if (question == null)
+            {
+                question = new OpenQuestionViewModel();
+            }
+            <partial name="OpenQuestionPartialView" model="question"/>
+        }
+    }
+    <div className={style.floatingContainer}>
+        <div id="add-q-btn" class= "floatingButton">+</div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        addQuestionBtn = document.getElementById("add-q-btn");
+        addQuestionBtn.addEventListener("click", () => {
+        @{
+            Model.OpenQuestions.Add(new OpenQuestionViewModel()
+            {
+                    Order = Model.ClosedQuestions.Count + Model.OpenQuestions.Count
+            });
+        }
+        })
+            console.log("here")
+                function onFocus(e) {
+                    console.log(e.parentNode.parentNode.parentNode)
+                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
+                }
+                function onFocusOut(e){
+                        e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
+                }
+                function handleChange(e) {
+
+                }
+    </script>
+}

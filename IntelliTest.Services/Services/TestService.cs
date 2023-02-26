@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Data;
 using IntelliTest.Models.Tests;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +60,10 @@ namespace IntelliTest.Core.Services
 
         public async Task<TestViewModel> GetById(int id)
         {
-            var t = await context.Tests.FirstOrDefaultAsync(t=>t.Id == id);
+            var t = await context.Tests
+                                 .Include(t=>t.OpenQuestions)
+                                 .Include(t=>t.ClosedQuestions)
+                                 .FirstOrDefaultAsync(t=>t.Id == id);
             return new TestViewModel()
             {
                 AverageScore = t.AverageScore,
@@ -74,6 +78,38 @@ namespace IntelliTest.Core.Services
                 OpenQuestions = t.OpenQuestions,
                 Time = t.Time,
                 Title = t.Title
+            };
+        }
+
+        public TestEditViewModel ToEdit(TestViewModel model)
+        {
+            return new TestEditViewModel()
+            {
+                OpenQuestions = model.OpenQuestions
+                                     .Where(q => !q.IsDeleted)
+                                     .Select(q => new OpenQuestionViewModel()
+                                     {
+                                         Answer = q.Answer,
+                                         IsDeleted = false,
+                                         Order = q.Order,
+                                         Text = q.Text
+                                     })
+                                     .ToList(),
+                ClosedQuestions = model.ClosedQuestions
+                                       .Where(q => !q.IsDeleted)
+                                       .Select(q => new ClosedQuestionViewModel()
+                                       {
+                                           Answers = q.Answers.Split("&"),
+                                           AnswerIndex = q.AnswerIndex,
+                                           IsDeleted = false,
+                                           Order = q.Order,
+                                           Text = q.Text
+                                       })
+                                       .ToList(),
+                Time = model.Time,
+                Description = model.Description,
+                Grade = model.Grade,
+                Title = model.Title
             };
         }
 

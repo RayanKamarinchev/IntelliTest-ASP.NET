@@ -1,4 +1,5 @@
-﻿using IntelliTest.Models.Tests;
+﻿using IntelliTest.Core.Models.Tests;
+using IntelliTest.Models.Tests;
 
 namespace IntelliTest.Core.Contracts
 {
@@ -8,5 +9,6 @@ namespace IntelliTest.Core.Contracts
         Task<IEnumerable<TestViewModel>> GetMy(string userId);
         Task<TestViewModel> GetById(int id);
         bool ExistsbyId(int id);
+        TestEditViewModel ToEdit(TestViewModel model);
     }
 }
