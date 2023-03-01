@@ -46,7 +46,6 @@ namespace IntelliTest.Controllers
             var model = await testService.GetMy(userId);
             return View("Index", model);
         }
-        [HttpPost]
         public async Task<IActionResult> Edit(int id)
         {
             if (!testService.ExistsbyId(id))
@@ -58,7 +57,8 @@ namespace IntelliTest.Controllers
             var testEdit = testService.ToEdit(model);
             return View(testEdit);
         }
-        public async Task<IActionResult> Edit(int id, TestEditViewModel model)
+        [HttpPost]
+        public IActionResult Edit(int id, TestEditViewModel model)
         {
             if (!testService.ExistsbyId(id))
             {
@@ -70,8 +70,13 @@ namespace IntelliTest.Controllers
                 return View(model);
             }
 
-            
             return View(model);
+        }
+
+        public IActionResult AddQuestion()
+        {
+            OpenQuestionViewModel model = new OpenQuestionViewModel();
+            return PartialView("OpenQuestionPartialView", model);
         }
     }
 }

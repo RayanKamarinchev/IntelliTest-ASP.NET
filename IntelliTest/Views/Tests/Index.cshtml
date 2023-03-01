@@ -33,9 +33,8 @@
                                             <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
                                         </ol>
                                         <div class="widget-49-meeting-action">
-                                                <form asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id">
-                                                <button class="btn btn-sm btn-primary back-col">Виж повече</button>
-                                            </form>
+                                            <a asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id"
+                                               class="btn btn-sm btn-primary back-col">Виж</a>
                                         </div>
                                     </div>
                                 </div>

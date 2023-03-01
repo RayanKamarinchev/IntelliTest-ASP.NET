@@ -14,5 +14,6 @@ namespace IntelliTest.Core.Models.Tests
         public string Description { get; set; }
         public int Grade { get; set; }
         public int Time { get; set; }
+        public int Id { get; set; }
     }
 }

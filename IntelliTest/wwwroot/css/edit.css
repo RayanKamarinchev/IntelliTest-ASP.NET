@@ -1,12 +1,10 @@
 ﻿.editMain {
     display: flex;
     justify-content: flex-start;
-    margin-top: 50px;
-    margin-bottom: 50px;
     flex-direction: column;
     align-items: center;
     min-height: calc(100vh - 160px);
-    background-color: #eee
+    background-color: #eee;
 }
 
 #add-q-btn{
@@ -21,7 +19,7 @@
 
 
 .questBox{
-    width: 60%;
+    width: 100%;
     margin-bottom: 50px;
     box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -66,8 +64,6 @@
 .questTextBox {
     position: relative;
     width: 50%;
-    margin-top: 20px;
-    margin-left: 50px;
 }
 .questTextBox input[type="text"] {
     width: 100%;
@@ -116,7 +112,7 @@
     --select-focus: #444;
     --select-arrow: var(--select-border);
 }
-select {
+customSelect {
     appearance: none;
     background-color: transparent;
     border: none;
@@ -130,62 +126,16 @@ select {
     z-index: 1;
     outline: none;
 }
-select::-ms-expand {
+customSelect::-ms-expand {
     display: none;
 }
-.select {
-    display: grid;
-    grid-template-areas: "select";
-    align-items: center;
-    position: relative;
-    width: 40%;
-    margin-left: 50px;
-    min-width: 15ch;
-    max-width: 30ch;
-    border: 1px solid var(--select-border);
-    border-radius: 0.25em;
-    padding: 0.25em 0.5em;
-    font-size: 1.25rem;
-    cursor: pointer;
-    line-height: 1.1;
-    background-color: #fff;
-    background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
-}
-.select select, .select::after {
-    grid-area: select;
-}
-.select:not(.select--multiple)::after {
-    content: "";
-    justify-self: end;
-    width: 0.8em;
-    height: 0.5em;
-    background-color: var(--select-arrow);
-    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
-}
-select:focus + .focus {
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    border: 2px solid var(--select-focus);
-    border-radius: inherit;
-}
-select[multiple] {
-    padding-right: 0;
-    /* * Safari will not reveal an option * unless the select height has room to * show all of it * Firefox and Chrome allow showing * a partial option */
-    height: 6rem;
-    /* * Experimental - styling of selected options * in the multiselect * Not supported crossbrowser */
-}
+
 label {
     font-size: 1.125rem;
     font-weight: 500;
 }
-.select + label {
-    margin-top: 2rem;
-}
 
-.row{
+.customRow{
     display: flex;
 }
 
@@ -242,3 +192,13 @@ label {
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
+
+#standard-select{
+    padding: 5px;
+    font-size: 25px;
+    border-radius: 10px;
+}
+.customRow{
+    justify-content: space-between;
+}
+

@@ -1,41 +1,15 @@
 ﻿@model OpenQuestionViewModel
 <div class="questBox">
-    <div class="row">
-        <div class="questBox">
-            <input onfocus="onFocus(this)" onblur=onFocusOut(this) id="input0" type="text"/>
-            <label htmlFor="input0">Въпрос</label>
+    <div class="customRow">
+        <div class="questTextBox">
+            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"/>
             <span class="underline"></span>
         </div>
-        <div class="select">
-            <select id="standard-select" onfocus="onFocus(this)" onblur="onFocusOut(this)" defaultValue="text"
-                    onChange="handleChange(this)">
-                <option value="text">Кратък отговор</option>
-                <option value="option">Избираем</option>
-            </select>
-            <span class="focus"></span>
-        </div>
     </div>
-    <div class="questTextBox">
+    <div class="questTextBox" style="margin-top: 20px;margin-left: 50px;">
         <div>
-            <input onFocus="onfocus(this)" onblur="onFocusOut(this)" id="input1" type="text"/>
-            <label htmlFor="input1">Отговор</label>
+            <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="@Model.Answer" asp-for="Answer"/>
             <span class="underline"></span>
         </div>
     </div>
 </div>
-@section Scripts
-{
-    <script>
-        console.log("here")
-        function onFocus(e) {
-            console.log(e.parentNode.parentNode.parentNode)
-            e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
-        }
-        function onFocusOut(e){
-                e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
-        }
-        function handleChange(e) {
-
-        }
-    </script>
-}
