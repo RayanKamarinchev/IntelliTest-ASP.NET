@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Text.Json;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Infrastructure;
@@ -73,10 +74,29 @@ namespace IntelliTest.Controllers
             return View(model);
         }
 
-        public IActionResult AddQuestion()
+        public IActionResult AddOpenQuestion(string jsonModel)
         {
-            OpenQuestionViewModel model = new OpenQuestionViewModel();
-            return PartialView("OpenQuestionPartialView", model);
+            var model = JsonSerializer.Deserialize<TestEditViewModel>(jsonModel);
+            var q = new OpenQuestionViewModel()
+            {
+                Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
+            };
+            model.OpenQuestions.Add(q);
+
+            return View("Edit", model);
+        }
+
+        public IActionResult AddClosedQuestion(string jsonModel)
+        {
+            var model = JsonSerializer.Deserialize<TestEditViewModel>(jsonModel);
+            var q = new ClosedQuestionViewModel()
+            {
+                Answers = new[] { "" },
+                Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
+            };
+            model.ClosedQuestions.Add(q);
+
+            return View("Edit", model);
         }
     }
 }

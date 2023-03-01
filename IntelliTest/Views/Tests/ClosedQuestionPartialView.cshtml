@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
-        @for (int i = 0; i < @Model.Answers.Count(); i++)
+        @for (int i = 0; i < Model.Answers.Count(); i++)
         {
             <div class="questTextBox option">
                 <div>
@@ -19,8 +19,5 @@
                 <span className={style.underline}></span>
             </div>
         }
-        @*<div className={style.floatingContainer}>
-            <div onClick={() => {count++; setOptions([...options, option])}} className={style.floatingButton}>+</div>
-        </div>*@
     </div>
 </div>
