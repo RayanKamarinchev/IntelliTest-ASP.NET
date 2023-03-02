@@ -85,10 +85,8 @@ namespace IntelliTest.Controllers
 
             return View("Edit", model);
         }
-
-        public IActionResult AddClosedQuestion(string jsonModel)
+        public IActionResult AddClosedQuestion(TestEditViewModel model)
         {
-            var model = JsonSerializer.Deserialize<TestEditViewModel>(jsonModel);
             var q = new ClosedQuestionViewModel()
             {
                 Answers = new[] { "" },

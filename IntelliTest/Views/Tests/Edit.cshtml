@@ -46,8 +46,8 @@
                 }
             }
         </div>
-        <button type="button" id="add-o-q-btn" class="btn btn-secondary">Добави отворен въпрос</button>
-        <button type="button" id="add-c-q-btn" class="btn btn-secondary">Добави затворен въпрос</button>
+        <a id="add-o-q-btn" class="btn btn-secondary">Добави отворен въпрос</a>
+        <button asp-action="AddClosedQuestion" asp-controller="Tests" type="submit" id="add-c-q-btn" class="btn btn-secondary">Добави затворен въпрос</button>
         <hr/>
         <button class="btn blue btn-primary" type="submit">Готово</button>
     </form>
@@ -76,18 +76,18 @@
                 }
             });
         });
-        $('#add-c-q-btn').on('click', function () {
-            $.ajax({
-                    url: '@Url.Action("AddClosedQuestion", "Tests", new {jsonModel = JsonSerializer.Serialize(Model)})',
-                type: 'GET',
-                data: {
-                },
-                success: function (result) {
-                        $("body").html(result);
-                },
-                error: function () {
-                }
-            });
-        });
+        //$('#add-c-q-btn').on('click', function () {
+        //    $.ajax({
+        //            url: '@Url.Action("AddClosedQuestion", "Tests", new {jsonModel = JsonSerializer.Serialize(Model)})',
+        //        type: 'GET',
+        //        data: {
+        //        },
+        //        success: function (result) {
+        //                $("body").html(result);
+        //        },
+        //        error: function () {
+        //        }
+        //    });
+        //});
     </script>
 }

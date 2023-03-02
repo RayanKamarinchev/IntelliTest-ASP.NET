@@ -100,7 +100,7 @@ namespace IntelliTest.Core.Services
                                        .Select(q => new ClosedQuestionViewModel()
                                        {
                                            Answers = q.Answers.Split("&"),
-                                           AnswerIndex = q.AnswerIndex,
+                                           AnswerIndexes = new int[]{q.AnswerIndex},
                                            IsDeleted = false,
                                            Order = q.Order,
                                            Text = q.Text

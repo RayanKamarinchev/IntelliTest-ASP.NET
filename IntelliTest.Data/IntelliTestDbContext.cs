@@ -14,6 +14,7 @@ namespace IntelliTest.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            User = new User()
             FirstTest = new Test()
             {
                 AverageScore = 67.5m,
@@ -27,7 +28,7 @@ namespace IntelliTest.Data
                 School = "ППМГ Добри Чинтулов",
                 Subject = "Физика",
                 Time = 30,
-                Students = 15,
+                Students = ,
                 MaxScore = 20,
                 Id=1
             };
@@ -59,6 +60,8 @@ namespace IntelliTest.Data
             base.OnModelCreating(builder);
         }
 
+        public User FirstUser { get; set; }
+        public Student FirstStudent { get; set; }
         public Test FirstTest { get; set; }
         public OpenQuestion OpenQuestion { get; set; }
         public ClosedQuestion ClosedQuestion { get; set; }
