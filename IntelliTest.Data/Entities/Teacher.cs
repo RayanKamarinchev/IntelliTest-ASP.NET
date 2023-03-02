@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Data.Entities
 {
-    public class Student
+    public class Teacher
     {
+        [Key]
+        public int Id { get; set; }
+
         public User User { get; set; }
         [Required]
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-        [Required]
-        public int Grade { get; set; }
-        [Required]
-        public string School { get; set; }
-        public string? Grades { get; set; }
         public IEnumerable<Class> Classes { get; set; }
-        public List<OpenQuestionAnswer> OpenAnswers { get; set; }
-        public List<ClosedQuestionAnswer> ClosedAnswers { get; set; }
     }
 }

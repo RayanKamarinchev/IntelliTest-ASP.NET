@@ -18,5 +18,7 @@ namespace IntelliTest.Data.Entities
         public int TestId { get; set; }
         [ForeignKey(nameof(TestId))]
         public Test Test { get; set; }
+
+        public IEnumerable<OpenQuestionAnswer> StudentAnswers { get; set; }
     }
 }

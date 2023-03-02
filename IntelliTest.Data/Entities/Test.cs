@@ -40,6 +40,6 @@ namespace IntelliTest.Data.Entities
         [Required]
         public bool IsDeleted { get; set; }
 
-        public IEnumerable<Student> Students { get; set; }
+        public IEnumerable<TestStudent> Students { get; set; }
     }
 }
