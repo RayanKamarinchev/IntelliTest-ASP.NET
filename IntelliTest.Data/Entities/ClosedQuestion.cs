@@ -10,7 +10,7 @@ namespace IntelliTest.Data.Entities
         [Required]
         public string Text { get; set; }
         [Required]
-        public int AnswerIndex { get; set; }
+        public string AnswerIndexes { get; set; }
         [Required]
         public string Answers { get; set; }
         [Required]

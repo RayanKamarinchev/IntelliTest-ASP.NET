@@ -26,8 +26,6 @@ namespace IntelliTest.Data.Entities
         [Required]
         public int MaxScore { get; set; }
         [Required]
-        public int Students { get; set; }
-        [Required]
         public int Time { get; set; }
         [Required]
         [DataType(DataType.DateTime)]
@@ -41,5 +39,7 @@ namespace IntelliTest.Data.Entities
         public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
         [Required]
         public bool IsDeleted { get; set; }
+
+        public IEnumerable<Student> Students { get; set; }
     }
 }
