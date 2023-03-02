@@ -41,5 +41,9 @@ namespace IntelliTest.Data.Entities
         public bool IsDeleted { get; set; }
 
         public IEnumerable<TestStudent> Students { get; set; }
+        [Required]
+        public Teacher Creator { get; set; }
+        [ForeignKey(nameof(Creator))]
+        public int CreatorId { get; set; }
     }
 }

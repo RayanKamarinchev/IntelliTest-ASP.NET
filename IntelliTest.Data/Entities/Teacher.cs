@@ -16,7 +16,7 @@ namespace IntelliTest.Data.Entities
         public User User { get; set; }
         [Required]
         [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public IEnumerable<Class> Classes { get; set; }
     }
 }

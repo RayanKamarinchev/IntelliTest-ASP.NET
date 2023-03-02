@@ -10,6 +10,6 @@ namespace IntelliTest.Core.Models.Tests
     public class ClosedQuestionViewModel : QuestionViewModel
     {
         public string[] Answers { get; set; }
-        public int[] AnswerIndexes { get; set; }
+        public bool[] AnswerIndexes { get; set; }
     }
 }

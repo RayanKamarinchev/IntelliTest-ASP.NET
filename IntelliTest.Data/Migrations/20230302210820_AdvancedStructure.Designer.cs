@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230302210820_AdvancedStructure")]
+    partial class AdvancedStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,15 +48,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Class");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "This is the first class ever made",
-                            Name = "Nothing class",
-                            TeacherId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestion", b =>
@@ -91,18 +84,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("TestId");
 
                     b.ToTable("ClosedQuestions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AnswerIndexes = "1",
-                            Answers = "Ti&Az&dvamata&nikoi",
-                            IsDeleted = false,
-                            Order = 1,
-                            TestId = 1,
-                            Text = "Koi suzdade testut"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestionAnswer", b =>
@@ -129,15 +110,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("ClosedQuestionAnswer");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AnswerIndex = 0,
-                            QuestionId = 1,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
@@ -170,17 +142,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("TestId");
 
                     b.ToTable("OpenQuestions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 2,
-                            Answer = "Az",
-                            IsDeleted = false,
-                            Order = 0,
-                            TestId = 1,
-                            Text = "Koi suzdade testut"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestionAnswer", b =>
@@ -208,15 +169,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("OpenQuestionAnswer");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Answer = "Ti",
-                            QuestionId = 2,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Student", b =>
@@ -246,16 +198,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Student");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Grade = 8,
-                            Grades = "6&5",
-                            School = "PPMG Dobri Chintulov",
-                            UserId = "4fb46fcc-ad1d-4120-835d-d351849efc73"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.StudentClass", b =>
@@ -271,13 +213,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentClass");
-
-                    b.HasData(
-                        new
-                        {
-                            ClassId = 1,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Teacher", b =>
@@ -297,13 +232,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Teacher");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            UserId = "e9242048-504d-4ea9-9776-47691844c4a6"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
@@ -368,25 +296,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("CreatorId");
 
                     b.ToTable("Tests");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AverageScore = 67.5m,
-                            Color1 = "#358DF1",
-                            Color2 = "#2383f0",
-                            CreatedOn = new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307),
-                            CreatorId = 0,
-                            Description = "Просто тест",
-                            Grade = 10,
-                            IsDeleted = false,
-                            MaxScore = 20,
-                            School = "ППМГ Добри Чинтулов",
-                            Subject = "Физика",
-                            Time = 30,
-                            Title = "Електромагнитни вълни"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.TestStudent", b =>
@@ -402,13 +311,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("TestStudent");
-
-                    b.HasData(
-                        new
-                        {
-                            TestId = 1,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

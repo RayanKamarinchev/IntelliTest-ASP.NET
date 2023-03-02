@@ -10,6 +10,8 @@ namespace IntelliTest.Data.Entities
 {
     public class ClosedQuestionAnswer
     {
+        [Key]
+        public int Id { get; set; }
         [Required]
         public int AnswerIndex { get; set; }
         public ClosedQuestion Question { get; set; }

@@ -83,7 +83,7 @@ namespace IntelliTest.Core.Services
 
         public TestEditViewModel ToEdit(TestViewModel model)
         {
-            return new TestEditViewModel()
+            var t = new TestEditViewModel()
             {
                 OpenQuestions = model.OpenQuestions
                                      .Where(q => !q.IsDeleted)
@@ -100,7 +100,7 @@ namespace IntelliTest.Core.Services
                                        .Select(q => new ClosedQuestionViewModel()
                                        {
                                            Answers = q.Answers.Split("&"),
-                                           AnswerIndexes = new int[]{q.AnswerIndex},
+                                           AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
                                            IsDeleted = false,
                                            Order = q.Order,
                                            Text = q.Text
@@ -111,6 +111,22 @@ namespace IntelliTest.Core.Services
                 Grade = model.Grade,
                 Title = model.Title
             };
+            return t;
+        }
+
+        private bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
+        {
+            var list = Enumerable.Repeat(false, answers.Length).ToArray();
+            var listOfIndx = answerIndexes.Split("&").Select(int.Parse);
+            for (int i = 0; i < list.Length; i++)
+            {
+                if (listOfIndx.Contains(i))
+                {
+                    list[i] = true;
+                }
+            }
+
+            return list;
         }
 
         public bool ExistsbyId(int id)
