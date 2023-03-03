@@ -28,7 +28,6 @@
     <_ContentIncludedByDefault Remove="wwwroot\img\img-8.jpg" />
     <_ContentIncludedByDefault Remove="wwwroot\img\img-9.jpg" />
     <_ContentIncludedByDefault Remove="wwwroot\img\question-feedback.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\img\test-img.png" />
     <_ContentIncludedByDefault Remove="wwwroot\img\users-line.svg" />
   </ItemGroup>
 

@@ -179,3 +179,15 @@ textarea{
     padding-left: 2px !important;
     width: 100%;
 }
+
+.smallInput {
+    width: 50px;
+    margin-right: 50px
+}
+
+.widthMax {
+    width: 100%;
+}
+.customRow {
+    margin-top: 50px;
+}

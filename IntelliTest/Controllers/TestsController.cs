@@ -1,7 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Services;
 using IntelliTest.Infrastructure;
 using IntelliTest.Models.Tests;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +13,11 @@ using StackExchange.Redis;
 
 namespace IntelliTest.Controllers
 {
+    public enum EditType
+    {
+        OpenQuestionAdd, ClosedQuestionAdd, Normal
+    }
+
     [Authorize]
     public class TestsController : Controller
     {
@@ -47,54 +54,79 @@ namespace IntelliTest.Controllers
             var model = await testService.GetMy(userId);
             return View("Index", model);
         }
-        public async Task<IActionResult> Edit(int id)
+        [Route("Edit/{id}")]
+        public async Task<IActionResult> Edit(int id, EditType type, TestEditViewModel viewModel)
         {
-            if (!testService.ExistsbyId(id))
+            if (id!=-1)
             {
-                return BadRequest();
+                if (!testService.ExistsbyId(id))
+                {
+                    return BadRequest();
+                }
+                var model = await testService.GetById(id);
+                var testEdit = testService.ToEdit(model);
+                TempData["editModel"] = JsonSerializer.Serialize(testEdit);
+                return View("Edit", testEdit);
             }
+            else
+            {
+                var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
 
-            var model = await testService.GetById(id);
-            var testEdit = testService.ToEdit(model);
-            return View(testEdit);
+                model.Description = viewModel.Description;
+                model.Time = viewModel.Time;
+                model.Grade = viewModel.Grade;
+                model.Title = viewModel.Title;
+                for (int i = 0; i < viewModel.OpenQuestions.Count; i++)
+                {
+                    model.OpenQuestions[i].Answer = viewModel.OpenQuestions[i].Answer;
+                    model.OpenQuestions[i].Order = viewModel.OpenQuestions[i].Order;
+                    model.OpenQuestions[i].Text = viewModel.OpenQuestions[i].Text;
+                }
+                for (int i = 0; i < viewModel.ClosedQuestions.Count; i++)
+                {
+                    model.ClosedQuestions[i].Answers = viewModel.ClosedQuestions[i].Answers;
+                    model.ClosedQuestions[i].AnswerIndexes = viewModel.ClosedQuestions[i].AnswerIndexes;
+                    model.ClosedQuestions[i].Order = viewModel.ClosedQuestions[i].Order;
+                    model.ClosedQuestions[i].Text = viewModel.ClosedQuestions[i].Text;
+                }
+
+                if (type == EditType.OpenQuestionAdd)
+                {
+                    var q = new OpenQuestionViewModel()
+                    {
+                        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
+                    };
+                    model.OpenQuestions.Add(q);
+                }
+                else if (type == EditType.ClosedQuestionAdd)
+                {
+                    var q = new ClosedQuestionViewModel()
+                    {
+                        Answers = new[] { "" },
+                        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
+                    };
+                    model.ClosedQuestions.Add(q);
+                }
+
+                TempData["editModel"] = JsonSerializer.Serialize(model);
+                return View("Edit", model);
+            }
         }
         [HttpPost]
-        public IActionResult Edit(int id, TestEditViewModel model)
+        public async Task<IActionResult> EditSubmit(int id, TestEditViewModel model)
         {
-            if (!testService.ExistsbyId(id))
+            if (!testService.ExistsbyId(id+1))
             {
                 return BadRequest();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("Edit", model);
             }
 
-            return View(model);
-        }
-
-        public IActionResult AddOpenQuestion(string jsonModel)
-        {
-            var model = JsonSerializer.Deserialize<TestEditViewModel>(jsonModel);
-            var q = new OpenQuestionViewModel()
-            {
-                Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
-            };
-            model.OpenQuestions.Add(q);
-
-            return View("Edit", model);
-        }
-        public IActionResult AddClosedQuestion(TestEditViewModel model)
-        {
-            var q = new ClosedQuestionViewModel()
-            {
-                Answers = new[] { "" },
-                Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
-            };
-            model.ClosedQuestions.Add(q);
-
-            return View("Edit", model);
+            await testService.Edit(id+1, model);
+            return View("Index", await testService.GetAll());
         }
     }
 }

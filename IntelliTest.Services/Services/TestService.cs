@@ -114,6 +114,39 @@ namespace IntelliTest.Core.Services
             return t;
         }
 
+        public async Task Edit(int id, TestEditViewModel model)
+        {
+            var test = await context.Tests
+                                    .Include(t=>t.OpenQuestions)
+                                    .Include(t=>t.ClosedQuestions)
+                                    .FirstOrDefaultAsync(t=>t.Id==id);
+            test.Title = model.Title;
+            test.Description = model.Description;
+            test.Grade = model.Grade;
+            test.Time = model.Time;
+            List<OpenQuestion> openQuestions = model.OpenQuestions
+                                                    .Select(q=>new OpenQuestion()
+                                                    {
+                                                        Text = q.Text,
+                                                        Answer = q.Answer,
+                                                        Order = q.Order
+                                                    }).ToList();
+            List<ClosedQuestion> closedQuestions = model.ClosedQuestions
+                                                    .Select(q => new ClosedQuestion()
+                                                    {
+                                                        Text = q.Text,
+                                                        AnswerIndexes = string.Join("&", q.AnswerIndexes
+                                                                                     .Select((val, indx) => new { val, indx })
+                                                                                     .Where(q => q.val)
+                                                                                     .Select(q => q.indx)),
+                                                        Answers = string.Join("&", q.Answers),
+                                                        Order = q.Order
+                                                    }).ToList();
+            test.ClosedQuestions = closedQuestions;
+            test.OpenQuestions = openQuestions;
+            await context.SaveChangesAsync();
+        }
+
         private bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
         {
             var list = Enumerable.Repeat(false, answers.Length).ToArray();

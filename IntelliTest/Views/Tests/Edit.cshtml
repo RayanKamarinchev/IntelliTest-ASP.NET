@@ -1,5 +1,4 @@
-﻿@using System.Text.Json
-@model TestEditViewModel
+﻿@model TestEditViewModel
 @{
     ViewBag.Title = "Edit Test";
 }
@@ -7,27 +6,36 @@
     <form method="post" style="width: 60%">
         <div id="addAddMoreDiv">
             <div class="customRow">
-                    <div class="questTextBox d-flex questBox align-items-start" style="flex-direction: column; width: 100%">
-                        <div class="d-flex">
-                            <label asp-for="Title"></label>
-                            <div style="flex-grow: 1">
-                                <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Title" asp-for="Title"/>
-                            </div>
+                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
+                    <div class="d-flex">
+                        <label asp-for="Title"></label>
+                        <div style="flex-grow: 1">
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Title" asp-for="Title"/>
                         </div>
-                        <div>
-                            <label asp-for="Description" style="display: flex"></label>
-                            <textarea onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Description" asp-for="Description"></textarea>
+                    </div>
+                    <div class="widthMax">
+                        <label asp-for="Description" style="display: flex"></label>
+                        <textarea onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Description" asp-for="Description"></textarea>
+                    </div>
+                    <div class="d-flex">
+                        <label asp-for="Grade"></label>
+                        <div class="smallInput">
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Grade" asp-for="Grade"/>
                         </div>
-                        <div class="d-flex">
-                            <label asp-for="Grade"></label>
-                            <div style="width: 50px; margin-right: 50px">
-                                <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Grade" asp-for="Grade"/>
-                            </div>
-                            <label asp-for="Time"></label>
-                            <div style="width: 50px; margin-right: 50px">
-                                <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Time" asp-for="Time"/>
-                            </div>
+                        <label asp-for="Time"></label>
+                        <div class="smallInput">
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Time" asp-for="Time"/>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="customRow">
+                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
+                    <div class="widthMax">
+                        <label style="display: flex"></label>
+                        <textarea onfocus="onFocus(this)" onblur=onFocusOut(this) type="text"></textarea>
+                    </div>
+                    <button id="ai-gen"></button>
                 </div>
             </div>
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
@@ -46,10 +54,10 @@
                 }
             }
         </div>
-        <a id="add-o-q-btn" class="btn btn-secondary">Добави отворен въпрос</a>
-        <button asp-action="AddClosedQuestion" asp-controller="Tests" type="submit" id="add-c-q-btn" class="btn btn-secondary">Добави затворен въпрос</button>
+        <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
+        <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
         <hr/>
-        <button class="btn blue btn-primary" type="submit">Готово</button>
+        <button class="btn blue btn-primary" asp-action="EditSubmit" type="submit">Готово</button>
     </form>
 </div>
 
@@ -63,31 +71,16 @@
         function onFocusOut(e){
                 e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
         }
-        $('#add-o-q-btn').on('click', function () {
-            $.ajax({
-                url: '@Url.Action("AddOpenQuestion", "Tests", new {jsonModel = JsonSerializer.Serialize(Model)})',
-                type: 'GET',
-                data: {
-                },
-                success: function (result) {
-                        $("body").html(result);
-                },
-                error: function () {
-                }
-            });
-        });
-        //$('#add-c-q-btn').on('click', function () {
-        //    $.ajax({
-        //            url: '@Url.Action("AddClosedQuestion", "Tests", new {jsonModel = JsonSerializer.Serialize(Model)})',
-        //        type: 'GET',
-        //        data: {
-        //        },
-        //        success: function (result) {
-        //                $("body").html(result);
-        //        },
-        //        error: function () {
-        //        }
-        //    });
-        //});
+                $('ai-gen').on('click', function () {
+                $.ajax({
+                        url: '@Url.Action("AddClosedQuestion", "Tests", new {jsonModel = JsonSerializer.Serialize(Model)})',
+                    type: 'GET',
+                    data: {
+                    },
+                    success: function (result) {
+                            $("body").html(result);
+                    },
+                    error: function () {
+                    }
     </script>
 }
