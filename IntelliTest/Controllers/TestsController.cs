@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using IntelliTest.Core.Contracts;
@@ -127,6 +129,49 @@ namespace IntelliTest.Controllers
 
             await testService.Edit(id+1, model);
             return View("Index", await testService.GetAll());
+        }
+
+        public IActionResult AIGenerate(string text)
+        {
+            var res = run_cmd("script.py", "Войната приключва с подписването на предварителния Санстефански мирен договор на 3 март 1878 г. Той учредява автономно княжество България, което обхваща ядрото на българските земи в Мизия, Тракия и Македония (без Северна Добруджа, предадена на Румъния, и Нишко – на Сърбия). Европейските държави отхвърлят договора, защото се опасяват, че обширното ново княжество ще изпадне под пълно руско влияние.На 1 юли 1878 г. в Берлин се свиква конгрес, на който Великите сили разпокъсват българските земи на 5 части. Румъния се разширява в Северна Добруджа. Освен Нишко Сърбия получава и Пиротско. Султанът си връща цяла Македония и Одринска Тракия. Между Дунав и Стара планина е създадено васално княжество България, а на юг – автономна провинция Източна Румелия. Тези решения пораждат у българите желание за съпротива и за обединение на разпокъсаните земи.");
+            return Json(JsonSerializer.Serialize(res));
+        }
+
+        private IEnumerable<string[]> run_cmd(string cmd, string args)
+        {
+            ProcessStartInfo start = new ProcessStartInfo();
+            start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
+            start.Arguments = string.Format("{0} \"{1}\"", cmd, args);
+            start.UseShellExecute = false;
+            start.RedirectStandardOutput = true;
+            string last = "";
+            using (Process process = Process.Start(start))
+            {
+                using (StreamReader reader = process.StandardOutput)
+                {
+                    string result = reader.ReadToEnd();
+                    last = result;
+                }
+            }
+
+            string[] splitted = last.Split("*");
+            string all = "";
+            for (int i = 0; i < splitted.Length; i++)
+            {
+                all += (char)int.Parse(splitted[i]);
+            }
+
+            all = all.Replace("<pad> въпрос: ", "");
+            all = all.Replace("</s>", "");
+            var res = all.Split("&").Select(qa => qa.Split("|"));
+            //foreach (var qa in res)
+            //{
+            //    Console.WriteLine("Въпрос: ");
+            //    Console.WriteLine(qa[0]);
+            //    Console.WriteLine("Отговор: ");
+            //    Console.WriteLine(qa[1]);
+            //}
+            return res;
         }
     }
 }
