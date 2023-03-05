@@ -93,9 +93,9 @@ img
         letter-spacing: 0.3px;
         color: #070024;
     }
-.customCard p {
+    .customCard p {
         line-height: 1.2em;
-        color: #625a71;
+        color: #1178ee;
     }
 .customCard:hover {
         background-position: 0;
@@ -143,6 +143,7 @@ img
     position: relative;
     padding-right: 120px;
     position: relative;
+    align-self: center;
 }
 
     .switch-button:before {
@@ -203,11 +204,6 @@ img
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-
-.container {
-    margin: 50px auto
-}
-
 .panel-heading {
     text-align: center;
     margin-bottom: 10px
@@ -243,7 +239,7 @@ img
     align-items: center;
     cursor: pointer;
     border: 1px solid #ddd;
-    color: #4343ff
+    color: #1178ee
 }
 
 input[type='text'],

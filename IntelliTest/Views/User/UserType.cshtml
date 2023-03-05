@@ -1,0 +1,54 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model UserType
+@{
+    ViewData["Title"] = "Кажи ни повече";
+}
+
+<h3 class="text-center">@ViewData["Title"]</h3>
+<div class="row">
+    <form id="account" method="post">
+            <div class="row d-flex justify-content-center container customRegister">
+                <div class="col-lg-5 col-md-7 mt-3">
+                    <div class="panel border bg-white d-flex justify-content-center">
+                        <div style="width: 80%;" class="align-self-center">
+                            <div class="text-center mb-3" style="display: flex; flex-direction: column;">
+                                <label asp-for="@Model.IsStudent">Аз съм...</label>
+                                <div class="switch-button">
+                                    <input class="switch-button-checkbox" type="checkbox"></input>
+                                    <label class="switch-button-label" for=""><span class="switch-button-label-span">Ученик</span></label>
+                                </div>
+                            </div>
+                            <div class="form-group py-2 justify-content-center d-flex">
+                                <div class="input-field widthMax">
+                                    <span class="far fa-user p-2"></span>
+                                    <input asp-for="School" type="text" placeholder="Училище" required>
+                                </div>
+                            </div>
+                            <div class="form-group py-2 justify-content-center" style="display: flex">
+                                <div class="input-field widthMax">
+                                    <span class="far fa-user p-2"></span>
+                                    <input asp-for="Grade" value="" type="text" placeholder="Клас" required>
+                                </div>
+                            </div>
+                            <div class="btn btn-primary btn-block mt-3">Login</div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </form>
+</div>
+<script>
+    let checkbox = document.getElementsByClassName("switch-button-checkbox")[0]
+    let grade = document.getElementsByClassName("form-group")[1]
+    console.log(grade)
+    console.log(grade.style)
+    checkbox.addEventListener("click", ()=>{
+        if(grade.style.display == "none"){
+            grade.style.display = "flex"
+        }
+        else{
+            grade.style.display = "none"
+        }
+    })
+
+</script>

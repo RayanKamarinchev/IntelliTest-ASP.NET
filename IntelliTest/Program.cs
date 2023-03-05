@@ -15,13 +15,13 @@ builder.Services.AddDbContext<IntelliTestDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<User>(options =>
-       {
-           options.SignIn.RequireConfirmedAccount = false;
-           options.Password.RequireLowercase = false;
-           options.Password.RequireNonAlphanumeric = false;
-           options.Password.RequireUppercase = false;
-           options.Password.RequireDigit = false;
-       })
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit = false;
+})
        .AddRoles<IdentityRole>()
        .AddEntityFrameworkStores<IntelliTestDbContext>();
 
@@ -31,6 +31,10 @@ builder.Services.AddAuthentication()
        {
            facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
            facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+       }).AddGoogle(googleOptions =>
+       {
+           googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+           googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
        });
 
 builder.Services.AddControllersWithViews(options =>

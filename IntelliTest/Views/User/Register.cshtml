@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model Watchlist.Models.Users.RegisterViewModel
+@model IntelliTest.Core.Models.Users.RegisterViewModel
 @{
     ViewData["Title"] = "Register";
 }
@@ -70,42 +70,6 @@
                 </div>
             </div>
         </div>
-        <fb:login-button 
-            scope="public_profile,email"
-            onlogin="checkLoginState();">
-        </fb:login-button>
-        @*<hr/>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="text-center mb-3">
-                <label asp-for="@Model.Username">Username</label>
-                <input class="form-control " autocomplete="username" aria-required="true" asp-for="@Model.Username"/>
-                <span asp-validation-for="@Model.Username" class="text-danger"></span>
-            </div>
-            <div class="text-center mb-3">
-                <label asp-for="@Model.Email">Email</label>
-                <input class="form-control " autocomplete="username" aria-required="true" asp-for="@Model.Email"/>
-                <span asp-validation-for="@Model.Email" class="text-danger"></span>
-            </div>
-            <div class="text-center mb-3">
-                <label asp-for="@Model.Password">Password</label>
-                <input class="form-control" type="password" autocomplete="new-password" aria-required="true" asp-for="@Model.Password"/>
-                <span asp-validation-for="@Model.Password" class="text-danger"></span>
-            </div>
-            <div class="text-center mb-3">
-                <label asp-for="@Model.ConfirmPassword">Confirm Password</label>
-                <input class="form-control" type="password" autocomplete="new-password" aria-required="true" asp-for="@Model.ConfirmPassword"/>
-                <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <div class="text-center mb-3">
-                <label asp-for="@Model.IsStudent">Аз съм...</label>
-                <div class="switch-button">
-                    <input class="switch-button-checkbox" type="checkbox"></input>
-                    <label class="switch-button-label" for=""><span class="switch-button-label-span">Ученик</span></label>
-                </div>
-            </div>
-            <div class="text-center">
-                <button id="registerSubmit" type="submit" class="btn btn-primary">Register</button>
-            </div>*@
     </form>
 </div>
 @section Scripts {

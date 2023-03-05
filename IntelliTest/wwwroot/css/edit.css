@@ -29,10 +29,10 @@
     letter-spacing: 0.3px;
     color: #070024;
 }
-.questBox p {
-    line-height: 1.2em;
-    color: #625a71;
-}
+    .questBox p {
+        line-height: 1.2em;
+        color: #358DF1;
+    }
 @media screen and (min-width: 768px) {
     section {
         padding: 1em 7em;
