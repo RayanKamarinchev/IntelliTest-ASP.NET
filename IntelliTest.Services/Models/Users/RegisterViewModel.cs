@@ -18,5 +18,6 @@ namespace Watchlist.Models.Users
         [Compare(nameof(Password))]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
+        public bool IsStudent { get; set; }
     }
 }

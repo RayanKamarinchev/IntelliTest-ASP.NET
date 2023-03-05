@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Watchlist.Models.Users
 {
@@ -9,5 +10,6 @@ namespace Watchlist.Models.Users
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
     }
 }
