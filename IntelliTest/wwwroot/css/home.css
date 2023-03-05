@@ -130,3 +130,177 @@ img
 .why {
     font-size: 38px
 }
+
+.switch-button {
+    background: rgba(255, 255, 255, 0.56);
+    border-radius: 30px;
+    overflow: hidden;
+    width: 240px;
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: black;
+    position: relative;
+    padding-right: 120px;
+    position: relative;
+}
+
+    .switch-button:before {
+        content: "\423\447\438\442\435\43B";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+        pointer-events: none;
+    }
+
+.switch-button-checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+}
+
+.switch-button-checkbox:checked + .switch-button-label:before {
+    transform: translateX(120px);
+    transition: transform 300ms linear;
+}
+
+.switch-button-checkbox + .switch-button-label {
+    position: relative;
+    padding: 5px 0;
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+
+    .switch-button-checkbox + .switch-button-label:before {
+        content: "";
+        background: #358DF1;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 30px;
+        transform: translateX(0);
+        transition: transform 300ms;
+    }
+
+.switch-button-checkbox + .switch-button-label .switch-button-label-span {
+    position: relative;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+
+.container {
+    margin: 50px auto
+}
+
+.panel-heading {
+    text-align: center;
+    margin-bottom: 10px
+}
+
+#forgot {
+    min-width: 100px;
+    margin-left: auto;
+    text-decoration: none
+}
+
+.form-inline label {
+    padding-left: 10px;
+    margin: 0;
+    cursor: pointer
+}
+
+.customRegister > .btn.btn-primary {
+    margin-top: 20px;
+    border-radius: 15px
+}
+
+.panel {
+    min-height: 380px;
+    box-shadow: 20px 20px 80px rgb(218, 218, 218);
+    border-radius: 12px
+}
+
+.input-field {
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    color: #4343ff
+}
+
+input[type='text'],
+input[type='password'] {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    width: 100%
+}
+
+.fa-eye-slash.btn {
+    border: none;
+    outline: none;
+    box-shadow: none
+}
+
+.customRegister img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    position: relative
+}
+
+a[target='_blank'] {
+    position: relative;
+    transition: all 0.1s ease-in-out
+}
+
+.bordert {
+    border-top: 1px solid #aaa;
+    position: relative
+}
+
+    .bordert:after {
+        content: "or connect with";
+        position: absolute;
+        top: -13px;
+        left: calc(50% - 80px);
+        background-color: #fff;
+        padding: 0px 8px
+    }
+
+@media(max-width: 360px) {
+    #forgot {
+        margin-left: 0;
+        padding-top: 10px
+    }
+    .container {
+        margin: 30px 0
+    }
+
+    .bordert:after {
+        left: 25%
+    }
+}
+
+body {
+    overflow-x: hidden;
+}

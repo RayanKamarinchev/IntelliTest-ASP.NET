@@ -1,12 +1,16 @@
 ﻿@model OpenQuestionViewModel
 <div class="questBox">
+    <button asp-action="Edit" asp-controller="Tests" asp-route-id="-1" asp-route-type="Delete" asp-route-questionOrder="@Model.Order" class="circle">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+    <input style="display: none" value="@Model.Order" asp-for="Order"/>
     <div class="customRow">
         <div class="questTextBox">
             <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"/>
             <span class="underline"></span>
         </div>
     </div>
-    <div class="questTextBox" style="margin-top: 20px;margin-left: 50px;">
+    <div class="questTextBox questAnswer">
         <div>
             <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="@Model.Answer" asp-for="Answer"/>
             <span class="underline"></span>

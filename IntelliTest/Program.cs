@@ -24,6 +24,15 @@ builder.Services.AddDefaultIdentity<User>(options =>
        })
        .AddRoles<IdentityRole>()
        .AddEntityFrameworkStores<IntelliTestDbContext>();
+
+//External logins
+builder.Services.AddAuthentication()
+       .AddFacebook(facebookOptions =>
+       {
+           facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+           facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+       });
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();

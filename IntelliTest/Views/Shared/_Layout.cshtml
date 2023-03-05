@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
+    <script src="~/lib/font-awesome/js/all.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/0.4.0/chartjs-plugin-datalabels.min.js"></script>
     <script>
@@ -72,9 +74,9 @@
                         <li class="nav-item align-items-center d-flex">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
                         </li>
-                            <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
-                            </li>
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
+                        </li>
                     }
                 </ul>
                 <partial name="_LoginPartial"/>
@@ -82,20 +84,23 @@
         </div>
     </nav>
 </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container  text-center">
-            &copy; 2022 - IntelliTest
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+<footer class="border-top footer text-muted">
+    <div class="container  text-center">
+        &copy; 2022 - IntelliTest
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
+<script>
+    localStorage.setItem("scroll", 0)
+</script>
 </html>

@@ -2,6 +2,10 @@
 
 
 <div class="questBox">
+    <button asp-action="Edit" asp-route-id="-1" asp-route-type="Delete" asp-route-text="@Model.Order" class="circle">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+    <input style="display: none" value="@Model.Order" asp-for="Order"/>
     <div class="customRow">
         <div class="questTextBox">
             <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"/>
@@ -14,9 +18,9 @@
         {
             <div class="questTextBox option">
                 <div>
-                        <input type="checkbox" asp-for="@Model.AnswerIndexes[i]"/>
+                    <input type="checkbox" asp-for="@Model.AnswerIndexes[i]"/>
                 </div>
-                <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция @(i+1)" type="text" asp-for="Answers[i]"/>
+                <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция @(i + 1)" type="text" asp-for="Answers[i]"/>
                 <span className={style.underline}></span>
             </div>
         }

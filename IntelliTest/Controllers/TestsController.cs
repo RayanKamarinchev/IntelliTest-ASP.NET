@@ -6,6 +6,7 @@ using System.Text.Json;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
+using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
 using IntelliTest.Models.Tests;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +18,13 @@ namespace IntelliTest.Controllers
 {
     public enum EditType
     {
-        OpenQuestionAdd, ClosedQuestionAdd, Normal
+        OpenQuestionAdd, ClosedQuestionAdd, AiGenerate, Delete
     }
 
     [Authorize]
     public class TestsController : Controller
     {
+        const string SCRIPT_NAME = "script.py";
         private readonly ITestService testService;
         private readonly IDistributedCache cache;
 
@@ -57,7 +59,7 @@ namespace IntelliTest.Controllers
             return View("Index", model);
         }
         [Route("Edit/{id}")]
-        public async Task<IActionResult> Edit(int id, EditType type, TestEditViewModel viewModel)
+        public async Task<IActionResult> Edit(int id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
         {
             if (id!=-1)
             {
@@ -104,10 +106,55 @@ namespace IntelliTest.Controllers
                 {
                     var q = new ClosedQuestionViewModel()
                     {
-                        Answers = new[] { "" },
+                        Answers = Enumerable.Repeat("", 6).ToArray(),
                         Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
                     };
                     model.ClosedQuestions.Add(q);
+                }
+                else if (type == EditType.AiGenerate)
+                {
+                    var res = run_cmd(SCRIPT_NAME, text);
+                    foreach (var se in res)
+                    {
+                        var q = new OpenQuestionViewModel()
+                        {
+                            Order = model.ClosedQuestions.Count + model.OpenQuestions.Count,
+                            Text = se[0],
+                            Answer = se[1]
+                        };
+                        model.OpenQuestions.Add(q);
+                    }
+                }
+                else if (type == EditType.Delete)
+                {
+                    var closedQuestion = model.ClosedQuestions.FirstOrDefault(q => q.Order == questionOrder);
+                    int order; 
+                    if (closedQuestion == null)
+                    {
+                        var openQuestion = model.OpenQuestions.FirstOrDefault(q => q.Order == questionOrder);
+                        order = openQuestion.Order;
+                        model.OpenQuestions.Remove(openQuestion);
+                    }
+                    else
+                    {
+                        order = closedQuestion.Order;
+                        model.ClosedQuestions.Remove(closedQuestion);
+                    }
+
+                    for (int i = 0; i < model.OpenQuestions.Count; i++)
+                    {
+                        if (model.OpenQuestions[i].Order >= order)
+                        {
+                            model.OpenQuestions[i].Order--;
+                        }
+                    }
+                    for (int i = 0; i < model.ClosedQuestions.Count; i++)
+                    {
+                        if (model.ClosedQuestions[i].Order >= order)
+                        {
+                            model.ClosedQuestions[i].Order--;
+                        }
+                    }
                 }
 
                 TempData["editModel"] = JsonSerializer.Serialize(model);
@@ -133,7 +180,7 @@ namespace IntelliTest.Controllers
 
         public IActionResult AIGenerate(string text)
         {
-            var res = run_cmd("script.py", "Войната приключва с подписването на предварителния Санстефански мирен договор на 3 март 1878 г. Той учредява автономно княжество България, което обхваща ядрото на българските земи в Мизия, Тракия и Македония (без Северна Добруджа, предадена на Румъния, и Нишко – на Сърбия). Европейските държави отхвърлят договора, защото се опасяват, че обширното ново княжество ще изпадне под пълно руско влияние.На 1 юли 1878 г. в Берлин се свиква конгрес, на който Великите сили разпокъсват българските земи на 5 части. Румъния се разширява в Северна Добруджа. Освен Нишко Сърбия получава и Пиротско. Султанът си връща цяла Македония и Одринска Тракия. Между Дунав и Стара планина е създадено васално княжество България, а на юг – автономна провинция Източна Румелия. Тези решения пораждат у българите желание за съпротива и за обединение на разпокъсаните земи.");
+            var res = run_cmd("script.py", text);
             return Json(JsonSerializer.Serialize(res));
         }
 

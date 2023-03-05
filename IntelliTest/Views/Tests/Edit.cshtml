@@ -3,8 +3,9 @@
     ViewBag.Title = "Edit Test";
 }
 <div class="editMain">
-        <div id="addAddMoreDiv" style="width: 60%">
-            <div class="customRow">
+    <div id="addAddMoreDiv" style="width: 60%">
+        <form method="post">
+            <div class="customRow" style="margin-top: 50px">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
                     <div class="d-flex">
                         <label asp-for="Title"></label>
@@ -30,48 +31,55 @@
             </div>
             <div class="customRow">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
-                    <form asp-action="AIGenerate">
-                        <div class="widthMax">
-                            <label style="display: flex"></label>
-                            <textarea id="text" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text"></textarea>
-                        </div>
-                        <button type="submit">Генерирай</button>
-                    </form>
+                    <div class="widthMax">
+                        <label style="display: flex"></label>
+                        <textarea name="text"></textarea>
+                    </div>
+                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="-1" class="btn btn-secondary">Генерирай</button>
                 </div>
             </div>
-            <form method="post">
-                @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+            {
+                if (Model.ClosedQuestions.Any(q => q.Order == i))
                 {
-                    if (Model.ClosedQuestions.Any(q => q.Order == i))
-                    {
-                        var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                        int indx = Model.ClosedQuestions.IndexOf(question);
-                        <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
-                    }
-                    else
-                    {
-                        var question = @Model.OpenQuestions.FirstOrDefault(q => q.Order == i);
-                        int indx = Model.OpenQuestions.IndexOf(question);
-                        <partial name="OpenQuestionPartialView" for="OpenQuestions[indx]"/>
-                    }
+                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+                    int indx = Model.ClosedQuestions.IndexOf(question);
+                    <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
                 }
-                <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
-                <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
-                <hr/>
-                <button class="btn blue btn-primary" asp-action="EditSubmit" type="submit">Готово</button>
-            </form>
-        </div>
+                else
+                {
+                    var q = Model.OpenQuestions.FindIndex(j=>j.Order == i);
+                    <partial name="OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                }
+            }
+            <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
+            <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
+            <hr/>
+            <button class="btn blue btn-primary" asp-action="EditSubmit" type="submit">Готово</button>
+        </form>
+    </div>
 </div>
 
 @section Scripts
 {
     <script>
+        btns = document.getElementsByTagName("button");
+        input = Array.prototype.slice.call(btns);
+        function save(ev){
+            if(ev.currentTarget.type=="submit"){
+                console.log("lol")
+            }
+                var top  = window.pageYOffset || document.documentElement.scrollTop;
+                localStorage.setItem("scroll", top);
+        }
+        input.forEach(b=>b.addEventListener("click", save));
+        window.scrollTo(0, localStorage.getItem("scroll"));
         function onFocus(e) {
-            console.log(e.parentNode.parentNode.parentNode)
             e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
         }
         function onFocusOut(e){
-                e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
+            e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
         }
+    
     </script>
 }
