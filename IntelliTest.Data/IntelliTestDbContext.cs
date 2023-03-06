@@ -139,6 +139,13 @@ namespace IntelliTest.Data
         public ClosedQuestion ClosedQuestion { get; set; }
         public OpenQuestionAnswer FirstOpenQuestionAnswer { get; set; }
 
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<StudentClass> StudentClasses { get; set; }
+        public DbSet<TestStudent> TestStudents { get; set; }
+        public DbSet<ClosedQuestionAnswer> ClosedQuestionAnswers { get; set; }
+        public DbSet<OpenQuestionAnswer> OpenQuestionAnswers { get; set; }
         public DbSet<Test> Tests { get; set; }
         public DbSet<OpenQuestion> OpenQuestions { get; set; }
         public DbSet<ClosedQuestion> ClosedQuestions { get; set; }

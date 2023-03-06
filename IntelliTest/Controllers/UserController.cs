@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Users;
+using IntelliTest.Services.Infrastructure;
 
 namespace Watchlist.Controllers
 {
@@ -12,6 +14,8 @@ namespace Watchlist.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly ITeacherService teacherService;
+        private readonly IStudentService studentService;
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager)
@@ -39,7 +43,9 @@ namespace Watchlist.Controllers
             var user = new User()
             {
                 Email = model.Email,
-                UserName = model.Username
+                UserName = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
             };
 
             var res = await userManager.CreateAsync(user, model.Password);
@@ -84,7 +90,7 @@ namespace Watchlist.Controllers
 
             if (user != null)
             {
-                var res = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                var res = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                 if (res.Succeeded)
                 {
                     return RedirectToAction("Index", "Tests");
@@ -103,9 +109,36 @@ namespace Watchlist.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult UserType(UserType model)
+        [HttpGet]
+        public async Task<IActionResult> UserType()
         {
+            if (await studentService.ExistsByUserId(User.Id()) || await teacherService.ExistsByUserId(User.Id()))
+            {
+                return BadRequest();
+            }
+            return View(new UserType());
+        }
+        [HttpPost]
+        public async Task<IActionResult> UserType(UserType model)
+        {
+            if (await studentService.ExistsByUserId(User.Id()) || await teacherService.ExistsByUserId(User.Id()))
+            {
+                return BadRequest();
+            }
 
+            if (!ModelState.IsValid)
+            {
+                View(model);
+            }
+
+            if (model.IsStudent)
+            {
+                await studentService.AddStudent(model, User.Id());
+            }
+            else
+            {
+                await teacherService.AddTeacher(User.Id());
+            }
             return View(model);
         }
 
@@ -138,7 +171,7 @@ namespace Watchlist.Controllers
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                return RedirectToAction("UserType", new UserType());
+                return RedirectToAction("UserType");
             }
             if (result.IsLockedOut)
             {
@@ -164,7 +197,7 @@ namespace Watchlist.Controllers
                     await userManager.AddLoginAsync(user, info);
                     await signInManager.SignInAsync(user, isPersistent: false);
 
-                    return RedirectToAction("UserType", new UserType());
+                    return RedirectToAction("UserType");
                 }
                 return RedirectToAction("Register");
             }

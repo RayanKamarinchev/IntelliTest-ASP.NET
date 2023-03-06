@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Watchlist.Models.Users
+namespace IntelliTest.Core.Models.Users
 {
     public class RegisterViewModel
     {
-        [Required]
-        [StringLength(20, MinimumLength = 5)]
-        public string Username { get; set; }
         [Required]
         [EmailAddress]
         [StringLength(60, MinimumLength = 10)]
@@ -18,6 +15,11 @@ namespace Watchlist.Models.Users
         [Compare(nameof(Password))]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
-        public bool IsStudent { get; set; }
+        [Required]
+        [StringLength(20, MinimumLength = 3)]
+        public string FirstName { get; set; }
+        [Required]
+        [StringLength(20, MinimumLength = 3)]
+        public string LastName { get; set; }
     }
 }

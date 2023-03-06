@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using IntelliTest.Core.Services
+@using IntelliTest.Services.Infrastructure
+@inject TeacherService teacherService
+@inject StudentService studentService
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -68,15 +72,23 @@
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        <li class="nav-item align-items-center d-flex">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
-                        </li>
-                        <li class="nav-item align-items-center d-flex">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
-                        </li>
-                        <li class="nav-item align-items-center d-flex">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
-                        </li>
+                        bool isTeacher = await studentService.ExistsByUserId(User.Id());
+                        bool isStudent = await teacherService.ExistsByUserId(User.Id());
+                        if (isStudent || isTeacher)
+                        {
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
+                            </li>
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
+                            </li>
+                        }
+                        if (isTeacher)
+                        {
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
+                            </li>
+                        }
                     }
                 </ul>
                 <partial name="_LoginPartial"/>
