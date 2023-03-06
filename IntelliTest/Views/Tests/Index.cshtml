@@ -1,4 +1,6 @@
-﻿@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+﻿@using IntelliTest.Services.Infrastructure
+@using AngleSharp.Css.Dom
+@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
 @{
     ViewBag.Title = "Tests Blog";
 }
@@ -37,8 +39,8 @@
                                                class="btn btn-sm btn-primary back-col">Виж</a>
                                         </div>
                                         <div class="widget-49-meeting-action">
-                                            <a asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id"
-                                           class="btn btn-sm btn-primary back-col">Виж</a>
+                                                <a onClick="warn(@test.Id)" 
+                                           class="btn btn-sm btn-primary back-col">Направи</a>
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +126,7 @@
     </main>
 </div>
 @section Scripts
-    {
+{
     <script>
             const trigger = document.getElementById("trigger")
             const filter = document.getElementsByClassName("cd-filter")[0]
@@ -169,6 +171,32 @@
                     e.target.style.transitionDuration = "1s";
                     e.target.style.backgroundPosition = '-2800px 0';
                 }
+            }
+            function warn(testId){
+                    Swal.fire({
+                  title: 'Are you sure?',
+                  text: "You won't be able to revert this!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                        $.ajax({
+                            url: `Take/${testId}`,
+                            type: 'GET',
+                            data: {
+                            },
+                            success: function (data)  
+                            {  
+                                document.write(data);
+                            },
+                            error: function () {
+                            }
+                        });
+                  } 
+                })
             }
         
     </script>

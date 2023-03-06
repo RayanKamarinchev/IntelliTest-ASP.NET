@@ -300,3 +300,14 @@ a[target='_blank'] {
 body {
     overflow-x: hidden;
 }
+
+.hover-black:hover {
+    color: black !important;
+}
+
+.img-btn {
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    background-color: inherit;
+}

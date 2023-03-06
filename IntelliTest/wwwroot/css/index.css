@@ -78,7 +78,7 @@
   color: #4797f2 !important;
 }
 
-.nav-item a:hover{
+.nav-item a:hover:not(.hover-black){
   color: #4797f2 !important;
 }
 .nav-item a {

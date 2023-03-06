@@ -1,12 +1,35 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Data.Entities
+@using IntelliTest.Core.Contracts
+@using IntelliTest.Services.Infrastructure
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
+@inject ITeacherService teacherService
+@inject IStudentService studentService
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
+        string id = User.Id();
+        if ((bool)TempData.Peek("isStudent"))
+        {
+            <li class="nav-item">
+                        <a class="nav-link text-dark hover-black">Ти си Ученик</a>
+            </li>
+        }
+        else if ((bool)TempData.Peek("isTeacher"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark hover-black">Ти си Учител</a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="UserType" asp-route-id="@UserManager.GetUserId(User)">Кажи ни повече</a>
+            </li>
+        }
         <li class="nav-item">
             <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="Logout" asp-route-id="@UserManager.GetUserId(User)">Logout</a>
         </li>

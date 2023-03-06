@@ -1,7 +1,9 @@
 ﻿@using IntelliTest.Core.Services
 @using IntelliTest.Services.Infrastructure
-@inject TeacherService teacherService
-@inject StudentService studentService
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Core.Contracts
+@inject ITeacherService teacherService
+@inject IStudentService studentService
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +11,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Watchlist</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
     <script src="~/lib/font-awesome/js/all.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/0.4.0/chartjs-plugin-datalabels.min.js"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css"/>
     <script>
         const colors = ["#4797f2", "#ECA400", "#47f2a2", "#a247f2", "#D81159", "#493B2A", "#BF3100"]
         const gradeColors = ["#2CE574", "#CDF03A", "#FFE500", "#FF9600", "#FF3924"]
@@ -72,9 +76,12 @@
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        bool isTeacher = await studentService.ExistsByUserId(User.Id());
-                        bool isStudent = await teacherService.ExistsByUserId(User.Id());
-                        if (isStudent || isTeacher)
+                        if (string.IsNullOrEmpty(TempData.Peek("isStudent").ToString()))
+                        {
+                            TempData["isStudent"] = await studentService.ExistsByUserId(User.Id());
+                            TempData["isTeacher"] = await teacherService.ExistsByUserId(User.Id());
+                        }
+                        if ((bool)TempData.Peek("isStudent") || (bool)TempData.Peek("isTeacher"))
                         {
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
@@ -83,7 +90,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
                             </li>
                         }
-                        if (isTeacher)
+                            if ((bool)TempData.Peek("isTeacher"))
                         {
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>

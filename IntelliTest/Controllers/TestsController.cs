@@ -9,6 +9,7 @@ using IntelliTest.Core.Services;
 using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
 using IntelliTest.Models.Tests;
+using IntelliTest.Services.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -27,11 +28,13 @@ namespace IntelliTest.Controllers
         const string SCRIPT_NAME = "script.py";
         private readonly ITestService testService;
         private readonly IDistributedCache cache;
+        private readonly IStudentService studentService;
 
-        public TestsController(ITestService _testService, IDistributedCache _cache)
+        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService)
         {
             testService = _testService;
             cache = _cache;
+            studentService = _studentService;
         }
 
         [HttpGet]
@@ -63,7 +66,7 @@ namespace IntelliTest.Controllers
         {
             if (id!=-1)
             {
-                if (!testService.ExistsbyId(id))
+                if (!await testService.ExistsbyId(id))
                 {
                     return BadRequest();
                 }
@@ -79,6 +82,7 @@ namespace IntelliTest.Controllers
                 model.Description = viewModel.Description;
                 model.Time = viewModel.Time;
                 model.Grade = viewModel.Grade;
+
                 model.Title = viewModel.Title;
                 for (int i = 0; i < viewModel.OpenQuestions.Count; i++)
                 {
@@ -164,7 +168,7 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> EditSubmit(int id, TestEditViewModel model)
         {
-            if (!testService.ExistsbyId(id+1))
+            if (!await testService.ExistsbyId(id+1))
             {
                 return BadRequest();
             }
@@ -177,8 +181,31 @@ namespace IntelliTest.Controllers
             await testService.Edit(id+1, model);
             return View("Index", await testService.GetAll());
         }
+        [HttpGet]
+        [Route("Take/{testId}")]
+        public async Task<IActionResult> Take(int testId)
+        { 
+            if (!(bool)TempData.Peek("isStudent"))
+            {
+                return Unauthorized();
+            }
+            if (!await testService.ExistsbyId(testId))
+            {
+                return BadRequest();
+            }
 
-        public IActionResult AIGenerate(string text)
+            var test = testService.ToEdit(await testService.GetById(testId));
+            return View(test);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Take(TestEditViewModel model)
+        {
+            return View(model);
+        }
+
+
+        public IActionResult AiGenerate(string text)
         {
             var res = run_cmd("script.py", text);
             return Json(JsonSerializer.Serialize(res));

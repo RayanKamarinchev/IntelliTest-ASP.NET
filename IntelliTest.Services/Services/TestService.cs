@@ -162,10 +162,9 @@ namespace IntelliTest.Core.Services
             return list;
         }
 
-        public bool ExistsbyId(int id)
+        public async Task<bool> ExistsbyId(int id)
         {
-            var all = context.Tests.ToList();
-            return all.Any(t=>t.Id == id);
+            return await context.Tests.AnyAsync(t=>t.Id == id);
         }
     }
 }

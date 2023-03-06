@@ -6,11 +6,11 @@
 
 <h1 class="text-center">@ViewData["Title"]</h1>
 <div class="row">
-    <form id="account" method="post">
         <div class="container customRegister">
             <div class="row d-flex justify-content-center">
                 <div class="col-lg-5 col-md-7">
                     <div class="panel border bg-white">
+                        <form id="account" method="post">
                         <div class="panel-heading">
                             <h3 class="pt-3 font-weight-bold">Login</h3>
                         </div>
@@ -38,32 +38,32 @@
                             <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
                             <div class="text-center pt-4 text-muted">Нямаш акаунт? <a asp-action="Register">Регистрирай се</a> </div>
                         </div>
+                        <input asp-for="ExternalLogins" value="@Model.ExternalLogins" style="display: none"/>
+                        </form>
                         <div class="mx-3 my-2 py-2 bordert">
                             <div class="text-center py-3">
                                 <form id="external-account" asp-action="ExternalLogin" method="post" class="form-horizontal">
-                                    <a type="submit" href="https://wwww.facebook.com"
-                                       target="_blank"
-                                       class="px-2"
-                                       name="provider"
-                                       value="@Model.ExternalLogins[0].Name"
-                                       title="Log in using your @Model.ExternalLogins[0].DisplayName account">
+                                    <button type="submit"
+                                            target="_blank"
+                                            class="px-2 img-btn"
+                                            name="provider"
+                                            value="@Model.ExternalLogins[0].Name"
+                                            title="Log in using your @Model.ExternalLogins[0].DisplayName account">
                                         <img src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg" alt="">
-                                    </a>
-                                    <a type="submit"
+                                    </button>
+                                    <button type="submit"
                                        target="_blank"
-                                       class="px-2"
+                                       class="px-2 img-btn"
                                        name="provider"
                                        value="@Model.ExternalLogins[1].Name"
                                        title="Log in using your @Model.ExternalLogins[1].DisplayName account">
                                         <img src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png" alt="">
-                                    </a>
+                                    </button>
                                 </form>
                             </div>
                         </div>
-                        <input asp-for="ExternalLogins" value="@Model.ExternalLogins" style="display: none"/>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
 </div>

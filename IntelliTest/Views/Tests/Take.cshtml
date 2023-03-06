@@ -1,6 +1,6 @@
 ﻿@model TestEditViewModel
 @{
-    ViewBag.Title = "Edit Test";
+    ViewBag.Title = "Taking Test";
 }
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%">
@@ -44,12 +44,12 @@
                 {
                     var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                     int indx = Model.ClosedQuestions.IndexOf(question);
-                    <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                            <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
                 }
                 else
                 {
-                    var q = Model.OpenQuestions.FindIndex(j=>j.Order == i);
-                    <partial name="OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                    var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
+                            <partial name="OpenQuestionPartialView" for="OpenQuestions[q]"/>
                 }
             }
             <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
@@ -61,25 +61,25 @@
 </div>
 
 @section Scripts
-{
-    <script>
-        btns = document.getElementsByTagName("button");
-        input = Array.prototype.slice.call(btns);
-        function save(ev){
-            if(ev.currentTarget.type=="submit"){
-                console.log("lol")
+    {
+        <script>
+            btns = document.getElementsByTagName("button");
+            input = Array.prototype.slice.call(btns);
+            function save(ev){
+                if(ev.currentTarget.type=="submit"){
+                    console.log("lol")
+                }
+                    var top  = window.pageYOffset || document.documentElement.scrollTop;
+                    localStorage.setItem("scroll", top);
             }
-                var top  = window.pageYOffset || document.documentElement.scrollTop;
-                localStorage.setItem("scroll", top);
-        }
-        input.forEach(b=>b.addEventListener("click", save));
-        window.scrollTo(0, parseInt(localStorage.getItem("scroll")) + 150);
-        function onFocus(e) {
-            e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
-        }
-        function onFocusOut(e){
-            e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
-        }
-    
-    </script>
+            input.forEach(b=>b.addEventListener("click", save));
+            window.scrollTo(0, parseInt(localStorage.getItem("scroll")) + 150);
+            function onFocus(e) {
+                e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
+            }
+            function onFocusOut(e){
+                e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
+            }
+
+        </script>
 }

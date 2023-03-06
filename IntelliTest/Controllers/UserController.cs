@@ -18,10 +18,14 @@ namespace Watchlist.Controllers
         private readonly IStudentService studentService;
 
         public UserController(UserManager<User> _userManager,
-                              SignInManager<User> _signInManager)
+                              SignInManager<User> _signInManager,
+                              ITeacherService _teacherService,
+                              IStudentService _studentService)
         {
             userManager = _userManager;
             signInManager = _signInManager;
+            studentService = _studentService;
+            teacherService = _teacherService;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -93,7 +97,7 @@ namespace Watchlist.Controllers
                 var res = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                 if (res.Succeeded)
                 {
-                    return RedirectToAction("Index", "Tests");
+                    return RedirectToAction("Index", "Home");
                 }
             }
 
@@ -139,7 +143,7 @@ namespace Watchlist.Controllers
             {
                 await teacherService.AddTeacher(User.Id());
             }
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -171,7 +175,7 @@ namespace Watchlist.Controllers
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                return RedirectToAction("UserType");
+                return RedirectToAction("Index", "Home");
             }
             if (result.IsLockedOut)
             {
@@ -197,7 +201,7 @@ namespace Watchlist.Controllers
                     await userManager.AddLoginAsync(user, info);
                     await signInManager.SignInAsync(user, isPersistent: false);
 
-                    return RedirectToAction("UserType");
+                    return RedirectToAction("Index", "Home");
                 }
                 return RedirectToAction("Register");
             }

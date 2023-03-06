@@ -11,5 +11,6 @@ namespace IntelliTest.Core.Contracts
     {
         Task<bool> ExistsByUserId(string id);
         Task AddStudent(UserType model, string userId);
+        Task<int> GetStudentId(string userId);
     }
 }
