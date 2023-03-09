@@ -1,59 +1,27 @@
-﻿@model TestEditViewModel
+﻿@model TestSubmitViewModel
 @{
     ViewBag.Title = "Taking Test";
 }
 <div class="editMain">
-    <div id="addAddMoreDiv" style="width: 60%">
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
+        <div class="timer">
+            <h1 style="margin: 0">30:00</h1>    
+        </div>
         <form method="post">
-            <div class="customRow" style="margin-top: 50px">
-                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
-                    <div class="d-flex">
-                        <label asp-for="Title"></label>
-                        <div style="flex-grow: 1">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Title" asp-for="Title"/>
-                        </div>
-                    </div>
-                    <div class="widthMax">
-                        <label asp-for="Description" style="display: flex"></label>
-                        <textarea onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Description" asp-for="Description"></textarea>
-                    </div>
-                    <div class="d-flex">
-                        <label asp-for="Grade"></label>
-                        <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Grade" asp-for="Grade"/>
-                        </div>
-                        <label asp-for="Time"></label>
-                        <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Time" asp-for="Time"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="customRow">
-                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
-                    <div class="widthMax">
-                        <label style="display: flex"></label>
-                        <textarea name="text"></textarea>
-                    </div>
-                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="-1" class="btn btn-secondary">Генерирай</button>
-                </div>
-            </div>
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
             {
                 if (Model.ClosedQuestions.Any(q => q.Order == i))
                 {
                     var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                     int indx = Model.ClosedQuestions.IndexOf(question);
-                            <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                    <partial name="ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
                 }
                 else
                 {
                     var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                            <partial name="OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                    <partial name="OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
                 }
             }
-            <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
-            <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
             <hr/>
             <button class="btn blue btn-primary" asp-action="EditSubmit" type="submit">Готово</button>
         </form>

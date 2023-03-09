@@ -34,13 +34,11 @@
                                             <li class="widget-49-meeting-item"><span>Време: @test.Time мин</span></li>
                                             <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
                                         </ol>
-                                        <div class="widget-49-meeting-action">
+                                        <div class="widget-49-meeting-action d-flex justify-content-end">
+                                                    <a onClick="warn(@test.Id, @test.Time, '@test.Title')" 
+                                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Направи</a>
                                             <a asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id"
                                                class="btn btn-sm btn-primary back-col">Виж</a>
-                                        </div>
-                                        <div class="widget-49-meeting-action">
-                                                <a onClick="warn(@test.Id)" 
-                                           class="btn btn-sm btn-primary back-col">Направи</a>
                                         </div>
                                     </div>
                                 </div>
@@ -172,29 +170,20 @@
                     e.target.style.backgroundPosition = '-2800px 0';
                 }
             }
-            function warn(testId){
+            function warn(testId, time, title){
                     Swal.fire({
-                  title: 'Are you sure?',
-                  text: "You won't be able to revert this!",
+                  title: 'Сигурен ли си че искаш да направиш тестът сега?',
+
+                      html: `${title} <br/> Време за работа: ${time} минути`,
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonColor: '#3085d6',
                   cancelButtonColor: '#d33',
-                  confirmButtonText: 'Yes, delete it!'
+                  confirmButtonText: 'Да започваме!',
+                  cancelButtonText: 'Откажи'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                        $.ajax({
-                            url: `Take/${testId}`,
-                            type: 'GET',
-                            data: {
-                            },
-                            success: function (data)  
-                            {  
-                                document.write(data);
-                            },
-                            error: function () {
-                            }
-                        });
+                        window.location.href = `Take/${testId}`;
                   } 
                 })
             }

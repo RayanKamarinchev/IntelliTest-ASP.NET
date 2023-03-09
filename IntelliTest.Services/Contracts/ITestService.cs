@@ -11,5 +11,6 @@ namespace IntelliTest.Core.Contracts
         Task<bool> ExistsbyId(int id);
         TestEditViewModel ToEdit(TestViewModel model);
         Task Edit(int id, TestEditViewModel model);
+        TestSubmitViewModel ToSubmit(TestViewModel model);
     }
 }

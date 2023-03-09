@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
 using IntelliTest.Data.Entities;
@@ -194,12 +195,12 @@ namespace IntelliTest.Controllers
                 return BadRequest();
             }
 
-            var test = testService.ToEdit(await testService.GetById(testId));
+            var test = testService.ToSubmit(await testService.GetById(testId));
             return View(test);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Take(TestEditViewModel model)
+        public async Task<IActionResult> Take(TestSubmitViewModel model)
         {
             return View(model);
         }

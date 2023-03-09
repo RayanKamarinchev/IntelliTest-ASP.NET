@@ -1,0 +1,14 @@
+﻿@model OpenQuestionAnswerViewModel
+<div class="questBox">
+    <div class="customRow">
+        <div class="questTextBox">
+            <p>@Model.Text</p>
+        </div>
+    </div>
+    <div class="questTextBox questAnswer">
+        <div>
+            <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="@Model.Answer" asp-for="Answer"/>
+            <span class="underline"></span>
+        </div>
+    </div>
+</div>

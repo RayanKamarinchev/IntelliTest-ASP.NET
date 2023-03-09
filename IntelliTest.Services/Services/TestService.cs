@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Data;
 using IntelliTest.Models.Tests;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -109,6 +110,33 @@ namespace IntelliTest.Core.Services
                 Time = model.Time,
                 Description = model.Description,
                 Grade = model.Grade,
+                Title = model.Title
+            };
+            return t;
+        }
+        public TestSubmitViewModel ToSubmit(TestViewModel model)
+        {
+            var t = new TestSubmitViewModel()
+            {
+                OpenQuestions = model.OpenQuestions
+                                     .Where(q => !q.IsDeleted)
+                                     .Select(q => new OpenQuestionAnswerViewModel()
+                                     {
+                                         Order = q.Order,
+                                         Text = q.Text
+                                     })
+                                     .ToList(),
+                ClosedQuestions = model.ClosedQuestions
+                                       .Where(q => !q.IsDeleted)
+                                       .Select(q => new ClosedQuestionAnswerViewModel()
+                                       {
+                                           PossibleAnswers = q.Answers.Split("&"),
+                                           IsDeleted = false,
+                                           Order = q.Order,
+                                           Text = q.Text
+                                       })
+                                       .ToList(),
+                Time = model.Time,
                 Title = model.Title
             };
             return t;
