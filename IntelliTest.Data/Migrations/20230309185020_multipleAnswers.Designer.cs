@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230309185020_multipleAnswers")]
+    partial class multipleAnswers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,16 +125,11 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("TestId");
 
                     b.ToTable("ClosedQuestionAnswers");
 
@@ -142,8 +139,7 @@ namespace IntelliTest.Data.Migrations
                             Id = 1,
                             AnswerIndexes = "0",
                             QuestionId = 1,
-                            StudentId = 1,
-                            TestId = 0
+                            StudentId = 1
                         });
                 });
 
@@ -208,16 +204,11 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("TestId");
 
                     b.ToTable("OpenQuestionAnswers");
 
@@ -227,8 +218,7 @@ namespace IntelliTest.Data.Migrations
                             Id = 1,
                             Answer = "Ti",
                             QuestionId = 2,
-                            StudentId = 1,
-                            TestId = 0
+                            StudentId = 1
                         });
                 });
 
@@ -683,17 +673,9 @@ namespace IntelliTest.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
-                        .WithMany("ClosedQuestionAnswers")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Question");
 
                     b.Navigation("Student");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
@@ -721,17 +703,9 @@ namespace IntelliTest.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
-                        .WithMany("OpenQuestionAnswers")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Question");
 
                     b.Navigation("Student");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Student", b =>
@@ -887,11 +861,7 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
                 {
-                    b.Navigation("ClosedQuestionAnswers");
-
                     b.Navigation("ClosedQuestions");
-
-                    b.Navigation("OpenQuestionAnswers");
 
                     b.Navigation("OpenQuestions");
 

@@ -13,7 +13,7 @@ namespace IntelliTest.Data.Entities
         [Key]
         public int Id { get; set; }
         [Required]
-        public int AnswerIndex { get; set; }
+        public string AnswerIndexes { get; set; }
         public ClosedQuestion Question { get; set; }
         [ForeignKey(nameof(Question))]
         public int QuestionId { get; set; }

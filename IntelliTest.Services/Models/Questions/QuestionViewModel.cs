@@ -14,5 +14,6 @@ namespace IntelliTest.Core.Models.Questions
         [Required]
         public int Order { get; set; }
         public bool IsDeleted { get; set; }
+        public int Id { get; set; }
     }
 }

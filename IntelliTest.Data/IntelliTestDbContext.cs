@@ -91,7 +91,7 @@ namespace IntelliTest.Data
 
             FirstClosedQuestionAnswer = new ClosedQuestionAnswer()
             {
-                AnswerIndex = 0,
+                AnswerIndexes = "0",
                 StudentId = 1,
                 Id = 1,
                 QuestionId = 1

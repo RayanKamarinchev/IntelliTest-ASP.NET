@@ -180,7 +180,7 @@ namespace IntelliTest.Controllers
             }
 
             await testService.Edit(id+1, model);
-            return View("Index", await testService.GetAll());
+            return RedirectToAction("Index", testService.GetAll());
         }
         [HttpGet]
         [Route("Take/{testId}")]
@@ -200,9 +200,28 @@ namespace IntelliTest.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Take(TestSubmitViewModel model)
+        [Route("Take/{testId}")]
+        public async Task<IActionResult> Take(TestSubmitViewModel model, int testId)
         {
-            return View(model);
+            await studentService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, User.Id(), testId);
+            return RedirectToAction("ReviewAnswers");
+        }
+
+        [HttpGet]
+        [Route("Review/{testId}-{studentId}")]
+        public async Task<IActionResult> ReviewAnswers(int testId, int studentId)
+        {
+            if (!(bool)TempData.Peek("isStudent"))
+            {
+                return Unauthorized();
+            }
+            if (!await testService.ExistsbyId(testId))
+            {
+                return BadRequest();
+            }
+
+            var test = testService.TestResults(testId, studentId);
+            return View(test);
         }
 
 

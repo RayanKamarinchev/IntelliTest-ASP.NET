@@ -123,7 +123,8 @@ namespace IntelliTest.Core.Services
                                      .Select(q => new OpenQuestionAnswerViewModel()
                                      {
                                          Order = q.Order,
-                                         Text = q.Text
+                                         Text = q.Text,
+                                         Id = q.Id
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
@@ -133,7 +134,8 @@ namespace IntelliTest.Core.Services
                                            PossibleAnswers = q.Answers.Split("&"),
                                            IsDeleted = false,
                                            Order = q.Order,
-                                           Text = q.Text
+                                           Text = q.Text,
+                                           Id = q.Id
                                        })
                                        .ToList(),
                 Time = model.Time,

@@ -1,5 +1,6 @@
 ﻿@model OpenQuestionAnswerViewModel
 <div class="questBox">
+    <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">
             <p>@Model.Text</p>

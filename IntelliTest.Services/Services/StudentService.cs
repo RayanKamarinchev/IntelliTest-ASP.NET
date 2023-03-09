@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -40,6 +41,29 @@ namespace IntelliTest.Core.Services
         public async Task<int> GetStudentId(string userId)
         {
             return context.Students.FirstOrDefaultAsync(u => u.UserId == userId).Id;
+        }
+
+        public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
+                                        List<ClosedQuestionAnswerViewModel> closedQuestions, string userId, int testId)
+        {
+            int studentId = await GetStudentId(userId);
+            var open = openQuestions.Select(q => new OpenQuestionAnswer()
+            {
+                Answer = q.Answer,
+                QuestionId = q.Id,
+                StudentId = studentId
+            });
+            var closed = closedQuestions.Select(q => new ClosedQuestionAnswer()
+            {
+                AnswerIndexes = string.Join("&", q.Answers
+                                                 .Select((val, indx) => new { val, indx })
+                                                 .Where(q => q.val)
+                                                 .Select(q => q.indx)),
+                QuestionId = q.Id,
+                StudentId = studentId
+            });
+            context.OpenQuestionAnswers.AddRange(open);
+            context.ClosedQuestionAnswers.AddRange(closed);
         }
     }
 }

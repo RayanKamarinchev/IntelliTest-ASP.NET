@@ -37,6 +37,8 @@ namespace IntelliTest.Data.Entities
 
         public IList<OpenQuestion> OpenQuestions { get; set; } = new List<OpenQuestion>();
         public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
+        public IList<OpenQuestionAnswer> OpenQuestionAnswers { get; set; } = new List<OpenQuestionAnswer>();
+        public IList<ClosedQuestionAnswer> ClosedQuestionAnswers { get; set; } = new List<ClosedQuestionAnswer>();
         [Required]
         public bool IsDeleted { get; set; }
 

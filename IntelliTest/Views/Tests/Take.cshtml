@@ -5,9 +5,9 @@
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
         <div class="timer">
-            <h1 style="margin: 0">30:00</h1>    
+            <h1 id="timer" style="margin: 0">@Model.Time:00</h1>    
         </div>
-        <form method="post">
+        <form method="post" name="test">
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
             {
                 if (Model.ClosedQuestions.Any(q => q.Order == i))
@@ -23,31 +23,41 @@
                 }
             }
             <hr/>
-            <button class="btn blue btn-primary" asp-action="EditSubmit" type="submit">Готово</button>
+            <button class="btn blue btn-primary" type="submit">Готово</button>
         </form>
     </div>
 </div>
 
 @section Scripts
-    {
-        <script>
-            btns = document.getElementsByTagName("button");
-            input = Array.prototype.slice.call(btns);
-            function save(ev){
-                if(ev.currentTarget.type=="submit"){
-                    console.log("lol")
-                }
-                    var top  = window.pageYOffset || document.documentElement.scrollTop;
-                    localStorage.setItem("scroll", top);
-            }
-            input.forEach(b=>b.addEventListener("click", save));
-            window.scrollTo(0, parseInt(localStorage.getItem("scroll")) + 150);
+{
+    <script>
             function onFocus(e) {
                 e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
             }
             function onFocusOut(e){
                 e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
             }
-
+            var timer = document.getElementById("timer");
+            var interval = 1000; // ms
+            var expected = Date.now() + interval;
+            var min = @Model.Time;
+            var sec = 0;
+            setTimeout(step, interval);
+            function step() {
+                var dt = Date.now() - expected; // the drift (positive for overshooting)
+                sec--;
+                if(sec < 0){
+                    sec+=60;
+                    min--;
+                }
+                if(min===0 && sec===0){
+                        document.forms["test"].submit(); 
+                }
+                console.log(min);
+                console.log(sec);
+                timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
+                expected += interval;
+                setTimeout(step, Math.max(0, interval - dt)); // take into account drift
+            }
         </script>
 }
