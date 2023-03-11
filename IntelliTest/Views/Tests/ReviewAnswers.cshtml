@@ -1,0 +1,38 @@
+﻿@model TestReviewViewModel
+@{
+    ViewBag.Title = "Taking Test";
+}
+<div class="editMain">
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
+        <form method="post" name="test">
+            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+            {
+                if (Model.ClosedQuestions.Any(q => q.Order == i))
+                {
+                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+                    int indx = Model.ClosedQuestions.IndexOf(question);
+                    <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[indx]"/>
+                }
+                else
+                {
+                    var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
+                    <partial name="Questions/OpenQuestionReviewPartialView" for="OpenQuestions[q]"/>
+                }
+            }
+            <hr/>
+            <button class="btn blue btn-primary" type="submit">Готово</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+    {
+        <script>
+                function onFocus(e) {
+                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
+                }
+                function onFocusOut(e){
+                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
+                }
+            </script>
+}

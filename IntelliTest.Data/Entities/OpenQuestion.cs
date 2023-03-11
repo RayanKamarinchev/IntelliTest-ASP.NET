@@ -20,5 +20,6 @@ namespace IntelliTest.Data.Entities
         public Test Test { get; set; }
 
         public IEnumerable<OpenQuestionAnswer> StudentAnswers { get; set; }
+        public int MaxScore { get; set; }
     }
 }

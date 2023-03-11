@@ -22,5 +22,6 @@ namespace IntelliTest.Data.Entities
         [ForeignKey(nameof(TestId))]
         public Test Test { get; set; }
         public IEnumerable<ClosedQuestionAnswer> StudentAnswers { get; set; }
+        public int MaxScore { get; set; }
     }
 }

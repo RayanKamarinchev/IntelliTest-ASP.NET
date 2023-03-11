@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230311130321_multiSubmission")]
+    partial class multiSubmission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +78,6 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MaxScore")
-                        .HasColumnType("int");
-
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -102,7 +101,6 @@ namespace IntelliTest.Data.Migrations
                             AnswerIndexes = "1",
                             Answers = "Ti&Az&dvamata&nikoi",
                             IsDeleted = false,
-                            MaxScore = 2,
                             Order = 1,
                             TestId = 1,
                             Text = "Koi suzdade testut"
@@ -160,9 +158,6 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MaxScore")
-                        .HasColumnType("int");
-
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -185,7 +180,6 @@ namespace IntelliTest.Data.Migrations
                             Id = 2,
                             Answer = "Az",
                             IsDeleted = false,
-                            MaxScore = 3,
                             Order = 0,
                             TestId = 1,
                             Text = "Koi suzdade testut"
@@ -351,6 +345,9 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MaxScore")
+                        .HasColumnType("int");
+
                     b.Property<bool>("MultiSubmission")
                         .HasColumnType("bit");
 
@@ -390,11 +387,34 @@ namespace IntelliTest.Data.Migrations
                             Description = "Просто тест",
                             Grade = 10,
                             IsDeleted = false,
+                            MaxScore = 20,
                             MultiSubmission = false,
                             School = "ППМГ Добри Чинтулов",
                             Subject = "Физика",
                             Time = 30,
                             Title = "Електромагнитни вълни"
+                        });
+                });
+
+            modelBuilder.Entity("IntelliTest.Data.Entities.TestStudent", b =>
+                {
+                    b.Property<int>("TestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TestId", "StudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("TestStudents");
+
+                    b.HasData(
+                        new
+                        {
+                            TestId = 1,
+                            StudentId = 1
                         });
                 });
 
@@ -736,12 +756,31 @@ namespace IntelliTest.Data.Migrations
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
                 {
                     b.HasOne("IntelliTest.Data.Entities.Teacher", "Creator")
-                        .WithMany("Tests")
+                        .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("IntelliTest.Data.Entities.TestStudent", b =>
+                {
+                    b.HasOne("IntelliTest.Data.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
+                        .WithMany("Students")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -822,8 +861,6 @@ namespace IntelliTest.Data.Migrations
             modelBuilder.Entity("IntelliTest.Data.Entities.Teacher", b =>
                 {
                     b.Navigation("Classes");
-
-                    b.Navigation("Tests");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
@@ -831,6 +868,8 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("ClosedQuestions");
 
                     b.Navigation("OpenQuestions");
+
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

@@ -40,7 +40,8 @@ namespace IntelliTest.Core.Services
 
         public async Task<int> GetStudentId(string userId)
         {
-            return context.Students.FirstOrDefaultAsync(u => u.UserId == userId).Id;
+            var student = await context.Students.FirstOrDefaultAsync(u => u.UserId == userId);
+            return student.Id;
         }
 
         public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
@@ -64,6 +65,17 @@ namespace IntelliTest.Core.Services
             });
             context.OpenQuestionAnswers.AddRange(open);
             context.ClosedQuestionAnswers.AddRange(closed);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<Student> GetStudent(int studentId)
+        {
+            return await context.Students
+                                .Include(s=>s.ClosedAnswers)
+                                .ThenInclude(q => q.Question.Test)
+                                .Include(s=>s.OpenAnswers)
+                                .ThenInclude(q=>q.Question.Test)
+                                .FirstOrDefaultAsync(s=>s.Id==studentId);
         }
     }
 }

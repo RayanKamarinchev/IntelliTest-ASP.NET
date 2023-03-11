@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Core.Models.Questions
 {
-    public class OpenQuestionAnswerViewModel : QuestionViewModel
+    public class ClosedQuestionReviewViewModel : ClosedQuestionAnswerViewModel
     {
-        public string Answer { get; set; }
-        public int MaxScore { get; set; }
+        public int[] RightAnswers { get; set; }
     }
 }

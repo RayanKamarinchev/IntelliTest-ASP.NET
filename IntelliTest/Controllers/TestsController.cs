@@ -194,6 +194,10 @@ namespace IntelliTest.Controllers
             {
                 return BadRequest();
             }
+            if (await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
+            {
+                return BadRequest();
+            }
 
             var test = testService.ToSubmit(await testService.GetById(testId));
             return View(test);
@@ -203,8 +207,9 @@ namespace IntelliTest.Controllers
         [Route("Take/{testId}")]
         public async Task<IActionResult> Take(TestSubmitViewModel model, int testId)
         {
+            int studentId = await studentService.GetStudentId(User.Id());
             await studentService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, User.Id(), testId);
-            return RedirectToAction("ReviewAnswers");
+            return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 
         [HttpGet]
@@ -218,6 +223,11 @@ namespace IntelliTest.Controllers
             if (!await testService.ExistsbyId(testId))
             {
                 return BadRequest();
+            }
+
+            if (studentId != await studentService.GetStudentId(User.Id()))
+            {
+                return Unauthorized();
             }
 
             var test = testService.TestResults(testId, studentId);

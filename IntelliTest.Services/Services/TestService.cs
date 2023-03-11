@@ -30,10 +30,11 @@ namespace IntelliTest.Core.Services
                                     Description = t.Description,
                                     Grade = t.Grade,
                                     Id = t.Id,
-                                    MaxScore = t.MaxScore,
+                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
                                     OpenQuestions = t.OpenQuestions,
                                     Time = t.Time,
-                                    Title = t.Title
+                                    Title = t.Title,
+                                    MultiSubmit = t.MultiSubmission
                                 })
                            .ToListAsync();
         }
@@ -51,10 +52,11 @@ namespace IntelliTest.Core.Services
                                     Description = t.Description,
                                     Grade = t.Grade,
                                     Id = t.Id,
-                                    MaxScore = t.MaxScore,
+                                    MaxScore = t.ClosedQuestions.Sum(q=>q.MaxScore) + t.OpenQuestions.Sum(q=>q.MaxScore),
                                     OpenQuestions = t.OpenQuestions,
                                     Time = t.Time,
-                                    Title = t.Title
+                                    Title = t.Title,
+                                    MultiSubmit = t.MultiSubmission
                                 })
                                 .ToListAsync();
         }
@@ -75,10 +77,11 @@ namespace IntelliTest.Core.Services
                 Description = t.Description,
                 Grade = t.Grade,
                 Id = t.Id,
-                MaxScore = t.MaxScore,
+                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
                 OpenQuestions = t.OpenQuestions,
                 Time = t.Time,
-                Title = t.Title
+                Title = t.Title,
+                MultiSubmit = t.MultiSubmission
             };
         }
 
@@ -93,7 +96,8 @@ namespace IntelliTest.Core.Services
                                          Answer = q.Answer,
                                          IsDeleted = false,
                                          Order = q.Order,
-                                         Text = q.Text
+                                         Text = q.Text,
+                                         MaxScore = q.MaxScore
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
@@ -104,13 +108,15 @@ namespace IntelliTest.Core.Services
                                            AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
                                            IsDeleted = false,
                                            Order = q.Order,
-                                           Text = q.Text
+                                           Text = q.Text,
+                                           MaxScore = q.MaxScore
                                        })
                                        .ToList(),
                 Time = model.Time,
                 Description = model.Description,
                 Grade = model.Grade,
-                Title = model.Title
+                Title = model.Title,
+                
             };
             return t;
         }
@@ -124,7 +130,8 @@ namespace IntelliTest.Core.Services
                                      {
                                          Order = q.Order,
                                          Text = q.Text,
-                                         Id = q.Id
+                                         Id = q.Id,
+                                         MaxScore = q.MaxScore
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
@@ -135,7 +142,8 @@ namespace IntelliTest.Core.Services
                                            IsDeleted = false,
                                            Order = q.Order,
                                            Text = q.Text,
-                                           Id = q.Id
+                                           Id = q.Id,
+                                           MaxScore = q.MaxScore
                                        })
                                        .ToList(),
                 Time = model.Time,
@@ -143,6 +151,7 @@ namespace IntelliTest.Core.Services
             };
             return t;
         }
+
 
         public async Task Edit(int id, TestEditViewModel model)
         {
@@ -159,7 +168,8 @@ namespace IntelliTest.Core.Services
                                                     {
                                                         Text = q.Text,
                                                         Answer = q.Answer,
-                                                        Order = q.Order
+                                                        Order = q.Order,
+                                                        MaxScore = q.MaxScore
                                                     }).ToList();
             List<ClosedQuestion> closedQuestions = model.ClosedQuestions
                                                     .Select(q => new ClosedQuestion()
@@ -170,16 +180,61 @@ namespace IntelliTest.Core.Services
                                                                                      .Where(q => q.val)
                                                                                      .Select(q => q.indx)),
                                                         Answers = string.Join("&", q.Answers),
-                                                        Order = q.Order
+                                                        Order = q.Order,
+                                                        MaxScore = q.MaxScore
                                                     }).ToList();
             test.ClosedQuestions = closedQuestions;
             test.OpenQuestions = openQuestions;
+            context.Update(test);
             await context.SaveChangesAsync();
         }
 
-        private bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
+        public TestReviewViewModel TestResults(int testId, int studentId)
+        {
+            var openQuestions = context.OpenQuestionAnswers
+                                       .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
+                                       .Include(q => q.Question)
+                                       .Select(q => new OpenQuestionReviewViewModel()
+                                       {
+                                           Order = q.Question.Order,
+                                           Text = q.Question.Text,
+                                           Id = q.Id,
+                                           RightAnswer = q.Question.Answer,
+                                           MaxScore = q.Question.MaxScore
+                                       })
+                                       .ToList();
+            var closedQuestions = new List<ClosedQuestionReviewViewModel>();
+            var db = context.ClosedQuestionAnswers
+                            .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
+                            .Include(q => q.Question);
+            foreach (var q in db)
+            {
+                closedQuestions.Add(new ClosedQuestionReviewViewModel()
+                {
+                    PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                    IsDeleted = false,
+                    Order = q.Question.Order,
+                    Text = q.Question.Text,
+                    Id = q.Id,
+                    Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None), q.AnswerIndexes),
+                    RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse).ToArray(),
+                    MaxScore = q.Question.MaxScore
+                });
+            }
+
+            return new TestReviewViewModel()
+            {
+                OpenQuestions = openQuestions,
+                ClosedQuestions = closedQuestions
+            };
+        }
+        public static bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
         {
             var list = Enumerable.Repeat(false, answers.Length).ToArray();
+            if (answerIndexes=="")
+            {
+                return list;
+            }
             var listOfIndx = answerIndexes.Split("&").Select(int.Parse);
             for (int i = 0; i < list.Length; i++)
             {
@@ -190,6 +245,13 @@ namespace IntelliTest.Core.Services
             }
 
             return list;
+        }
+
+        public async Task<bool> IsTestTakenByStudentId(int testId, Student student)
+        {
+            bool closed = (student?.ClosedAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
+            bool open = (student?.OpenAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
+            return closed || open;
         }
 
         public async Task<bool> ExistsbyId(int id)

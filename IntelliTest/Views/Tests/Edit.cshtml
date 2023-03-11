@@ -44,12 +44,12 @@
                 {
                     var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                     int indx = Model.ClosedQuestions.IndexOf(question);
-                    <partial name="ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                            <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
                 }
                 else
                 {
                     var q = Model.OpenQuestions.FindIndex(j=>j.Order == i);
-                    <partial name="OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                            <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[q]"/>
                 }
             }
             <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>

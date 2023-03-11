@@ -1,4 +1,5 @@
 ﻿using IntelliTest.Core.Models.Tests;
+using IntelliTest.Data.Entities;
 using IntelliTest.Models.Tests;
 
 namespace IntelliTest.Core.Contracts
@@ -12,5 +13,7 @@ namespace IntelliTest.Core.Contracts
         TestEditViewModel ToEdit(TestViewModel model);
         Task Edit(int id, TestEditViewModel model);
         TestSubmitViewModel ToSubmit(TestViewModel model);
+        TestReviewViewModel TestResults(int testId, int studentId);
+        Task<bool> IsTestTakenByStudentId(int testId, Student student);
     }
 }

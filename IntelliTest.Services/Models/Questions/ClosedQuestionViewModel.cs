@@ -11,5 +11,6 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string[] Answers { get; set; }
         public bool[] AnswerIndexes { get; set; }
+        public int MaxScore { get; set; }
     }
 }

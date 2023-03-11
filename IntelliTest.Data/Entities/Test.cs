@@ -24,8 +24,6 @@ namespace IntelliTest.Data.Entities
         [Required]
         public decimal AverageScore { get; set; }
         [Required]
-        public int MaxScore { get; set; }
-        [Required]
         public int Time { get; set; }
         [Required]
         [DataType(DataType.DateTime)]
@@ -37,12 +35,10 @@ namespace IntelliTest.Data.Entities
 
         public IList<OpenQuestion> OpenQuestions { get; set; } = new List<OpenQuestion>();
         public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
-        public IList<OpenQuestionAnswer> OpenQuestionAnswers { get; set; } = new List<OpenQuestionAnswer>();
-        public IList<ClosedQuestionAnswer> ClosedQuestionAnswers { get; set; } = new List<ClosedQuestionAnswer>();
         [Required]
         public bool IsDeleted { get; set; }
-
-        public IEnumerable<TestStudent> Students { get; set; }
+        [Required]
+        public bool MultiSubmission { get; set; }
         [Required]
         public Teacher Creator { get; set; }
         [ForeignKey(nameof(Creator))]

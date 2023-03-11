@@ -38,5 +38,6 @@ namespace IntelliTest.Models.Tests
         public string Color2 { get; set; }
         public IList<OpenQuestion> OpenQuestions { get; set; }
         public IList<ClosedQuestion> ClosedQuestions { get; set; }
+        public bool MultiSubmit { get; set; }
     }
 }

@@ -1,0 +1,52 @@
+﻿@model ClosedQuestionReviewViewModel
+
+<div class="questBox">
+    @{
+        double score = 0;
+        for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
+        {
+            @if (Model.RightAnswers.Contains(i) && Model.Answers[i])
+            {
+                score++;
+            }
+        }
+        score *= Model.MaxScore*1.0 / Model.Answers.Count(a=>a);
+    }
+    <p class="questionScore">@score/@Model.MaxScore</p>
+    <input value="@Model.Id" asp-for="Id" style="display: none"/>
+    <div class="customRow">
+        <div class="questTextBox">
+            <p>@Model.Text</p>
+        </div>
+    </div>
+    <input type="text" value="@Model.Order" asp-for="Order" class="d-none"/>
+    <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
+        @for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
+        {
+            <div class="questTextBox icon-answer option">
+                @{
+                    @if (Model.RightAnswers.Contains(i))
+                    {
+                        if (Model.Answers[i])
+                        {
+                            <i class="fa-solid fa-square-check" style="color: #358DF1;"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-square-check" style="color: #198754;"></i>
+                        }
+                    }
+                    else if (Model.Answers[i])
+                    {
+                        <i class="fa-solid fa-square-xmark" style="color: #BF3100;"></i>
+                    }
+                    else
+                    {
+                        <i class="fa-regular fa-square"></i>
+                    }
+                }
+                <p>@Model.PossibleAnswers[i]</p>
+            </div>
+        }
+    </div>
+</div>

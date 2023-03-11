@@ -10,5 +10,6 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string[] PossibleAnswers { get; set; }
         public bool[] Answers { get; set; }
+        public int MaxScore { get; set; }
     }
 }

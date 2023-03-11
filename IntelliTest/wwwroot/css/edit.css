@@ -225,6 +225,13 @@ textarea{
 .circle:active {
     background-color: #aaa;
 }
+.questionScore {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    border: none;
+    font-size: 30px;
+}
 textarea {
     border-radius: 5px;
 }
@@ -240,4 +247,15 @@ textarea {
     padding: 10px;
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.icon-answer {
+    display: flex;
+}
+.icon-answer svg {
+    align-self: center;
+}
+.icon-answer p {
+    margin-bottom: 0 !important;
+    margin-left: 10px;
 }

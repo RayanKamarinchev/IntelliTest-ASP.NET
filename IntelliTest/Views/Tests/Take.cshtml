@@ -14,12 +14,12 @@
                 {
                     var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                     int indx = Model.ClosedQuestions.IndexOf(question);
-                    <partial name="ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
+                            <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
                 }
                 else
                 {
                     var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                    <partial name="OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
+                            <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
                 }
             }
             <hr/>
@@ -51,13 +51,16 @@
                     min--;
                 }
                 if(min===0 && sec===0){
-                        document.forms["test"].submit(); 
+                    document.forms["test"].submit(); 
                 }
-                console.log(min);
-                console.log(sec);
                 timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
                 expected += interval;
                 setTimeout(step, Math.max(0, interval - dt)); // take into account drift
             }
+            document.addEventListener("visibilitychange", () => {
+                if(document.hidden){
+                    document.forms["test"].submit();
+                }
+            });
         </script>
-}
+    }

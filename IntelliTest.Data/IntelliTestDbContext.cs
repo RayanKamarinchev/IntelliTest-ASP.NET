@@ -17,8 +17,6 @@ namespace IntelliTest.Data
         {
             builder.Entity<StudentClass>()
                    .HasKey(p=> new{p.ClassId, p.StudentId});
-            builder.Entity<TestStudent>()
-                   .HasKey(p => new { p.TestId, p.StudentId });
 
             FirstTeacher = new Teacher()
             {
@@ -63,7 +61,8 @@ namespace IntelliTest.Data
                 IsDeleted = false,
                 Order = 0,
                 Text = "Koi suzdade testut",
-                TestId = 1
+                TestId = 1,
+                MaxScore = 3
             };
             builder.Entity<OpenQuestion>()
                    .HasData(OpenQuestion);
@@ -84,7 +83,8 @@ namespace IntelliTest.Data
                 IsDeleted = false,
                 Order = 1,
                 Text = "Koi suzdade testut",
-                TestId = 1
+                TestId = 1,
+                MaxScore = 2
             };
             builder.Entity<ClosedQuestion>()
                    .HasData(ClosedQuestion);
@@ -112,27 +112,18 @@ namespace IntelliTest.Data
                 School = "ППМГ Добри Чинтулов",
                 Subject = "Физика",
                 Time = 30,
-                MaxScore = 20,
                 Id = 1,
                 CreatorId = 1
             };
             builder.Entity<Test>()
                    .HasData(FirstTest);
 
-            TestStudent = new TestStudent()
-            {
-                StudentId = 1,
-                TestId = 1
-            };
-            builder.Entity<TestStudent>()
-                   .HasData(TestStudent);
             base.OnModelCreating(builder);
         }
         public Teacher FirstTeacher { get; set; }
         public StudentClass StudentClass { get; set; }
         public Class FirstClass { get; set; }
         public Student FirstStudent { get; set; }
-        public TestStudent TestStudent { get; set; }
         public Test FirstTest { get; set; }
         public OpenQuestion OpenQuestion { get; set; }
         public ClosedQuestionAnswer FirstClosedQuestionAnswer { get; set; }
@@ -143,7 +134,6 @@ namespace IntelliTest.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
-        public DbSet<TestStudent> TestStudents { get; set; }
         public DbSet<ClosedQuestionAnswer> ClosedQuestionAnswers { get; set; }
         public DbSet<OpenQuestionAnswer> OpenQuestionAnswers { get; set; }
         public DbSet<Test> Tests { get; set; }
