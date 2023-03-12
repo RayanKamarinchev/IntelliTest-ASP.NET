@@ -51,7 +51,7 @@ namespace IntelliTest.Controllers
             {
                 model = await testService.GetAll();
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
-                                        .SetSlidingExpiration(TimeSpan.FromSeconds(60));
+                                        .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 await cache.SetAsync("tests", model, cacheEntryOptions);
             }
             return View(model);

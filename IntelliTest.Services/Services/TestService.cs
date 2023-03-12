@@ -290,7 +290,8 @@ namespace IntelliTest.Core.Services
                 {
                     StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
                     Text = res[0].ClosedQuestions[i].Text,
-                    Answers = res[0].ClosedQuestions[i].PossibleAnswers
+                    Answers = res[0].ClosedQuestions[i].PossibleAnswers,
+                    Order = res[0].ClosedQuestions[i].Order
                 });
             }
 
@@ -309,7 +310,8 @@ namespace IntelliTest.Core.Services
                 model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
                 {
                     StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
-                    Text = res[0].OpenQuestions[i].Text
+                    Text = res[0].OpenQuestions[i].Text,
+                    Order = res[0].OpenQuestions[i].Order
                 });
             }
 

@@ -91,6 +91,8 @@ app.MapRazorPages();
 
 app.Run();
 
+//TODO:Check ofr quotes in questions
+
 ///anti XSS cross site scripting
 //var sanitizer = new HtmlSanitizer();
 //sanitizer.Sanitize("");
