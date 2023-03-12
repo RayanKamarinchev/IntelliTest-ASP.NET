@@ -76,7 +76,7 @@
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        if (string.IsNullOrEmpty(TempData.Peek("isStudent").ToString()))
+                            if (TempData.Peek("isStudent") == null)
                         {
                             TempData["isStudent"] = await studentService.ExistsByUserId(User.Id());
                             TempData["isTeacher"] = await teacherService.ExistsByUserId(User.Id());

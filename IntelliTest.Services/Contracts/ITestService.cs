@@ -15,5 +15,7 @@ namespace IntelliTest.Core.Contracts
         TestSubmitViewModel ToSubmit(TestViewModel model);
         TestReviewViewModel TestResults(int testId, int studentId);
         Task<bool> IsTestTakenByStudentId(int testId, Student student);
+        TestStatsViewModel GetStatistics(int testId);
+        int[] GetStudentIds(int testId);
     }
 }

@@ -5,6 +5,7 @@ using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace IntelliTest.Core.Services
 {
@@ -200,7 +201,8 @@ namespace IntelliTest.Core.Services
                                            Text = q.Question.Text,
                                            Id = q.Id,
                                            RightAnswer = q.Question.Answer,
-                                           MaxScore = q.Question.MaxScore
+                                           MaxScore = q.Question.MaxScore,
+                                           Answer = q.Answer
                                        })
                                        .ToList();
             var closedQuestions = new List<ClosedQuestionReviewViewModel>();
@@ -253,6 +255,80 @@ namespace IntelliTest.Core.Services
             bool open = (student?.OpenAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
             return closed || open;
         }
+
+        public TestStatsViewModel GetStatistics(int testId)
+        {
+            var studentIds = GetStudentIds(testId);
+            List<TestReviewViewModel> res = new List<TestReviewViewModel>();
+            foreach (var studentId in studentIds)
+            {
+                res.Add(TestResults(testId, studentId));
+            }
+
+            TestStatsViewModel model = new TestStatsViewModel();
+
+            List<List<List<int>>> allClosedAnswers = new List<List<List<int>>>();
+            res.ForEach(r =>
+            {
+                List<List<int>> answers = new List<List<int>>();
+                r.ClosedQuestions.ForEach(q =>
+                {
+                    answers.Add(new List<int>());
+                    for (int i = 0; i < q.Answers.Length; ++i)
+                    {
+                        if (q.Answers[i])
+                        {
+                            answers.Last().Add(i);
+                        }
+                    }
+                });
+                allClosedAnswers.Add(answers);
+            });
+            for (int i = 0; i < allClosedAnswers[0].Count; i++)
+            {
+                model.ClosedQuestions.Add(new ClosedQuestionStatsViewModel()
+                {
+                    StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
+                    Text = res[0].ClosedQuestions[i].Text,
+                    Answers = res[0].ClosedQuestions[i].PossibleAnswers
+                });
+            }
+
+            List<List<string>> allOpenAnswers = new List<List<string>>();
+            res.ForEach(r =>
+            {
+                List<string> answers = new List<string>();
+                r.OpenQuestions.ForEach(q =>
+                {
+                    answers.Add(q.Answer);
+                });
+                allOpenAnswers.Add(answers);
+            });
+            for (int i = 0; i < allOpenAnswers[0].Count; i++)
+            {
+                model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
+                {
+                    StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
+                    Text = res[0].OpenQuestions[i].Text
+                });
+            }
+
+
+            return model;
+        }
+
+        public int[] GetStudentIds(int testId)
+        {
+            return context.OpenQuestionAnswers
+                          .Where(q => q.Question.TestId == testId)
+                          .Select(t => t.StudentId)
+                          .Union(
+                              context.ClosedQuestionAnswers
+                                     .Where(q => q.Question.TestId == testId)
+                                     .Select(t => t.StudentId)
+                          ).ToArray();
+        }
+
 
         public async Task<bool> ExistsbyId(int id)
         {

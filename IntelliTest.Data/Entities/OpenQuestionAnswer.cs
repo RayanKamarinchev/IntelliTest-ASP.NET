@@ -12,8 +12,7 @@ namespace IntelliTest.Data.Entities
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        public string Answer { get; set; }
+        public string? Answer { get; set; }
         public OpenQuestion Question { get; set; }
         [ForeignKey(nameof(Question))]
         public int QuestionId { get; set; }

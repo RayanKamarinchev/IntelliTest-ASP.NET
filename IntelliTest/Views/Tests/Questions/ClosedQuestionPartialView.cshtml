@@ -2,12 +2,16 @@
 
 
 <div class="questBox">
-    <button asp-action="Edit" asp-route-id="-1" asp-route-type="Delete" asp-route-text="@Model.Order" class="circle">
-        <i class="fa-solid fa-trash"></i>
-    </button>
+    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
+        <span>Points:</span>
+        <input type="text" value="@Model.MaxScore" asp-for="MaxScore" style="width: 20px"/>
+        <button asp-action="Edit" asp-controller="Tests" asp-route-id="-1" asp-route-type="Delete" asp-route-questionOrder="@Model.Order" class="circle">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
     <input style="display: none" value="@Model.Order" asp-for="Order"/>
     <div class="customRow">
-        <div class="questTextBox">
+        <div class="questTextBox" style="width: calc(100% - 220px);">
             <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"/>
             <span class="underline"></span>
         </div>

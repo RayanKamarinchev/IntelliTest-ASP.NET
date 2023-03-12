@@ -27,6 +27,13 @@ namespace Watchlist.Controllers
             studentService = _studentService;
             teacherService = _teacherService;
         }
+
+        public void ClearCookies()
+        {
+            TempData.Remove("isStudent");
+            TempData.Remove("isTeacher");
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -65,6 +72,7 @@ namespace Watchlist.Controllers
                 ModelState.AddModelError("", error.Description);
             }
 
+            ClearCookies();
             return View(model);
         }
 
@@ -102,14 +110,14 @@ namespace Watchlist.Controllers
             }
 
             ModelState.AddModelError("", "Invalid Login");
-
+            ClearCookies();
             return View(model);
         }
 
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-
+            ClearCookies();
             return RedirectToAction("Index", "Home");
         }
 
@@ -143,6 +151,7 @@ namespace Watchlist.Controllers
             {
                 await teacherService.AddTeacher(User.Id());
             }
+            ClearCookies();
             return RedirectToAction("Index", "Home");
         }
 
@@ -154,6 +163,7 @@ namespace Watchlist.Controllers
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "User");
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            ClearCookies();
             return new ChallengeResult(provider, properties);
         }
         [AllowAnonymous]

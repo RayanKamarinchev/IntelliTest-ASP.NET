@@ -5,12 +5,23 @@
         double score = 0;
         for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
         {
-            @if (Model.RightAnswers.Contains(i) && Model.Answers[i])
+            if (Model.Answers[i])
             {
-                score++;
+                if (Model.RightAnswers.Contains(i))
+                {
+                    score++;
+                }
+                else
+                {
+                    score--;
+                }
             }
         }
-        score *= Model.MaxScore*1.0 / Model.Answers.Count(a=>a);
+        score *= Model.MaxScore*1.0 / Model.RightAnswers.Count();
+        if (score<0)
+        {
+            score = 0;
+        }
     }
     <p class="questionScore">@score/@Model.MaxScore</p>
     <input value="@Model.Id" asp-for="Id" style="display: none"/>

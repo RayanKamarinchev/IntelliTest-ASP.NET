@@ -30,12 +30,14 @@ namespace IntelliTest.Controllers
         private readonly ITestService testService;
         private readonly IDistributedCache cache;
         private readonly IStudentService studentService;
+        private readonly ITeacherService teacherService;
 
-        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService)
+        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService, ITeacherService _teacherService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
+            teacherService = _teacherService;
         }
 
         [HttpGet]
@@ -199,6 +201,14 @@ namespace IntelliTest.Controllers
                 return BadRequest();
             }
 
+            if ((bool)TempData.Peek("isTeacher"))
+            {
+                if (await teacherService.IsCreator(testId, await teacherService.GetTeacherId(User.Id())))
+                {
+                    return BadRequest();
+                }
+            }
+
             var test = testService.ToSubmit(await testService.GetById(testId));
             return View(test);
         }
@@ -234,6 +244,23 @@ namespace IntelliTest.Controllers
             return View(test);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Statistics(int testId)
+        {
+            if (!(bool)TempData.Peek("isTeacher"))
+            {
+                return Unauthorized();
+            }
+
+            if (!await teacherService.IsCreator(testId, await teacherService.GetTeacherId(User.Id())))
+            {
+                return Unauthorized();
+            }
+
+            var model = testService.GetStatistics(testId);
+
+            return View(model);
+        }
 
         public IActionResult AiGenerate(string text)
         {
