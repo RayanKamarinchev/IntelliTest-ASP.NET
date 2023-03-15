@@ -40,9 +40,10 @@ namespace IntelliTest.Core.Services
                            .ToListAsync();
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetMy(string userId)
+        public async Task<IEnumerable<TestViewModel>> GetMy(int teacherId)
         {
             return await context.Tests
+                                .Where(t=>t.CreatorId== teacherId)
                                 .Select(t=> new TestViewModel()
                                 {
                                     AverageScore = t.AverageScore,
@@ -154,18 +155,14 @@ namespace IntelliTest.Core.Services
         }
 
 
-        public async Task Edit(int id, TestEditViewModel model)
+        public async Task Edit(int id, TestEditViewModel model, int teacherId)
         {
             var test = await context.Tests
                                     .Include(t=>t.OpenQuestions)
                                     .Include(t=>t.ClosedQuestions)
                                     .FirstOrDefaultAsync(t=>t.Id==id);
-            test.Title = model.Title;
-            test.Description = model.Description;
-            test.Grade = model.Grade;
-            test.Time = model.Time;
             List<OpenQuestion> openQuestions = model.OpenQuestions
-                                                    .Select(q=>new OpenQuestion()
+                                                    .Select(q => new OpenQuestion()
                                                     {
                                                         Text = q.Text,
                                                         Answer = q.Answer,
@@ -173,20 +170,44 @@ namespace IntelliTest.Core.Services
                                                         MaxScore = q.MaxScore
                                                     }).ToList();
             List<ClosedQuestion> closedQuestions = model.ClosedQuestions
-                                                    .Select(q => new ClosedQuestion()
-                                                    {
-                                                        Text = q.Text,
-                                                        AnswerIndexes = string.Join("&", q.AnswerIndexes
-                                                                                     .Select((val, indx) => new { val, indx })
-                                                                                     .Where(q => q.val)
-                                                                                     .Select(q => q.indx)),
-                                                        Answers = string.Join("&", q.Answers),
-                                                        Order = q.Order,
-                                                        MaxScore = q.MaxScore
-                                                    }).ToList();
-            test.ClosedQuestions = closedQuestions;
-            test.OpenQuestions = openQuestions;
-            context.Update(test);
+                                                        .Select(q => new ClosedQuestion()
+                                                        {
+                                                            Text = q.Text,
+                                                            AnswerIndexes = string.Join("&", q.AnswerIndexes
+                                                                                              .Select((val, indx) => new { val, indx })
+                                                                                              .Where(q => q.val)
+                                                                                              .Select(q => q.indx)),
+                                                            Answers = string.Join("&", q.Answers),
+                                                            Order = q.Order,
+                                                            MaxScore = q.MaxScore
+                                                        }).ToList();
+            if (test.CreatorId==teacherId)
+            {
+                test.Title = model.Title;
+                test.Description = model.Description;
+                test.Grade = model.Grade;
+                test.Time = model.Time;
+                test.ClosedQuestions = closedQuestions;
+                test.OpenQuestions = openQuestions;
+                context.Update(test);
+            }
+            else
+            {
+                var newTest = new Test()
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    Grade = model.Grade,
+                    Time = model.Time,
+                    ClosedQuestions = closedQuestions,
+                    OpenQuestions = openQuestions,
+                    Color1 = test.Color1,
+                    Color2 = test.Color2,
+                    CreatedOn = DateTime.Now,
+                    CreatorId = teacherId
+                };
+                context.Tests.Add(newTest);
+            }
             await context.SaveChangesAsync();
         }
 
@@ -329,6 +350,64 @@ namespace IntelliTest.Core.Services
                                      .Where(q => q.Question.TestId == testId)
                                      .Select(t => t.StudentId)
                           ).ToArray();
+        }
+
+        public async Task<IEnumerable<TestViewModel>> TestsTakenByStudent(int studentId)
+        {
+            var student = await context.Students
+                                       .Include(s=>s.ClosedAnswers)
+                                       .ThenInclude(a=>a.Question)
+                                       .ThenInclude(q=>q.Test)
+                                       .Include(s=>s.OpenAnswers)
+                                       .ThenInclude(a => a.Question)
+                                       .ThenInclude(q => q.Test)
+                                       .FirstOrDefaultAsync(s=>s.Id == studentId);
+            var closedIds = student?.ClosedAnswers
+                                 ?.Select(a => a.Question.Test)
+                                 ?.Distinct() ?? new List<Test>();
+            var openIds = student?.OpenAnswers
+                                  ?.Select(a => a.Question.Test)
+                                  ?.Distinct() ?? new List<Test>();
+            return closedIds.Union(openIds)
+                            .Select(t => new TestViewModel()
+                            {
+                                AverageScore = t.AverageScore,
+                                ClosedQuestions = t.ClosedQuestions,
+                                Color1 = t.Color1,
+                                Color2 = t.Color2,
+                                CreatedOn = t.CreatedOn,
+                                Description = t.Description,
+                                Grade = t.Grade,
+                                Id = t.Id,
+                                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
+                                OpenQuestions = t.OpenQuestions,
+                                Time = t.Time,
+                                Title = t.Title,
+                                MultiSubmit = t.MultiSubmission
+                            });
+
+        }
+
+        public async Task<int> Create(TestViewModel model, int teacherId)
+        {
+            Test test = new Test()
+            {
+                Title = model.Title,
+                Description = model.Description,
+                Subject = model.Subject,
+                Time = model.Time,
+                Grade = model.Grade,
+                School = model.School,
+                Color1 = model.Color1,
+                Color2 = model.Color2,
+                CreatedOn = DateTime.Now,
+                CreatorId = teacherId,
+                OpenQuestions = new List<OpenQuestion>(),
+                ClosedQuestions = new List<ClosedQuestion>()
+            };
+            var e = await context.Tests.AddAsync(test);
+            await context.SaveChangesAsync();
+            return e.Entity.Id;
         }
 
 

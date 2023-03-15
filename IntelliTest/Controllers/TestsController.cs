@@ -60,8 +60,18 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> MyTests()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var model = await testService.GetMy(userId);
+            IEnumerable<TestViewModel> model = new List<TestViewModel>();
+            if ((bool)TempData.Peek("isTeacher"))
+            {
+                int teacherId = await teacherService.GetTeacherId(User.Id());
+                model = await testService.GetMy(teacherId);
+            }
+            else if ((bool)TempData.Peek("isStudent"))
+            {
+                int studentId = await studentService.GetStudentId(User.Id());
+                model = await testService.TestsTakenByStudent(studentId);
+            }
+            
             return View("Index", model);
         }
         [Route("Edit/{id}")]
@@ -76,6 +86,7 @@ namespace IntelliTest.Controllers
                 var model = await testService.GetById(id);
                 var testEdit = testService.ToEdit(model);
                 TempData["editModel"] = JsonSerializer.Serialize(testEdit);
+                TempData["testId"] = id;
                 return View("Edit", testEdit);
             }
             else
@@ -87,18 +98,25 @@ namespace IntelliTest.Controllers
                 model.Grade = viewModel.Grade;
 
                 model.Title = viewModel.Title;
-                for (int i = 0; i < viewModel.OpenQuestions.Count; i++)
+                if (viewModel.OpenQuestions != null)
                 {
-                    model.OpenQuestions[i].Answer = viewModel.OpenQuestions[i].Answer;
-                    model.OpenQuestions[i].Order = viewModel.OpenQuestions[i].Order;
-                    model.OpenQuestions[i].Text = viewModel.OpenQuestions[i].Text;
+                    for (int i = 0; i < viewModel.OpenQuestions.Count; i++)
+                    {
+                        model.OpenQuestions[i].Answer = viewModel.OpenQuestions[i].Answer;
+                        model.OpenQuestions[i].Order = viewModel.OpenQuestions[i].Order;
+                        model.OpenQuestions[i].Text = viewModel.OpenQuestions[i].Text;
+                    }
                 }
-                for (int i = 0; i < viewModel.ClosedQuestions.Count; i++)
+
+                if (viewModel.ClosedQuestions != null)
                 {
-                    model.ClosedQuestions[i].Answers = viewModel.ClosedQuestions[i].Answers;
-                    model.ClosedQuestions[i].AnswerIndexes = viewModel.ClosedQuestions[i].AnswerIndexes;
-                    model.ClosedQuestions[i].Order = viewModel.ClosedQuestions[i].Order;
-                    model.ClosedQuestions[i].Text = viewModel.ClosedQuestions[i].Text;
+                    for (int i = 0; i < viewModel.ClosedQuestions.Count; i++)
+                    {
+                        model.ClosedQuestions[i].Answers = viewModel.ClosedQuestions[i].Answers;
+                        model.ClosedQuestions[i].AnswerIndexes = viewModel.ClosedQuestions[i].AnswerIndexes;
+                        model.ClosedQuestions[i].Order = viewModel.ClosedQuestions[i].Order;
+                        model.ClosedQuestions[i].Text = viewModel.ClosedQuestions[i].Text;
+                    }
                 }
 
                 if (type == EditType.OpenQuestionAdd)
@@ -171,19 +189,52 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> EditSubmit(int id, TestEditViewModel model)
         {
-            if (!await testService.ExistsbyId(id+1))
+            if (model.ClosedQuestions == null)
+            {
+                model.ClosedQuestions = new List<ClosedQuestionViewModel>();
+            }
+            if (model.OpenQuestions == null)
+            {
+                model.OpenQuestions = new List<OpenQuestionViewModel>();
+            }
+            if (!await testService.ExistsbyId(id))
             {
                 return BadRequest();
             }
-
             if (!ModelState.IsValid)
             {
                 return View("Edit", model);
             }
 
-            await testService.Edit(id+1, model);
+            if (!(bool)TempData.Peek("isTeacher"))
+            {
+                return Unauthorized();
+            }
+
+            int teacherId = await teacherService.GetTeacherId(User.Id());
+            await testService.Edit(id, model, teacherId);
             return RedirectToAction("Index", testService.GetAll());
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            if (!(bool)TempData.Peek("isTeacher"))
+            {
+                return Unauthorized();
+            }
+
+            return View("Create", new TestViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(TestViewModel model)
+        {
+            int teacherId = await teacherService.GetTeacherId(User.Id());
+            int id = await testService.Create(model, teacherId);
+            return RedirectToAction("Edit", new {id = id});
+        }
+
         [HttpGet]
         [Route("Take/{testId}")]
         public async Task<IActionResult> Take(int testId)

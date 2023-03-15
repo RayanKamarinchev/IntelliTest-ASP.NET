@@ -10,8 +10,8 @@ namespace IntelliTest.Core.Models.Tests
 {
     public class TestEditViewModel
     {
-        public List<OpenQuestionViewModel> OpenQuestions { get; set; }
-        public List<ClosedQuestionViewModel> ClosedQuestions { get; set; }
+        public List<OpenQuestionViewModel>? OpenQuestions { get; set; }
+        public List<ClosedQuestionViewModel>? ClosedQuestions { get; set; }
         [Display(Name = "Заглавие: ")]
         public string Title { get; set; }
         [Display(Name = "Описание: ")]
