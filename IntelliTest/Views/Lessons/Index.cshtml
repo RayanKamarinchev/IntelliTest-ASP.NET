@@ -1,4 +1,5 @@
-﻿@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<LessonViewModel>
 @{
     ViewBag.Title = "Tests Blog";
 }
@@ -10,9 +11,9 @@
         </div>
         <section class="cd-gallery">
             <ul style="width: 100%">
-                @foreach (var test in Model)
+                @foreach (var lesson in Model)
                 {
-                    <partial name="TestPartialView" for="@test"/>
+                    <partial name="LessonPartialView" for="@lesson"/>
                 }
             </ul>
             <div class="cd-fail-message">Няма резултати</div>
@@ -20,6 +21,7 @@
         <partial name="FilterMenuPartialView"/>
     </main>
 </div>
+
 @section Scripts
 {
     <script src="~/js/filter.js"></script>

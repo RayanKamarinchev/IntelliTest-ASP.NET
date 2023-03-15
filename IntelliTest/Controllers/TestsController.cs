@@ -43,7 +43,6 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            cache.Remove("tests");
             if (cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
             {
             }
@@ -74,7 +73,8 @@ namespace IntelliTest.Controllers
             
             return View("Index", model);
         }
-        [Route("Edit/{id}")]
+        [Route("Tests/Edit/{id}")]
+        [HttpGet]
         public async Task<IActionResult> Edit(int id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
         {
             if (id!=-1)
@@ -254,7 +254,7 @@ namespace IntelliTest.Controllers
 
             if ((bool)TempData.Peek("isTeacher"))
             {
-                if (await teacherService.IsCreator(testId, await teacherService.GetTeacherId(User.Id())))
+                if (await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
                 {
                     return BadRequest();
                 }
@@ -303,7 +303,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            if (!await teacherService.IsCreator(testId, await teacherService.GetTeacherId(User.Id())))
+            if (!await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
             {
                 return Unauthorized();
             }

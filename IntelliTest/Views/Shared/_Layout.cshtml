@@ -7,12 +7,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - Watchlist</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
@@ -72,11 +72,13 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="navbar-brand logo" asp-area="" asp-controller="Home" asp-action="Index"><span class="logoCol1">Intelli</span><span class="logoCol2">Test</span></a>
+                        <a class="navbar-brand logo" asp-area="" asp-controller="Home" asp-action="Index">
+                            <span class="logoCol1">Intelli</span><span class="logoCol2">Test</span>
+                        </a>
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                            if (TempData.Peek("isStudent") == null)
+                        if (TempData.Peek("isStudent") == null)
                         {
                             TempData["isStudent"] = await studentService.ExistsByUserId(User.Id());
                             TempData["isTeacher"] = await teacherService.ExistsByUserId(User.Id());
@@ -89,8 +91,11 @@
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
                             </li>
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Lessons" asp-action="Index">Уроци</a>
+                            </li>
                         }
-                            if ((bool)TempData.Peek("isTeacher"))
+                        if ((bool)TempData.Peek("isTeacher"))
                         {
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>

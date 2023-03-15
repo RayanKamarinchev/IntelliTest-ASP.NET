@@ -19,5 +19,6 @@ namespace IntelliTest.Data.Entities
         public string UserId { get; set; }
         public IEnumerable<Class> Classes { get; set; }
         public IEnumerable<Test> Tests { get; set; }
+        public IEnumerable<Lesson> Lessons { get; set; }
     }
 }

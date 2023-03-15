@@ -138,5 +138,6 @@ namespace IntelliTest.Data
         public DbSet<OpenQuestion> OpenQuestions { get; set; }
         public DbSet<ClosedQuestion> ClosedQuestions { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
     }
 }

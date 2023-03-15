@@ -375,3 +375,11 @@ textarea {
     border-radius: 10px;
     background-color: #F5F5F5;
 }
+
+.lessonBox {
+    text-align: left;
+}
+
+.lessonBox p {
+    color: black;
+}

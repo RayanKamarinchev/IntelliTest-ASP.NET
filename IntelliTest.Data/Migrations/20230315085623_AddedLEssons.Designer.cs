@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230315085623_AddedLEssons")]
+    partial class AddedLEssons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +47,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Classes", (string)null);
+                    b.ToTable("Classes");
 
                     b.HasData(
                         new
@@ -98,7 +100,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("TestId");
 
-                    b.ToTable("ClosedQuestions", (string)null);
+                    b.ToTable("ClosedQuestions");
 
                     b.HasData(
                         new
@@ -137,7 +139,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("ClosedQuestionAnswers", (string)null);
+                    b.ToTable("ClosedQuestionAnswers");
 
                     b.HasData(
                         new
@@ -167,25 +169,11 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Grade")
-                        .HasColumnType("int");
-
                     b.Property<int>("Likes")
                         .HasColumnType("int");
 
                     b.Property<int>("Readers")
                         .HasColumnType("int");
-
-                    b.Property<int>("ReadingTime")
-                        .HasColumnType("int");
-
-                    b.Property<string>("School")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -195,7 +183,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Lessons", (string)null);
+                    b.ToTable("Lesson");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
@@ -235,7 +223,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("TestId");
 
-                    b.ToTable("OpenQuestions", (string)null);
+                    b.ToTable("OpenQuestions");
 
                     b.HasData(
                         new
@@ -273,7 +261,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("OpenQuestionAnswers", (string)null);
+                    b.ToTable("OpenQuestionAnswers");
 
                     b.HasData(
                         new
@@ -311,7 +299,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
 
                     b.HasData(
                         new
@@ -336,7 +324,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentClasses", (string)null);
+                    b.ToTable("StudentClasses");
 
                     b.HasData(
                         new
@@ -362,7 +350,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Teachers", (string)null);
+                    b.ToTable("Teachers");
 
                     b.HasData(
                         new
@@ -428,7 +416,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Tests", (string)null);
+                    b.ToTable("Tests");
 
                     b.HasData(
                         new

@@ -52,6 +52,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
