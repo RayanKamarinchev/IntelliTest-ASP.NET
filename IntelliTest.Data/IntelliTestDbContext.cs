@@ -102,8 +102,6 @@ namespace IntelliTest.Data
             FirstTest = new Test()
             {
                 AverageScore = 67.5m,
-                Color1 = "#358DF1",
-                Color2 = "#2383f0",
                 Title = "Електромагнитни вълни",
                 CreatedOn = new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307),
                 Description = "Просто тест",

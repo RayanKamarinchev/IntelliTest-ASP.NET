@@ -38,12 +38,6 @@ namespace IntelliTest.Models.Tests
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
-        [Required]
-        [Display(Name = "Цвят 1")]
-        public string Color1 { get; set; }
-        [Required]
-        [Display(Name = "Цвят 2")]
-        public string Color2 { get; set; }
         public IList<OpenQuestion> OpenQuestions { get; set; }
         public IList<ClosedQuestion> ClosedQuestions { get; set; }
         public bool MultiSubmit { get; set; }

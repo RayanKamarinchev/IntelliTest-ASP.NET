@@ -11,71 +11,68 @@
 
 <div>
     <main class="cd-main-content">
-        <a class="btn btn-secondary" style="position: fixed; bottom: 30px;right: 30px"
-           asp-action="Create">Направи</a>
+        <div class="floating-container">
+            <a class="floating-button" asp-action="Create">+</a>
+        </div>
         <section class="cd-gallery">
-            <ul>
+            <ul style="width: 100%">
                 @foreach (var test in Model)
                 {
-                    <div class="container">
-                        <div class="row">
-                            <div class="card card-margin">
-                                <div class="card-header no-border">
-                                    <h5 class="card-title">@test.Title - @test.Grade</h5>
+                    <div class="card card-margin">
+                        <div class="card-header no-border">
+                            <h5 class="card-title">@test.Title - @test.Grade</h5>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="widget-49">
+                                <div class="widget-49-title-wrapper">
+                                    <div class="widget-49-date-primary">
+                                        <span class="widget-49-date-day">@test.AverageScore</span>
+                                        <span class="widget-49-date-month">score</span>
+                                    </div>
+                                    <div class="widget-49-meeting-info">
+                                        <span class="widget-49-pro-title">@test.Description</span>
+                                        <span class="widget-49-meeting-time">@test.CreatedOn</span>
+                                    </div>
                                 </div>
-                                <div class="card-body pt-0">
-                                    <div class="widget-49">
-                                        <div class="widget-49-title-wrapper">
-                                            <div class="widget-49-date-primary">
-                                                <span class="widget-49-date-day">@test.AverageScore</span>
-                                                <span class="widget-49-date-month">score</span>
-                                            </div>
-                                            <div class="widget-49-meeting-info">
-                                                <span class="widget-49-pro-title">@test.Description</span>
-                                                <span class="widget-49-meeting-time">@test.CreatedOn</span>
-                                            </div>
-                                        </div>
-                                        <ol class="widget-49-meeting-points">
-                                            <li class="widget-49-meeting-item"><span>Въпроси: @(test.OpenQuestions.Count() + test.ClosedQuestions.Count())</span></li>
-                                            <li class="widget-49-meeting-item"><span>Време: @test.Time мин</span></li>
-                                            <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
-                                        </ol>
-                                        <div class="widget-49-meeting-action d-flex justify-content-end">
-                                            @{
-                                                if ((bool)TempData.Peek("isTeacher"))
+                                <ol class="widget-49-meeting-points">
+                                    <li class="widget-49-meeting-item"><span>Въпроси: @(test.OpenQuestions.Count() + test.ClosedQuestions.Count())</span></li>
+                                    <li class="widget-49-meeting-item"><span>Време: @test.Time мин</span></li>
+                                    <li class="widget-49-meeting-item"><span>Изпитници: @test.Students</span></li>
+                                </ol>
+                                <div class="widget-49-meeting-action d-flex justify-content-end">
+                                    @{
+                                        if ((bool)TempData.Peek("isTeacher"))
+                                        {
+                                            bool isOwner = await teacherService.IsCreator(test.Id, await teacherService.GetTeacherId(User.Id()));
+                                            if (isOwner)
+                                            {
+                                                <a asp-action="Statistics" asp-route-testId="@test.Id"
+                                                   class="btn btn-sm btn-primary back-col" style="margin-right: 30px">Статистика</a>
+                                            }
+                                            <a asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id"
+                                               class="btn btn-sm btn-primary back-col">Редактирай</a>
+                                        }
+                                        else
+                                        {
+                                            int studentId = await studentService.GetStudentId(User.Id());
+                                            var student = await studentService.GetStudent(studentId);
+                                            if (await testService.IsTestTakenByStudentId(test.Id, student))
+                                            {
+                                                <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@test.Id"
+                                                   class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Резултати</a>
+                                                @if (test.MultiSubmit)
                                                 {
-                                                    bool isOwner = await teacherService.IsCreator(test.Id, await teacherService.GetTeacherId(User.Id()));
-                                                    if (isOwner)
-                                                    {
-                                                            <a asp-action="Statistics" asp-route-testId="@test.Id"
-                                                           class="btn btn-sm btn-primary back-col" style="margin-right: 30px">Статистика</a>
-                                                    }
-                                                        <a asp-controller="Tests" asp-action="Edit" asp-route-id="@test.Id"
-                                                       class="btn btn-sm btn-primary back-col">Редактирай</a>
-                                                }
-                                                else
-                                                {
-                                                    int studentId = await studentService.GetStudentId(User.Id());
-                                                    var student = await studentService.GetStudent(studentId);
-                                                    if (await testService.IsTestTakenByStudentId(test.Id, student))
-                                                    {
-                                                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@test.Id"
-                                                           class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Резултати</a>
-                                                            @if (test.MultiSubmit)
-                                                        {
-                                                                <a onClick="warn(@test.Id, @test.Time, '@test.Title')"
-                                                                   class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Направи</a>
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                            <a onClick="warn(@test.Id, @test.Time, '@test.Title')"
-                                                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Направи</a>
-                                                    }
+                                                    <a onClick="warn(@test.Id, @test.Time, '@test.Title')"
+                                                       class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Направи</a>
                                                 }
                                             }
-                                        </div>
-                                    </div>
+                                            else
+                                            {
+                                                <a onClick="warn(@test.Id, @test.Time, '@test.Title')"
+                                                   class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">Направи</a>
+                                            }
+                                        }
+                                    }
                                 </div>
                             </div>
                         </div>

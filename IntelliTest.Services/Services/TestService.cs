@@ -25,8 +25,6 @@ namespace IntelliTest.Core.Services
                                 {
                                     AverageScore = t.AverageScore,
                                     ClosedQuestions = t.ClosedQuestions,
-                                    Color1 = t.Color1,
-                                    Color2 = t.Color2,
                                     CreatedOn = t.CreatedOn,
                                     Description = t.Description,
                                     Grade = t.Grade,
@@ -48,8 +46,6 @@ namespace IntelliTest.Core.Services
                                 {
                                     AverageScore = t.AverageScore,
                                     ClosedQuestions = t.ClosedQuestions,
-                                    Color1 = t.Color1,
-                                    Color2 = t.Color2,
                                     CreatedOn = t.CreatedOn,
                                     Description = t.Description,
                                     Grade = t.Grade,
@@ -73,8 +69,6 @@ namespace IntelliTest.Core.Services
             {
                 AverageScore = t.AverageScore,
                 ClosedQuestions = t.ClosedQuestions,
-                Color1 = t.Color1,
-                Color2 = t.Color2,
                 CreatedOn = t.CreatedOn,
                 Description = t.Description,
                 Grade = t.Grade,
@@ -201,8 +195,6 @@ namespace IntelliTest.Core.Services
                     Time = model.Time,
                     ClosedQuestions = closedQuestions,
                     OpenQuestions = openQuestions,
-                    Color1 = test.Color1,
-                    Color2 = test.Color2,
                     CreatedOn = DateTime.Now,
                     CreatorId = teacherId
                 };
@@ -373,8 +365,6 @@ namespace IntelliTest.Core.Services
                             {
                                 AverageScore = t.AverageScore,
                                 ClosedQuestions = t.ClosedQuestions,
-                                Color1 = t.Color1,
-                                Color2 = t.Color2,
                                 CreatedOn = t.CreatedOn,
                                 Description = t.Description,
                                 Grade = t.Grade,
@@ -398,8 +388,6 @@ namespace IntelliTest.Core.Services
                 Time = model.Time,
                 Grade = model.Grade,
                 School = model.School,
-                Color1 = model.Color1,
-                Color2 = model.Color2,
                 CreatedOn = DateTime.Now,
                 CreatorId = teacherId,
                 OpenQuestions = new List<OpenQuestion>(),

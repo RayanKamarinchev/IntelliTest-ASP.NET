@@ -28,10 +28,6 @@ namespace IntelliTest.Data.Entities
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
-        [Required]
-        public string Color1 { get; set; }
-        [Required]
-        public string Color2 { get; set; }
 
         public IList<OpenQuestion> OpenQuestions { get; set; } = new List<OpenQuestion>();
         public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
