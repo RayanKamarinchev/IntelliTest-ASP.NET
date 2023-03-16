@@ -30,7 +30,7 @@
                         bool isOwner = await teacherService.IsLessonCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
                         if (isOwner)
                         {
-                                        <a asp-action="Edit" asp-route-testId="@Model.Id"
+                                        <a asp-action="Edit" asp-route-id="@Model.Id"
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
                                                         Редактирай
                                         </a>

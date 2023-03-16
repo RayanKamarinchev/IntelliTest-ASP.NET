@@ -17,6 +17,16 @@
     {
       "library": "sweetalert2@11.7.3",
       "destination": "wwwroot/lib/sweetalert2/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@ckeditor/ckeditor5-autoformat@34.1.0",
+      "destination": "wwwroot/lib/ckeditor/ckeditor5-autoformat/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@ckeditor/ckeditor5-basic-styles@34.1.0",
+      "destination": "wwwroot/lib/ckeditor/ckeditor5-basic-styles/"
     }
   ]
 }

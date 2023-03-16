@@ -58,10 +58,10 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Edit/{id}")]
-        public async Task<IActionResult> Edit(int lessonId)
+        [Route("Lessons/Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (!await lessonService.ExistsById(lessonId))
+            if (!await lessonService.ExistsById(id))
             {
                 return BadRequest();
             }
@@ -73,20 +73,19 @@ namespace IntelliTest.Controllers
 
             int teacherId = await teacherService.GetTeacherId(User.Id());
 
-            if (!await teacherService.IsLessonCreator(lessonId, teacherId))
+            if (!await teacherService.IsLessonCreator(id, teacherId))
             {
                 return Unauthorized();
             }
 
-            LessonViewModel model = await lessonService.GetById(lessonId);
+            LessonViewModel model = await lessonService.GetById(id);
             return View(model);
         }
 
         [HttpPost]
-        [Route("Edit/{id}")]
-        public async Task<IActionResult> Edit(int lessonId, LessonViewModel model)
+        public async Task<IActionResult> Edit(int id, LessonViewModel model)
         {
-            if (!await lessonService.ExistsById(lessonId))
+            if (!await lessonService.ExistsById(id))
             {
                 return BadRequest();
             }
@@ -98,12 +97,12 @@ namespace IntelliTest.Controllers
 
             int teacherId = await teacherService.GetTeacherId(User.Id());
 
-            if (!await teacherService.IsLessonCreator(lessonId, teacherId))
+            if (!await teacherService.IsLessonCreator(id, teacherId))
             {
                 return Unauthorized();
             }
 
-            await lessonService.Edit(lessonId, model);
+            await lessonService.Edit(id, model);
             return View("Index");
         }
     }
