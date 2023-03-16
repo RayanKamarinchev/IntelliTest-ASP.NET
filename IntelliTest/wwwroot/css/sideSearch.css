@@ -255,11 +255,11 @@ xgallery
   .cd-gallery {
     padding: 40px 3%;
   }
-  .cd-gallery ul {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: left;
-  }
+    .cd-gallery ul {
+        justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+    }
   .cd-gallery ul:after {
     content: "";
     display: table;
@@ -386,20 +386,21 @@ xfilter
   pointer-events: none;
 }
 @media only screen and (min-width: 1170px) {
-  .cd-filter-trigger {
-    width: auto;
-    left: 2%;
-    text-indent: 0;
-    color: #9a9a9a;
-    text-transform: uppercase;
-    /*font-size: 1.3rem;*/
-    font-weight: 700;
-    padding-left: 24px;
-    background-position: left center;
-    -webkit-transition: color 0.3s;
-    -moz-transition: color 0.3s;
-    transition: color 0.3s;
-  }
+    .cd-filter-trigger {
+        width: auto;
+        left: 2%;
+        text-indent: 0;
+        color: #9a9a9a;
+        text-transform: uppercase;
+        /*font-size: 1.3rem;*/
+        font-weight: 700;
+        padding-left: 24px;
+        background-position: left center;
+        -webkit-transition: color 0.3s;
+        -moz-transition: color 0.3s;
+        transition: color 0.3s;
+        font-size: 30px;
+    }
   .no-touch .cd-filter-trigger:hover {
     color: #4797f2;
   }

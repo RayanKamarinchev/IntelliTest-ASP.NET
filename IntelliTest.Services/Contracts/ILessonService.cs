@@ -13,5 +13,7 @@ namespace IntelliTest.Core.Contracts
         Task<LessonViewModel> GetById(int lessonId);
         Task<bool> ExistsById(int lessonId);
         Task Edit(int lessonId, LessonViewModel model);
+        EditLessonViewModel ToEdit(LessonViewModel model);
+        Task Create(EditLessonViewModel model, int teacherId);
     }
 }

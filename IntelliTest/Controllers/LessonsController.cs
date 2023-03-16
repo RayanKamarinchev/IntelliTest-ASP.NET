@@ -53,8 +53,38 @@ namespace IntelliTest.Controllers
                 return BadRequest();
             }
 
-            LessonViewModel model = await lessonService.GetById(id);
+            EditLessonViewModel model = lessonService.ToEdit(await lessonService.GetById(id));
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            if (!(bool)TempData.Peek("IsTeacher"))
+            {
+                return Unauthorized();
+            }
+
+            return View("Edit", new EditLessonViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(EditLessonViewModel model)
+        {
+            if (!(bool)TempData.Peek("IsTeacher"))
+            {
+                return Unauthorized();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Edit", model);
+            }
+
+            int teacherId = await teacherService.GetTeacherId(User.Id());
+            await lessonService.Create(model, teacherId);
+
+            return View("Index");
         }
 
         [HttpGet]
@@ -78,7 +108,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            LessonViewModel model = await lessonService.GetById(id);
+            EditLessonViewModel model = lessonService.ToEdit(await lessonService.GetById(id));
             return View(model);
         }
 
