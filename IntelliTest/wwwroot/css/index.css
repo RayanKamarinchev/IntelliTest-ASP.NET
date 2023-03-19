@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Montserrat:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
 *,
 *::after,
-*::before{
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  font-family: "Open Sans";
-  font-size: 20px;
+*::before {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: "Montserrat";
+    font-size: 20px;
 }
 
 .html{
@@ -19,10 +19,10 @@
   display: none;
 }
 
-.container{
-  max-width: 10000px;
-  width: 100%;
-  margin: auto;
+.container-mother {
+    max-width: 10000px;
+    width: 100%;
+    margin: auto;
     padding: 0;
 }
 
@@ -71,7 +71,7 @@
   color: #444;
   text-decoration: none;
   font-weight: 800;
-  transition: color 0.3s ease-in-out;
+  transition: color 0.2s ease-in-out;
 }
 
 .active{
@@ -82,7 +82,9 @@
   color: #4797f2 !important;
 }
 .nav-item a {
-    font-size: 25px
+    font-size: 25px;
+    cursor: pointer;
+    user-select: none;
 }
 
 a{
@@ -206,12 +208,14 @@ ul, il{
     font-family: "Quicksand";
     color: #4797f2;
     font-size: 40px;
+    user-select: none;
 }
 
 .logoCol2 {
     font-family: "Quicksand";
     color: #ECA400;
     font-size: 40px;
+    user-select: none;
 }
 
 .heartIcon {
@@ -267,15 +271,20 @@ body {
 
 .card {
     width: 500px;
+    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: #ffffff;
     background-clip: border-box;
     border: 1px solid #e6e4e9;
-    border-radius: 8px;
+    border-radius: 10px;
+}
+
+.card > img {
+    margin-bottom: 10px;
+    max-height: 300px;
 }
 
     .card .card-header.no-border {

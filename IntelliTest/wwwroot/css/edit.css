@@ -101,6 +101,25 @@
     background-color: #eee;
 }
 
+.icon-1x {
+    font-size: 24px !important;
+}
+
+a {
+    text-decoration: none;
+}
+
+.text-primary, a.text-primary:focus, a.text-primary:hover {
+    color: #00ADBB !important;
+}
+
+.text-black, .text-hover-black:hover {
+    color: #000 !important;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
 
 
 .questBox {
@@ -136,7 +155,7 @@
     section {
         padding: 1em;
     }
-    .card {
+    .card-body {
         padding: 1em 1em;
     }
     .column {
@@ -152,7 +171,7 @@
     width: calc(100% - 80px);
 }
 .questAnswer {
-    width: calc(100%-130px);
+    width: calc(100% - 130px);
     margin-top: 20px;
     margin-left: 50px;
 }
@@ -382,4 +401,109 @@ textarea {
 
 .lessonBox p {
     color: black;
+}
+
+.propMenu {
+    overflow: hidden;
+    width: 20%;
+    min-height: 400px;
+    position: sticky;
+    left: 3%;
+    top: 10%;
+    background-color: #ffffff;
+    margin-top: 50px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 9px 0px rgb(0 0 0 / 10%);
+    user-select: none;
+}
+
+.propMenu > * > * {
+    margin-bottom: 24px;
+}
+
+.propMenu-description {
+    padding: 10px;
+}
+
+.propMenu-title-input {
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 18px;
+    background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 45%, rgba(239,239,239,1) 75%, rgba(226,226,226,1) 100%);
+}
+
+.propMenu-description-button {
+    margin: 15px;
+    text-align: center;
+}
+
+.btn-hover {
+    width: 200px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    margin: 20px;
+    height: 55px;
+    text-align: center;
+    border: none;
+    background-size: 300% 100%;
+    border-radius: 50px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:hover {
+    background-position: 100% 0;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:focus {
+    outline: none;
+}
+
+.btn-hover.color {
+    background-image: linear-gradient(to right, #1b90e5, #0f80ee, #0083e8, #1b89e3);
+    box-shadow: 0 4px 15px 0 rgba(53, 152, 234, 0.75);
+}
+
+.btn-hover {
+    width: 200px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    margin: 20px;
+    height: 55px;
+    text-align: center;
+    border: none;
+    background-size: 300% 100%;
+    border-radius: 50px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:hover {
+    background-position: 100% 0;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:focus {
+    outline: none;
+}
+
+.btn-hover.color-2 {
+    background-image: linear-gradient(to right, #fc6076, #ff9a44, #ef9d43, #fc6348);
+    box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
 }

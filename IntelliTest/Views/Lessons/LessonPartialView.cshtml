@@ -4,6 +4,7 @@
 @model LessonViewModel
 @inject ITeacherService teacherService
 <div class="card card-margin">
+    <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
     <div class="card-header no-border">
         <h5 class="card-title">@Model.Title - @Model.Grade</h5>
     </div>
@@ -11,16 +12,16 @@
         <div class="widget-49">
             <div class="widget-49-title-wrapper">
                 <div class="widget-49-meeting-info">
-                    <span class="widget-49-pro-title">@Model.Content.Substring(0,100)...</span>
+                    <span class="widget-49-pro-title">@Model.Content.Substring(0, 100)...</span>
                     <span class="widget-49-meeting-time">@Model.CreatedOn</span>
                 </div>
             </div>
             <ol class="widget-49-meeting-points">
                 <li class="widget-49-meeting-item">
-                    <span>Време за прочитане: @Model.ReadingTime мин</span>
+                    <span>Време за прочитане: <strong>@Model.ReadingTime мин</strong></span>
                 </li>
                 <li class="widget-49-meeting-item">
-                    <span>Читатели: @Model.Readers</span>
+                    <span>Читатели: <strong>@Model.Readers</strong></span>
                 </li>
             </ol>
             <div class="widget-49-meeting-action d-flex justify-content-end">
@@ -30,10 +31,10 @@
                         bool isOwner = await teacherService.IsLessonCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
                         if (isOwner)
                         {
-                                        <a asp-action="Edit" asp-route-id="@Model.Id"
+                            <a asp-action="Edit" asp-route-id="@Model.Id"
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
-                                                        Редактирай
-                                        </a>
+                                Редактирай
+                            </a>
                         }
                     }
                     <a asp-action="Details" asp-route-id="@Model.Id"
