@@ -1,47 +1,37 @@
-﻿@using IntelliTest.Services.Infrastructure
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using IntelliTest.Core.Contracts
-@model LessonViewModel
-@inject ITeacherService teacherService
-<div class="card card-margin">
-    <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
-    <div class="card-header no-border">
-        <h5 class="card-title">@Model.Title - @Model.Grade</h5>
+﻿@model LessonViewModel
+<div class="row align-items-center">
+    <div class="col-md-8 mb-3 mb-sm-0">
+        <h5>
+            <a href="#" class="text-primary">@Model.Title</a>
+        </h5>
+        <p style="color: rgba(0, 0, 0, 0.6)">
+            <span class="body_size">Posted</span>
+            <a class="text-black body_size" href="#">@((DateTime.Now - Model.CreatedOn).Minutes) minutes</a>
+            <span class="body_size">ago by</span>
+            <a class="text-black body_size">@Model.CreatorName</a>
+        </p>
+        <p>училище @Model.School</p>
+        <div style="color: rgba(0, 0, 0, 0.5)">
+            <a class="text-black body_size">#@Model.Subject</a>
+        </div>
     </div>
-    <div class="card-body pt-0">
-        <div class="widget-49">
-            <div class="widget-49-title-wrapper">
-                <div class="widget-49-meeting-info">
-                    <span class="widget-49-pro-title">@Model.Content.Substring(0, 100)...</span>
-                    <span class="widget-49-meeting-time">@Model.CreatedOn</span>
-                </div>
+    <div class="col-md-4">
+        <div class="row text-center op-7">
+            <div class="col px-1 lessonProp">
+                <div class="heart" onClick="onLike(this)"></div>
+                <span style="align-self: end" class="d-block body_size">@Model.Likes Likes</span>
             </div>
-            <ol class="widget-49-meeting-points">
-                <li class="widget-49-meeting-item">
-                    <span>Време за прочитане: <strong>@Model.ReadingTime мин</strong></span>
-                </li>
-                <li class="widget-49-meeting-item">
-                    <span>Читатели: <strong>@Model.Readers</strong></span>
-                </li>
-            </ol>
-            <div class="widget-49-meeting-action d-flex justify-content-end">
-                @{
-                    if ((bool)TempData.Peek("isTeacher"))
-                    {
-                        bool isOwner = await teacherService.IsLessonCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
-                        if (isOwner)
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.Id"
-                               class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
-                                Редактирай
-                            </a>
-                        }
-                    }
-                    <a asp-action="Details" asp-route-id="@Model.Id"
-                       class="btn btn-sm btn-secondary back-col">
-                        Виж
-                    </a>
-                }
+            <div class="col px-1">
+                <i class="fa-regular fa-comment"></i>
+                <span class="d-block body_size">2 Replies</span>
+            </div>
+            <div class="col px-1">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <span class="d-block body_size">@Model.Readers Readers</span>
+            </div>
+            <div class="col px-1">
+                <i class="fa-regular fa-clock"></i>
+                <span class="d-block body_size">@Math.Round(Model.Content.Split(" ").Length/150.0) min reading time</span>
             </div>
         </div>
     </div>

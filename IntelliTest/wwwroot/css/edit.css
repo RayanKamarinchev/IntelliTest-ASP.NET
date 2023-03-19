@@ -1,6 +1,4 @@
-﻿html {
-    scroll-behavior: auto !important;
-}
+﻿html { scroll-behavior: auto !important; }
 
 @-webkit-keyframes come-in {
     0% {
@@ -59,38 +57,36 @@
     margin: 35px 25px;
 }
 
-.floating-container:hover {
-    height: 300px;
+.floating-container:hover { height: 300px; }
+
+.floating-container:hover .floating-button {
+    box-shadow: 0 10px 25px rgba(255, 164, 0, 0.8);
+    -webkit-transform: translatey(5px);
+    transform: translatey(5px);
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
 }
 
-    .floating-container:hover .floating-button {
-        box-shadow: 0 10px 25px rgba(255, 164, 0, 0.8);
-        -webkit-transform: translatey(5px);
-        transform: translatey(5px);
-        -webkit-transition: all 0.3s;
-        transition: all 0.3s;
-    }
-
-    .floating-container .floating-button {
-        position: absolute;
-        width: 65px;
-        height: 65px;
-        background: #ECA400;
-        bottom: 0;
-        border-radius: 50%;
-        left: 0;
-        right: 0;
-        margin: auto;
-        color: white;
-        line-height: 65px;
-        text-align: center;
-        font-size: 30px;
-        z-index: 100;
-        box-shadow: 0 10px 25px -5px rgba(255, 164, 0, 0.6);
-        cursor: pointer;
-        -webkit-transition: all 0.3s;
-        transition: all 0.3s;
-    }
+.floating-container .floating-button {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    background: #ECA400;
+    bottom: 0;
+    border-radius: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    color: white;
+    line-height: 65px;
+    text-align: center;
+    font-size: 30px;
+    z-index: 100;
+    box-shadow: 0 10px 25px -5px rgba(255, 164, 0, 0.6);
+    cursor: pointer;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
 
 .editMain {
     display: flex;
@@ -101,26 +97,19 @@
     background-color: #eee;
 }
 
-.icon-1x {
-    font-size: 24px !important;
-}
+.icon-1x { font-size: 24px !important; }
 
-a {
-    text-decoration: none;
-}
+a { text-decoration: none; }
 
-.text-primary, a.text-primary:focus, a.text-primary:hover {
-    color: #00ADBB !important;
-}
+.text-primary, a.text-primary:focus, a.text-primary:hover { color: #4797f2 !important; }
 
-.text-black, .text-hover-black:hover {
-    color: #000 !important;
-}
+.text-black, .text-hover-black:hover { color: #000 !important; }
 
-.font-weight-bold {
-    font-weight: 700 !important;
-}
+.font-weight-bold { font-weight: 700 !important; }
 
+.questBoxHover { text-align: left !important; }
+
+.questBoxHover:hover { background-position: 0em 0em; }
 
 .questBox {
     position: relative;
@@ -136,28 +125,28 @@ a {
     background-position: -0.4em 0em;
     transition: 0.5s;
 }
+
 .questBox h3 {
     margin: 0.5em 0 1.4em 0;
     font-weight: 600;
     letter-spacing: 0.3px;
     color: #070024;
 }
-    .questBox p {
-        line-height: 1.2em;
-        color: #358DF1;
-    }
-@media screen and (min-width: 768px) {
-    section {
-        padding: 1em 7em;
-    }
+
+.questBox p {
+    line-height: 1.2em;
+    color: #358DF1;
 }
+
+@media screen and (min-width: 768px) {
+    section { padding: 1em 7em; }
+}
+
 @media screen and (min-width: 992px) {
-    section {
-        padding: 1em;
-    }
-    .card-body {
-        padding: 1em 1em;
-    }
+    section { padding: 1em; }
+
+    .card-body { padding: 1em 1em; }
+
     .column {
         flex: 0 0 33.33%;
         max-width: 33.33%;
@@ -165,18 +154,23 @@ a {
     }
 }
 
+.lessonProp {
+    display: flex;
+    justify-content: center
+}
 
 .questTextBox {
     position: relative;
     width: calc(100% - 80px);
 }
+
 .questAnswer {
     width: calc(100% - 130px);
     margin-top: 20px;
     margin-left: 50px;
 }
 
-.questTextBox input[type="text"]{
+.questTextBox input[type="text"] {
     margin-left: 20px;
     width: 100%;
     height: 30px;
@@ -198,29 +192,28 @@ a {
     color: black;
 }
 
-.questTextBox input[type="text"] :focus ~ label,  .questTextBox input[type="text"] :valid ~ label {
-    display: none;
+.questTextBox input[type="text"] :focus ~ label, .questTextBox input[type="text"] :valid ~ label { display: none; }
+
+.questTextBox input[type="text"]:focus ~ .underline { width: 100%; }
+
+.questTextBox .underline {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    width: 0;
+    height: 2px;
+    background: #444;
+    transition: all 300ms ease-out;
 }
-.questTextBox input[type="text"]:focus ~ .underline {
-    width: 100%;
-}
-    .questTextBox .underline {
-        content: '';
-        display: block;
-        position: absolute;
-        top: 30px;
-        left: 20px;
-        width: 0;
-        height: 2px;
-        background: #444;
-        transition: all 300ms ease-out;
-    }
 
 :root {
     --select-border: #777;
     --select-focus: #444;
     --select-arrow: var(--select-border);
 }
+
 customSelect {
     appearance: none;
     background-color: transparent;
@@ -235,29 +228,25 @@ customSelect {
     z-index: 1;
     outline: none;
 }
-customSelect::-ms-expand {
-    display: none;
-}
+
+customSelect::-ms-expand { display: none; }
 
 label {
     font-size: 1.125rem;
     font-weight: 500;
 }
 
-.customRow{
-    display: flex;
-}
+.customRow { display: flex; }
 
-.choice{
-    margin-top: 20px;
-}
+.choice { margin-top: 20px; }
 
-.option{
+.option {
     margin-top: 20px;
     margin-left: 20px;
     font-size: 1.2rem;
 }
-.questTextBox input[type="checkbox"]{
+
+.questTextBox input[type="checkbox"] {
     position: absolute;
     left: -25px;
     top: 5px;
@@ -265,44 +254,45 @@ label {
     width: 20px;
 }
 
-#standard-select{
+#standard-select {
     padding: 5px;
     font-size: 25px;
     border-radius: 10px;
 }
-.customRow{
-    justify-content: space-between;
-}
 
-.btn-primary{
+.customRow { justify-content: space-between; }
+
+.btn-primary {
     background-color: #2182ff;
     border-color: #2182ff;
 }
 
-.btn-primary:hover{
-    background-color: #0d77ff;
-    border-color: #0d77ff;
-}
-.btn-primary:focus{
+.btn-primary:hover {
     background-color: #0d77ff;
     border-color: #0d77ff;
 }
 
-.btn-secondary{
+.btn-primary:focus {
+    background-color: #0d77ff;
+    border-color: #0d77ff;
+}
+
+.btn-secondary {
     background-color: #ECA400;
     border-color: #ECA400;
 }
 
-.btn-secondary:hover{
-    background-color: #d89600;
-    border-color: #d89600;
-}
-.btn-secondary:focus{
+.btn-secondary:hover {
     background-color: #d89600;
     border-color: #d89600;
 }
 
-textarea{
+.btn-secondary:focus {
+    background-color: #d89600;
+    border-color: #d89600;
+}
+
+textarea {
     margin-left: calc(var(--bs-gutter-x) * .5);
     padding: 7px !important;
     width: 100%;
@@ -313,9 +303,7 @@ textarea{
     margin-right: 50px
 }
 
-.widthMax {
-    width: 100%;
-}
+.widthMax { width: 100%; }
 
 .circle {
     border-radius: 50%;
@@ -325,12 +313,11 @@ textarea{
     border: none;
     background-color: white;
 }
-.circle:hover{
-    background-color: #eee;
-}
-.circle:active {
-    background-color: #aaa;
-}
+
+.circle:hover { background-color: #eee; }
+
+.circle:active { background-color: #aaa; }
+
 .questionScore {
     position: absolute;
     right: 20px;
@@ -338,9 +325,8 @@ textarea{
     border: none;
     font-size: 30px;
 }
-textarea {
-    border-radius: 5px;
-}
+
+textarea { border-radius: 5px; }
 
 .timer {
     position: fixed;
@@ -355,12 +341,10 @@ textarea {
     padding-right: 15px;
 }
 
-.icon-answer {
-    display: flex;
-}
-.icon-answer svg {
-    align-self: center;
-}
+.icon-answer { display: flex; }
+
+.icon-answer svg { align-self: center; }
+
 .icon-answer p {
     margin-bottom: 0 !important;
     margin-left: 10px;
@@ -381,7 +365,7 @@ textarea {
 
 .answersView::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: #555;
 }
 
@@ -389,19 +373,16 @@ textarea {
     width: 12px;
     background-color: #F5F5F5;
 }
+
 .answersView::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     background-color: #F5F5F5;
 }
 
-.lessonBox {
-    text-align: left;
-}
+.lessonBox { text-align: left; }
 
-.lessonBox p {
-    color: black;
-}
+.lessonBox p { color: black; }
 
 .propMenu {
     overflow: hidden;
@@ -417,20 +398,16 @@ textarea {
     user-select: none;
 }
 
-.propMenu > * > * {
-    margin-bottom: 24px;
-}
+.propMenu > * > * { margin-bottom: 24px; }
 
-.propMenu-description {
-    padding: 10px;
-}
+.propMenu-description { padding: 10px; }
 
 .propMenu-title-input {
     border-radius: 4px;
     padding: 5px;
     font-size: 18px;
-    background: rgb(255,255,255);
-    background: linear-gradient(180deg, rgba(255,255,255,1) 45%, rgba(239,239,239,1) 75%, rgba(226,226,226,1) 100%);
+    background: rgb(255, 255, 255);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 45%, rgba(239, 239, 239, 1) 75%, rgba(226, 226, 226, 1) 100%);
 }
 
 .propMenu-description-button {
@@ -464,9 +441,7 @@ textarea {
     transition: all .4s ease-in-out;
 }
 
-.btn-hover:focus {
-    outline: none;
-}
+.btn-hover:focus { outline: none; }
 
 .btn-hover.color {
     background-image: linear-gradient(to right, #1b90e5, #0f80ee, #0083e8, #1b89e3);
@@ -499,9 +474,7 @@ textarea {
     transition: all .4s ease-in-out;
 }
 
-.btn-hover:focus {
-    outline: none;
-}
+.btn-hover:focus { outline: none; }
 
 .btn-hover.color-2 {
     background-image: linear-gradient(to right, #fc6076, #ff9a44, #ef9d43, #fc6348);

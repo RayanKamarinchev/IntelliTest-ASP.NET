@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230319212252_removedReadingTime")]
+    partial class removedReadingTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,6 +172,9 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Grade")
                         .HasColumnType("int");
 
+                    b.Property<int>("Likes")
+                        .HasColumnType("int");
+
                     b.Property<int>("Readers")
                         .HasColumnType("int");
 
@@ -190,21 +195,6 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("CreatorId");
 
                     b.ToTable("Lessons");
-                });
-
-            modelBuilder.Entity("IntelliTest.Data.Entities.LessonLike", b =>
-                {
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("LessonId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LessonLike");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
@@ -456,21 +446,6 @@ namespace IntelliTest.Data.Migrations
                             Time = 30,
                             Title = "Електромагнитни вълни"
                         });
-                });
-
-            modelBuilder.Entity("IntelliTest.Data.Entities.TestLike", b =>
-                {
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("TestId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TestLike");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -754,25 +729,6 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("IntelliTest.Data.Entities.LessonLike", b =>
-                {
-                    b.HasOne("IntelliTest.Data.Entities.Lesson", "Lesson")
-                        .WithMany("LessonLikes")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IntelliTest.Data.Entities.User", "User")
-                        .WithMany("LessonLikes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
                 {
                     b.HasOne("IntelliTest.Data.Entities.Lesson", "Lesson")
@@ -861,25 +817,6 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("IntelliTest.Data.Entities.TestLike", b =>
-                {
-                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
-                        .WithMany("TestLikes")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IntelliTest.Data.Entities.User", "User")
-                        .WithMany("TestLikes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Test");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -945,8 +882,6 @@ namespace IntelliTest.Data.Migrations
                 {
                     b.Navigation("ClosedQuestions");
 
-                    b.Navigation("LessonLikes");
-
                     b.Navigation("OpenQuestions");
                 });
 
@@ -978,15 +913,6 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("ClosedQuestions");
 
                     b.Navigation("OpenQuestions");
-
-                    b.Navigation("TestLikes");
-                });
-
-            modelBuilder.Entity("IntelliTest.Data.Entities.User", b =>
-                {
-                    b.Navigation("LessonLikes");
-
-                    b.Navigation("TestLikes");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,6 +10,10 @@
     font-size: 20px;
 }
 
+.body_size {
+    font-size: 1rem;
+}
+
 .html{
   font-size: 62.5%;
 }
@@ -94,6 +98,10 @@ a{
 
 ul, il{
   list-style: none;
+}
+
+.nav-link {
+    font-weight: 600 !important;
 }
 
 @media (max-width: 768px){
@@ -223,14 +231,9 @@ ul, il{
     font-size: 18px;
 }
 
-.heartMenu {
-    display: none;
-    position: absolute;
-    right: -25px;
-    top: -25px;
-}
-
 .heart {
+    position: absolute;
+    bottom: 30px;
     width: 100px;
     height: 100px;
     background: url("https://cssanimation.rocks/images/posts/steps/heart.png") no-repeat;

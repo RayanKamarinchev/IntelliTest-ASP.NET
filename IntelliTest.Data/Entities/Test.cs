@@ -41,5 +41,6 @@ namespace IntelliTest.Data.Entities
         public int CreatorId { get; set; }
 
         public int Likes { get; set; }
+        public IEnumerable<TestLike> TestLikes { get; set; }
     }
 }

@@ -30,12 +30,12 @@ namespace IntelliTest.Core.Services
                     CreatorId = l.CreatorId,
                     Grade = l.Grade,
                     Id = l.Id,
-                    Likes = l.Likes,
-                    ReadingTime = l.ReadingTime,
+                    Likes = l.LessonLikes.Count(),
                     Readers = l.Readers,
                     Title = l.Title,
                     School = l.School,
-                    Subject = l.Subject
+                    Subject = l.Subject,
+                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
                 });
             }
 
@@ -57,12 +57,12 @@ namespace IntelliTest.Core.Services
                 CreatorId = l.CreatorId,
                 Grade = l.Grade,
                 Id = l.Id,
-                Likes = l.Likes,
-                ReadingTime = l.ReadingTime,
+                Likes = l.LessonLikes.Count(),
                 Readers = l.Readers,
                 Title = l.Title,
                 School = l.School,
-                Subject = l.Subject
+                Subject = l.Subject,
+                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
             };
         }
 
@@ -71,7 +71,6 @@ namespace IntelliTest.Core.Services
             return new EditLessonViewModel()
             {
                 Title = model.Title,
-                ReadingTime = model.ReadingTime,
                 School = model.School,
                 ClosedQuestions = model.ClosedQuestions,
                 OpenQuestions = model.OpenQuestions,
@@ -94,8 +93,7 @@ namespace IntelliTest.Core.Services
                 Grade = model.Grade,
                 School = model.School,
                 Subject = model.Subject,
-                Title = model.Title,
-                ReadingTime = model.Content.Split(" ").Length / 150
+                Title = model.Title
             };
             await context.Lessons.AddAsync(lesson);
             await context.SaveChangesAsync();
@@ -115,7 +113,6 @@ namespace IntelliTest.Core.Services
             lesson.School = model.School;
             lesson.Content = model.Content;
             lesson.Title = model.Title;
-            lesson.ReadingTime = model.Content.Split(" ").Length / 150;
             context.Update(lesson);
             await context.SaveChangesAsync();
         }
