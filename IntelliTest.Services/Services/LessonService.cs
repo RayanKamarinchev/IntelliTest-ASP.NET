@@ -56,6 +56,8 @@ namespace IntelliTest.Core.Services
             var l = await context.Lessons
                                 .Include(l => l.OpenQuestions)
                                 .Include(l => l.ClosedQuestions)
+                                .Include(l=>l.Creator)
+                                .ThenInclude(t=>t.User)
                                 .FirstOrDefaultAsync(l => l.Id == lessonId);
             return new LessonViewModel()
             {

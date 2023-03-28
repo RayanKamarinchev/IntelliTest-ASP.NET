@@ -93,19 +93,19 @@ namespace IntelliTest.Controllers
         {
             if (!await lessonService.ExistsById(id))
             {
-                return BadRequest();
+                return RedirectToAction("Details", new { id = id });
             }
 
             if (!(bool)TempData.Peek("isTeacher"))
             {
-                return Unauthorized();
+                return RedirectToAction("Details", new { id = id });
             }
 
             int teacherId = await teacherService.GetTeacherId(User.Id());
 
             if (!await teacherService.IsLessonCreator(id, teacherId))
             {
-                return Unauthorized();
+                return RedirectToAction("Details", new { id = id });
             }
 
             EditLessonViewModel model = lessonService.ToEdit(await lessonService.GetById(id));

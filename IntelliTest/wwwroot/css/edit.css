@@ -481,3 +481,7 @@ textarea { border-radius: 5px; }
     background-image: linear-gradient(to right, #fc6076, #ff9a44, #ef9d43, #fc6348);
     box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
 }
+
+.editor > h1 {
+    margin-top: 0 !important;
+}

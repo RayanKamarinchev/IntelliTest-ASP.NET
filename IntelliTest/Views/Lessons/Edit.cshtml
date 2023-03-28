@@ -6,30 +6,16 @@
     <div class="propMenu" style="margin-bottom: 15px;">
         <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
         <div class="propMenu-description">
-            <div class="propMenu-title">
-                <input type="text" class="propMenu-title-input" placeholder="Title here...">
-            </div>
-            <div class="propMenu-description-creator" style="display: flex; gap: 20px;">
-                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png" alt="" style="max-width: 60px; height: 60px; margin-left: 10px; border-radius: 100%;">
-                <div class="propMenu-description-creator-info" style="margin-top: 5px;">
-                    <h6 style="margin: -2px; font-size: 18px">Created by:</h6>
-                    <p style="font-size: 24px; margin: 0px; font-weight: 550;">Чък Норис</p>
-                </div>
-            </div>
-            <div class="propMenu-description-button">
-                <button class="btn-hover color">DONE</button>
-            </div>
         </div>
     </div>
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%" class="questBox lessonBox">
         <form method="post" asp-route-id="@Model.Id">
-            <div class="row row-editor">
                 <div class="editor-container">
                     <div class="editor">
-                        @Model.Content
+                        <h1 data-placeholder="Напишете заглавието си" class="editor-title">@Model.Title</h1>
+                        <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
                     </div>
                 </div>
-            </div>
             <br/>
             <div class="button-container">
                 <button class="btn-hover color-2" type="submit">SEND</button>
@@ -40,10 +26,10 @@
 
 @section Scripts
 {
-    <script src="~/js/ckeditor.js"></script>
+    <script src="~/js/ckeditor.js" asp-append-version="true"></script>
     <script>BalloonBlockEditor
 				.create( document.querySelector( '.editor' ), {
-					
+
 					licenseKey: '',
 				} )
 				.then( editor => {
