@@ -233,7 +233,7 @@ ul, il{
 
 .heart {
     position: absolute;
-    bottom: 30px;
+    bottom: 50px;
     width: 100px;
     height: 100px;
     background: url("https://cssanimation.rocks/images/posts/steps/heart.png") no-repeat;

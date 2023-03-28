@@ -31,7 +31,7 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if (cache.TryGetValue("lessons", out IEnumerable<LessonViewModel>? model))
+            if (cache.TryGetValue("lessons", out IEnumerable<LessonViewModel>? model) && 0==1)
             {
             }
             else
@@ -134,6 +134,19 @@ namespace IntelliTest.Controllers
 
             await lessonService.Edit(id, model);
             return View("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Like(int lessonId, string userId)
+        {
+            await lessonService.LikeLesson(lessonId, userId);
+            return NoContent();
+        }
+        [HttpGet]
+        public async Task<IActionResult> Unlike(int lessonId, string userId)
+        {
+            await lessonService.UnlikeLesson(lessonId, userId);
+            return NoContent();
         }
     }
 }

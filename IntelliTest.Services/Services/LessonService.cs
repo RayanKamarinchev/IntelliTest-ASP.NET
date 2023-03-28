@@ -18,9 +18,18 @@ namespace IntelliTest.Core.Services
         {
             List<LessonViewModel> model = new List<LessonViewModel>();
             foreach (var l in context.Lessons
+                                     .Include(l=>l.LessonLikes)
                                      .Include(l => l.ClosedQuestions)
-                                     .Include(l => l.OpenQuestions))
+                                     .Include(l => l.OpenQuestions)
+                                     .Include(l=>l.Creator)
+                                     .ThenInclude(c=>c.User))
             {
+                var n = l.LessonLikes;
+                int c = 0;
+                if (n != null)
+                {
+                    c = n.Count();
+                }
                 model.Add(new LessonViewModel()
                 {
                     ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -30,7 +39,7 @@ namespace IntelliTest.Core.Services
                     CreatorId = l.CreatorId,
                     Grade = l.Grade,
                     Id = l.Id,
-                    Likes = l.LessonLikes.Count(),
+                    Likes = c,
                     Readers = l.Readers,
                     Title = l.Title,
                     School = l.School,
@@ -57,7 +66,7 @@ namespace IntelliTest.Core.Services
                 CreatorId = l.CreatorId,
                 Grade = l.Grade,
                 Id = l.Id,
-                Likes = l.LessonLikes.Count(),
+                Likes = l.LessonLikes?.Count() ?? 0,
                 Readers = l.Readers,
                 Title = l.Title,
                 School = l.School,
@@ -97,6 +106,35 @@ namespace IntelliTest.Core.Services
             };
             await context.Lessons.AddAsync(lesson);
             await context.SaveChangesAsync();
+        }
+
+        public async Task LikeLesson(int lessonId, string userId)
+        {
+            var lesson = await context.Lessons
+                                .Include(l => l.LessonLikes)
+                                .FirstOrDefaultAsync(l => l.Id == lessonId);
+            lesson.LessonLikes.Add(new LessonLike()
+            {
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
+        }
+
+        public async Task UnlikeLesson(int lessonId, string userId)
+        {
+            var lesson = await context.Lessons
+                                      .Include(l => l.LessonLikes)
+                                      .FirstOrDefaultAsync(l => l.Id == lessonId);
+            lesson.LessonLikes.Remove(lesson.LessonLikes.Single(l => l.UserId == userId));
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsLiked(int lessonId, string userId)
+        {
+            var lesson = await context.Lessons
+                                      .Include(l => l.LessonLikes)
+                                      .FirstOrDefaultAsync(l => l.Id == lessonId);
+            return lesson.LessonLikes.Any(l => l.UserId == userId);
         }
 
         public Task<bool> ExistsById(int lessonId)

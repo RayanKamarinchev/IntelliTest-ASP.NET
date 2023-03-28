@@ -156,7 +156,8 @@ a { text-decoration: none; }
 
 .lessonProp {
     display: flex;
-    justify-content: center
+    flex-flow: column;
+    justify-content: end;
 }
 
 .questTextBox {

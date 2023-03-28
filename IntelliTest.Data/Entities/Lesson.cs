@@ -23,7 +23,7 @@ namespace IntelliTest.Data.Entities
         public int CreatorId { get; set; }
 
         public int Readers { get; set; }
-        public IEnumerable<LessonLike> LessonLikes { get; set; }
+        public List<LessonLike>? LessonLikes { get; set; }
         public int Grade { get; set; }
         public string Subject { get; set; }
         public string School { get; set; }

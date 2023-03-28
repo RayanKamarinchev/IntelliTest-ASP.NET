@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Services.Infrastructure
+@using IntelliTest.Core.Contracts
 @model IEnumerable<LessonViewModel>
 @{
     ViewBag.Title = "Tests Blog";
@@ -57,14 +59,22 @@
     var root = document.querySelector(":root");
 
     root.style.fontSize = "16px";
-    
     function onLike(e){
-        console.log(e)
         if (e.style.backgroundPositionX === "-2800px"){
+            $.ajax({
+              type: 'get',
+              url: `/Lessons/Unlike?lessonId=${e.id}&userId=@User.Id()`
+            });
+            e.parentNode.children[1].textContent = parseInt(e.parentNode.children[1].textContent.replace(" Likes", ""))-1 + " Likes";
             e.style.transitionDuration = "0s";
             e.style.backgroundPosition = '0 0';
         }
         else{
+            $.ajax({
+              type: 'get',
+              url: `/Lessons/Like?lessonId=${e.id}&userId=@User.Id()`
+            });
+            e.parentNode.children[1].textContent = parseInt(e.parentNode.children[1].textContent.replace(" Likes", ""))+1 + " Likes";
             e.style.transitionDuration = "1s";
             e.style.backgroundPosition = '-2800px 0';
         }

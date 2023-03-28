@@ -15,5 +15,8 @@ namespace IntelliTest.Core.Contracts
         Task Edit(int lessonId, LessonViewModel model);
         EditLessonViewModel ToEdit(LessonViewModel model);
         Task Create(EditLessonViewModel model, int teacherId);
+        Task LikeLesson(int lessonId, string userId);
+        Task UnlikeLesson(int lessonId, string userId);
+        Task<bool> IsLiked(int lessonId, string userId);
     }
 }
