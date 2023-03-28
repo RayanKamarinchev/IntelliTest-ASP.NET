@@ -18,5 +18,6 @@ namespace IntelliTest.Core.Contracts
         Task LikeLesson(int lessonId, string userId);
         Task UnlikeLesson(int lessonId, string userId);
         Task<bool> IsLiked(int lessonId, string userId);
+        Task Read(int lessonId, string userId);
     }
 }

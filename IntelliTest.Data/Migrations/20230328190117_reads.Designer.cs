@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230328190117_reads")]
+    partial class reads
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,6 +172,9 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Grade")
                         .HasColumnType("int");
 
+                    b.Property<int>("Readers")
+                        .HasColumnType("int");
+
                     b.Property<string>("School")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -303,7 +308,7 @@ namespace IntelliTest.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reads");
+                    b.ToTable("Read");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Student", b =>

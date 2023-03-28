@@ -21,6 +21,7 @@ namespace IntelliTest.Core.Services
                                      .Include(l=>l.LessonLikes)
                                      .Include(l => l.ClosedQuestions)
                                      .Include(l => l.OpenQuestions)
+                                     .Include(l=>l.Reads)
                                      .Include(l=>l.Creator)
                                      .ThenInclude(c=>c.User))
             {
@@ -40,7 +41,7 @@ namespace IntelliTest.Core.Services
                     Grade = l.Grade,
                     Id = l.Id,
                     Likes = c,
-                    Readers = l.Readers,
+                    Readers = l.Reads.Count(),
                     Title = l.Title,
                     School = l.School,
                     Subject = l.Subject,
@@ -56,6 +57,7 @@ namespace IntelliTest.Core.Services
             var l = await context.Lessons
                                 .Include(l => l.OpenQuestions)
                                 .Include(l => l.ClosedQuestions)
+                                .Include(l => l.Reads)
                                 .Include(l=>l.Creator)
                                 .ThenInclude(t=>t.User)
                                 .FirstOrDefaultAsync(l => l.Id == lessonId);
@@ -69,11 +71,12 @@ namespace IntelliTest.Core.Services
                 Grade = l.Grade,
                 Id = l.Id,
                 Likes = l.LessonLikes?.Count() ?? 0,
-                Readers = l.Readers,
+                Readers = l.Reads.Count(),
                 Title = l.Title,
                 School = l.School,
                 Subject = l.Subject,
-                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
+                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
+                
             };
         }
 
@@ -137,6 +140,20 @@ namespace IntelliTest.Core.Services
                                       .Include(l => l.LessonLikes)
                                       .FirstOrDefaultAsync(l => l.Id == lessonId);
             return lesson.LessonLikes.Any(l => l.UserId == userId);
+        }
+
+        public async Task Read(int lessonId, string userId)
+        {
+            bool exists = await context.Reads.AnyAsync(r => r.LessonId == lessonId && r.UserId == userId);
+            if (!exists)
+            {
+                await context.Reads.AddAsync(new Read()
+                {
+                    LessonId = lessonId,
+                    UserId = userId
+                });
+                await context.SaveChangesAsync();
+            }
         }
 
         public Task<bool> ExistsById(int lessonId)

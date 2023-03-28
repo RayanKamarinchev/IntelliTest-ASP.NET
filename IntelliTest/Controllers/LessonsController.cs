@@ -53,6 +53,7 @@ namespace IntelliTest.Controllers
                 return BadRequest();
             }
 
+            await lessonService.Read(id, User.Id());
             EditLessonViewModel model = lessonService.ToEdit(await lessonService.GetById(id));
             return View(model);
         }

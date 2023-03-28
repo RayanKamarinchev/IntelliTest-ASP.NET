@@ -21,6 +21,8 @@ namespace IntelliTest.Data
                    .HasKey(p => new { p.LessonId, p.UserId });
             builder.Entity<TestLike>()
                    .HasKey(p => new { p.TestId, p.UserId });
+            builder.Entity<Read>()
+                   .HasKey(p => new { p.LessonId, p.UserId });
 
             FirstTeacher = new Teacher()
             {
@@ -143,5 +145,6 @@ namespace IntelliTest.Data
         public DbSet<ClosedQuestion> ClosedQuestions { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<Read> Reads { get; set; }
     }
 }
