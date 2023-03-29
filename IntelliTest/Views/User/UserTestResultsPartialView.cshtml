@@ -1,0 +1,33 @@
+﻿@using IntelliTest.Core.Contracts
+@using IntelliTest.Services.Infrastructure
+@model IEnumerable<TestResultsViewModel>
+@inject IStudentService studentService
+
+@foreach (var test in Model)
+{
+    <div class="card card-margin">
+        <div class="card-header no-border">
+            <h5 class="card-title">@test.Title - @test.Grade</h5>
+        </div>
+        <div class="card-body pt-0">
+            <div class="widget-49">
+                <div class="widget-49-title-wrapper">
+                    <div class="widget-49-date-primary">
+                        <span class="widget-49-date-day">@test.Score</span>
+                        <span class="widget-49-date-month">score</span>
+                    </div>
+                    <div class="widget-49-meeting-info">
+                        <span class="widget-49-pro-title">@test.Description</span>
+                        <span class="widget-49-meeting-time">@test.CreatedOn</span>
+                    </div>
+                </div>
+                <div class="widget-49-meeting-action d-flex justify-content-end">
+                    <a asp-action="ReviewAnswers" asp-controller="Tests"
+                       asp-route-studentId="@test.StudentId" asp-route-testId="@test.Id" class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                        Виж
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

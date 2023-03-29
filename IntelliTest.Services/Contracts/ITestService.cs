@@ -19,5 +19,6 @@ namespace IntelliTest.Core.Contracts
         int[] GetStudentIds(int testId);
         Task<IEnumerable<TestViewModel>> TestsTakenByStudent(int studentId);
         Task<int> Create(TestViewModel model, int teacherId);
+        Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId);
     }
 }

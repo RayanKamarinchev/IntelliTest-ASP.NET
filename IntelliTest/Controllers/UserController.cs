@@ -16,16 +16,19 @@ namespace Watchlist.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly ITeacherService teacherService;
         private readonly IStudentService studentService;
+        private readonly ITestService testService;
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager,
                               ITeacherService _teacherService,
-                              IStudentService _studentService)
+                              IStudentService _studentService,
+                              ITestService _testService)
         {
             userManager = _userManager;
             signInManager = _signInManager;
             studentService = _studentService;
             teacherService = _teacherService;
+            testService = _testService;
         }
 
         public void ClearCookies()
@@ -120,6 +123,100 @@ namespace Watchlist.Controllers
             ClearCookies();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewProfile()
+        {
+            var user = await userManager.GetUserAsync(User);
+            EditUser model = new EditUser()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                IsTeacher = (bool)TempData.Peek("IsTeacher"),
+                HasRole = (bool)TempData.Peek("IsTeacher") || (bool)TempData.Peek("IsStudent")
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ViewProfile(EditUser model)
+        {
+            var user = await userManager.GetUserAsync(User);
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            if (model.Password!=null && await userManager.CheckPasswordAsync(user, model.Password))
+            {
+                user.Email = model.Email;
+            }
+
+            if (!model.HasRole)
+            {
+                if (model.IsTeacher)
+                {
+                    await teacherService.AddTeacher(User.Id());
+                }
+                else
+                {
+                    await studentService.AddStudent(new UserType()
+                    {
+                        Grade = 0,
+                        IsStudent = true,
+                        School = ""
+                    }, User.Id());
+                }
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPanel(string type)
+        {
+            switch (type)
+            {
+                case "info":
+                    var user = await userManager.GetUserAsync(User);
+                    EditUser model = new EditUser()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        IsTeacher = (bool)TempData.Peek("IsTeacher"),
+                        HasRole = (bool)TempData.Peek("IsTeacher") || (bool)TempData.Peek("IsStudent")
+                    };
+                    return View("UserInfoPartialView", model);
+                case "results":
+                    int studentId = await studentService.GetStudentId(User.Id());
+                    var model = await testService.GetAllResults(studentId);
+                    return View("UserTestResultsPartialView", model);
+            }
+
+            return View("UserInfoPartialView");
+        }
+
+        [HttpGet]
+        public async Task<string> ImageUpload(FileUpload file)
+        {
+            var user = await userManager.GetUserAsync(User);
+            using (var ms = new MemoryStream())
+            {
+                await file.file.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                user.Photo = fileBytes;
+                //save this
+            }
+
+            return "Ok";
+        }
+
+        [HttpGet]
+        public async Task<bool> CheckPassword(string password)
+        {
+            var user = await userManager.GetUserAsync(User);
+            bool res = await userManager.CheckPasswordAsync(user, password);
+            return res;
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> UserType()

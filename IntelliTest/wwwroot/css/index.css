@@ -7,7 +7,7 @@
     padding: 0;
     margin: 0;
     font-family: "Montserrat";
-    font-size: 20px;
+    font-size: 1.1rem;
 }
 
 .body_size {
@@ -593,4 +593,8 @@ body {
     height: 400px;
     margin-bottom: 30px;
     width: 600px
+}
+
+.e-profile {
+    padding: 70px;
 }

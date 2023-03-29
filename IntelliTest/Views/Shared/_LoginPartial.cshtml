@@ -3,35 +3,32 @@
 @using IntelliTest.Data.Entities
 @using IntelliTest.Core.Contracts
 @using IntelliTest.Services.Infrastructure
+@using System.Security.Claims
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
-@inject ITeacherService teacherService
-@inject IStudentService studentService
 
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        string id = User.Id();
-        if ((bool)TempData.Peek("isStudent"))
-        {
-            <li class="nav-item">
-                        <a class="nav-link text-dark hover-black">Ти си Ученик</a>
-            </li>
-        }
-        else if ((bool)TempData.Peek("isTeacher"))
-        {
-            <li class="nav-item">
-                <a class="nav-link text-dark hover-black">Ти си Учител</a>
-            </li>
-        }
-        else
-        {
-            <li class="nav-item">
-                <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="UserType" asp-route-id="@UserManager.GetUserId(User)">Кажи ни повече</a>
-            </li>
-        }
+        <li class="nav-item" style="display: flex;
+                                    align-items: center;">
+                <a style="font-weight: 500">@(user.FirstName +" "+ user.LastName[0]+".")</a>
+        </li>
         <li class="nav-item">
-            <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="Logout" asp-route-id="@UserManager.GetUserId(User)">Logout</a>
+
+            <a asp-action="ViewProfile" asp-controller="User" class="nav-link text-dark">
+                <img asp-action="Login" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png" alt="" style="max-width: 40px; height: 40px; margin-left: 10px; border-radius: 100%;">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="Logout"
+               asp-route-id="@UserManager.GetUserId(User)">
+                    <i class="fa fa-sign-out"></i>
+                    <span>Logout</span>
+            </a>
         </li>
     }
     else

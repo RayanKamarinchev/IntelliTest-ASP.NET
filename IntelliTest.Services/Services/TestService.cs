@@ -398,6 +398,27 @@ namespace IntelliTest.Core.Services
             return e.Entity.Id;
         }
 
+        public Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId)
+        {
+            var tests = context.OpenQuestionAnswers
+                   .Where(q => q.StudentId == studentId)
+                   .Select(q => q.Question.Test)
+                   .Distinct()
+                   .Union(context.ClosedQuestionAnswers
+                                 .Where(q => q.StudentId == studentId)
+                                 .Select(q => q.Question.Test)
+                                 .Distinct());
+            return tests.Select(t=>new TestResultsViewModel()
+            {
+                CreatedOn = t.CreatedOn,
+                Grade = t.Grade,
+                Description = t.Description,
+                Title = t.Title,
+                School = t.School,
+                Score = t
+            })
+        }
+
 
         public async Task<bool> ExistsbyId(int id)
         {
