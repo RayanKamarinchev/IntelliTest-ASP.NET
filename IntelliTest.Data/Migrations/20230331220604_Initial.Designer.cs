@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    [Migration("20230329071422_userPhotos")]
-    partial class userPhotos
+    [Migration("20230331220604_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,11 +26,9 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Class", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -40,32 +38,36 @@ namespace IntelliTest.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Classes");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "This is the first class ever made",
-                            Name = "Nothing class",
-                            TeacherId = 1
-                        });
+            modelBuilder.Entity("IntelliTest.Data.Entities.ClassTest", b =>
+                {
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TestId", "ClassId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("ClassTest");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AnswerIndexes")
                         .IsRequired()
@@ -78,8 +80,8 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LessonId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("LessonId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("MaxScore")
                         .HasColumnType("int");
@@ -87,8 +89,8 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -101,37 +103,22 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("TestId");
 
                     b.ToTable("ClosedQuestions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AnswerIndexes = "1",
-                            Answers = "Ti&Az&dvamata&nikoi",
-                            IsDeleted = false,
-                            MaxScore = 2,
-                            Order = 1,
-                            TestId = 1,
-                            Text = "Koi suzdade testut"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestionAnswer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AnswerIndexes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -140,24 +127,13 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("ClosedQuestionAnswers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AnswerIndexes = "0",
-                            QuestionId = 1,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Lesson", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -166,11 +142,14 @@ namespace IntelliTest.Data.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Grade")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("bit");
 
                     b.Property<string>("School")
                         .IsRequired()
@@ -193,8 +172,8 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.LessonLike", b =>
                 {
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -208,11 +187,9 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Answer")
                         .IsRequired()
@@ -221,8 +198,8 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LessonId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("LessonId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("MaxScore")
                         .HasColumnType("int");
@@ -230,8 +207,8 @@ namespace IntelliTest.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -244,36 +221,22 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("TestId");
 
                     b.ToTable("OpenQuestions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 2,
-                            Answer = "Az",
-                            IsDeleted = false,
-                            MaxScore = 3,
-                            Order = 0,
-                            TestId = 1,
-                            Text = "Koi suzdade testut"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestionAnswer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Answer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -282,21 +245,12 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("OpenQuestionAnswers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Answer = "Ti",
-                            QuestionId = 2,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Read", b =>
                 {
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -310,11 +264,9 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Student", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Grade")
                         .HasColumnType("int");
@@ -335,47 +287,28 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Students");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Grade = 8,
-                            Grades = "6&5",
-                            School = "PPMG Dobri Chintulov",
-                            UserId = "4fb46fcc-ad1d-4120-835d-d351849efc73"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.StudentClass", b =>
                 {
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ClassId", "StudentId");
 
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentClasses");
-
-                    b.HasData(
-                        new
-                        {
-                            ClassId = 1,
-                            StudentId = 1
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Teacher", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -386,22 +319,13 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Teachers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            UserId = "e9242048-504d-4ea9-9776-47691844c4a6"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("AverageScore")
                         .HasColumnType("decimal(18,2)");
@@ -409,8 +333,8 @@ namespace IntelliTest.Data.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -423,11 +347,11 @@ namespace IntelliTest.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Likes")
-                        .HasColumnType("int");
-
                     b.Property<bool>("MultiSubmission")
                         .HasColumnType("bit");
+
+                    b.Property<int>("PublicyLevel")
+                        .HasColumnType("int");
 
                     b.Property<string>("School")
                         .IsRequired()
@@ -452,30 +376,12 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("CreatorId");
 
                     b.ToTable("Tests");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AverageScore = 67.5m,
-                            CreatedOn = new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307),
-                            CreatorId = 1,
-                            Description = "Просто тест",
-                            Grade = 10,
-                            IsDeleted = false,
-                            Likes = 0,
-                            MultiSubmission = false,
-                            School = "ППМГ Добри Чинтулов",
-                            Subject = "Физика",
-                            Time = 30,
-                            Title = "Електромагнитни вълни"
-                        });
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.TestLike", b =>
                 {
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -485,6 +391,30 @@ namespace IntelliTest.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TestLike");
+                });
+
+            modelBuilder.Entity("IntelliTest.Data.Entities.TestResult", b =>
+                {
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("TakenOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TestId", "StudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("TestResults");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -725,6 +655,25 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("IntelliTest.Data.Entities.ClassTest", b =>
+                {
+                    b.HasOne("IntelliTest.Data.Entities.Class", "Class")
+                        .WithMany("ClassTests")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
+                        .WithMany("ClassesWithAccess")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Test");
+                });
+
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestion", b =>
                 {
                     b.HasOne("IntelliTest.Data.Entities.Lesson", "Lesson")
@@ -917,6 +866,25 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IntelliTest.Data.Entities.TestResult", b =>
+                {
+                    b.HasOne("IntelliTest.Data.Entities.Student", "Student")
+                        .WithMany("TestResults")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IntelliTest.Data.Entities.Test", "Test")
+                        .WithMany("TestResults")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Test");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -970,6 +938,8 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Class", b =>
                 {
+                    b.Navigation("ClassTests");
+
                     b.Navigation("Students");
                 });
 
@@ -1001,6 +971,8 @@ namespace IntelliTest.Data.Migrations
                     b.Navigation("ClosedAnswers");
 
                     b.Navigation("OpenAnswers");
+
+                    b.Navigation("TestResults");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Teacher", b =>
@@ -1014,11 +986,15 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
                 {
+                    b.Navigation("ClassesWithAccess");
+
                     b.Navigation("ClosedQuestions");
 
                     b.Navigation("OpenQuestions");
 
                     b.Navigation("TestLikes");
+
+                    b.Navigation("TestResults");
                 });
 
             modelBuilder.Entity("IntelliTest.Data.Entities.User", b =>
