@@ -1,7 +1,29 @@
 ﻿@using IntelliTest.Core.Contracts
+@using IntelliTest.Data.Entities
 @using IntelliTest.Services.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model IEnumerable<TestResultsViewModel>
 @inject IStudentService studentService
+@{
+    string GetGrade(Grade mark)
+    {
+        switch (mark)
+        {
+            case Grade.Poor:
+                return "Слаб 2";
+            case Grade.Average:
+                return "Среден 3";
+            case Grade.Good:
+                return "Добър 4";
+            case Grade.Great:
+                return "Мн. Добър 5";
+            case Grade.Excellent:
+                return "Отличен 6";
+            default:
+                return "Неоценен";
+        }
+    }
+}
 
 @foreach (var test in Model)
 {
@@ -17,13 +39,14 @@
                         <span class="widget-49-date-month">score</span>
                     </div>
                     <div class="widget-49-meeting-info">
+                            <span class="widget-49-pro-title">@GetGrade(test.Mark)</span>
                         <span class="widget-49-pro-title">@test.Description</span>
-                        <span class="widget-49-meeting-time">@test.CreatedOn</span>
+                        <span class="widget-49-meeting-time">@test.TakenOn</span>
                     </div>
                 </div>
                 <div class="widget-49-meeting-action d-flex justify-content-end">
                     <a asp-action="ReviewAnswers" asp-controller="Tests"
-                       asp-route-studentId="@test.StudentId" asp-route-testId="@test.Id" class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                       asp-route-studentId="@test.StudentId" asp-route-testId="@test" class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                         Виж
                     </a>
                 </div>

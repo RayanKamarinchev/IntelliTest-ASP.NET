@@ -24,5 +24,6 @@ namespace IntelliTest.Data.Entities
         public IEnumerable<StudentClass> Classes { get; set; }
         public List<OpenQuestionAnswer> OpenAnswers { get; set; }
         public List<ClosedQuestionAnswer> ClosedAnswers { get; set; }
+        public IEnumerable<TestResult> TestResults { get; set; }
     }
 }

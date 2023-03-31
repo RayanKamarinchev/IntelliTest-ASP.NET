@@ -273,7 +273,7 @@ body {
 }
 
 .card {
-    width: 500px;
+    width: 450px;
     overflow: hidden;
     position: relative;
     display: flex;

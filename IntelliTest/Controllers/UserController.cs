@@ -174,7 +174,11 @@ namespace Watchlist.Controllers
         {
             switch (type)
             {
-                case "info":
+                case "results":
+                    int studentId = await studentService.GetStudentId(User.Id());
+                    var results = await studentService.GetAllResults(studentId);
+                    return PartialView("UserTestResultsPartialView", results);
+                default:
                     var user = await userManager.GetUserAsync(User);
                     EditUser model = new EditUser()
                     {
@@ -184,14 +188,8 @@ namespace Watchlist.Controllers
                         IsTeacher = (bool)TempData.Peek("IsTeacher"),
                         HasRole = (bool)TempData.Peek("IsTeacher") || (bool)TempData.Peek("IsStudent")
                     };
-                    return View("UserInfoPartialView", model);
-                case "results":
-                    int studentId = await studentService.GetStudentId(User.Id());
-                    var model = await testService.GetAllResults(studentId);
-                    return View("UserTestResultsPartialView", model);
+                    return PartialView("UserInfoPartialView", model);
             }
-
-            return View("UserInfoPartialView");
         }
 
         [HttpGet]

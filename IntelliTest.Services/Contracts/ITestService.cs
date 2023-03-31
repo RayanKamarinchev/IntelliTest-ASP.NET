@@ -1,4 +1,5 @@
-﻿using IntelliTest.Core.Models.Tests;
+﻿using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using IntelliTest.Models.Tests;
 
@@ -13,12 +14,18 @@ namespace IntelliTest.Core.Contracts
         TestEditViewModel ToEdit(TestViewModel model);
         Task Edit(int id, TestEditViewModel model, int teacherId);
         TestSubmitViewModel ToSubmit(TestViewModel model);
-        TestReviewViewModel TestResults(int testId, int studentId);
+        Task<TestReviewViewModel> TestResults(int testId, int studentId);
         Task<bool> IsTestTakenByStudentId(int testId, Student student);
-        TestStatsViewModel GetStatistics(int testId);
+        Task<TestStatsViewModel> GetStatistics(int testId);
+        Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
+                           List<ClosedQuestionAnswerViewModel> closedQuestions,
+                           int studentId,
+                           int testId);
         int[] GetStudentIds(int testId);
         Task<IEnumerable<TestViewModel>> TestsTakenByStudent(int studentId);
         Task<int> Create(TestViewModel model, int teacherId);
-        Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId);
+        decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
+
+        decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
     }
 }

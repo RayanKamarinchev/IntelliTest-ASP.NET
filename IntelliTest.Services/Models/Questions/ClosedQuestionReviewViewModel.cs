@@ -9,5 +9,6 @@ namespace IntelliTest.Core.Models.Questions
     public class ClosedQuestionReviewViewModel : ClosedQuestionAnswerViewModel
     {
         public int[] RightAnswers { get; set; }
+        public decimal Score { get; set; }
     }
 }

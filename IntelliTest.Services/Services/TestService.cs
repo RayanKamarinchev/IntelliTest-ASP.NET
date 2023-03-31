@@ -6,6 +6,8 @@ using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using static System.Formats.Asn1.AsnWriter;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IntelliTest.Core.Services
 {
@@ -203,9 +205,51 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public TestReviewViewModel TestResults(int testId, int studentId)
+        public decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount)
         {
-            var openQuestions = context.OpenQuestionAnswers
+            decimal score = 0;
+            for (int i = 0; i < answersCount; i++)
+            {
+                if (Answers[i])
+                {
+                    if (RightAnswers.Contains(i))
+                    {
+                        score++;
+                    }
+                    else
+                    {
+                        score--;
+                    }
+                }
+            }
+            score *= MaxScore * 1.0m / RightAnswers.Count();
+            if (score < 0)
+            {
+                score = 0;
+            }
+
+            return score;
+        }
+
+
+        public decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore)
+        {
+            decimal score = 0;
+            if (Answer == "")
+            {
+                Answer = "...";
+            }
+            if (RightAnswer == Answer)
+            {
+                score = MaxScore;
+            }
+
+            return score;
+        }
+
+        public async Task<TestReviewViewModel> TestResults(int testId, int studentId)
+        {
+            var openQuestions = await context.OpenQuestionAnswers
                                        .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
                                        .Include(q => q.Question)
                                        .Select(q => new OpenQuestionReviewViewModel()
@@ -217,24 +261,35 @@ namespace IntelliTest.Core.Services
                                            MaxScore = q.Question.MaxScore,
                                            Answer = q.Answer
                                        })
-                                       .ToList();
+                                       .ToListAsync();
+            foreach (var q in openQuestions)
+            {
+                q.Score = CalculateOpenQuestionScore(q.Answer, q.RightAnswer, q.MaxScore);
+            }
             var closedQuestions = new List<ClosedQuestionReviewViewModel>();
             var db = context.ClosedQuestionAnswers
                             .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
                             .Include(q => q.Question);
             foreach (var q in db)
             {
-                closedQuestions.Add(new ClosedQuestionReviewViewModel()
+                var closedQuestionModel = new ClosedQuestionReviewViewModel()
                 {
                     PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
                     IsDeleted = false,
                     Order = q.Question.Order,
                     Text = q.Question.Text,
                     Id = q.Id,
-                    Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None), q.AnswerIndexes),
-                    RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse).ToArray(),
+                    Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                                                    q.AnswerIndexes),
+                    RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
+                                    .ToArray(),
                     MaxScore = q.Question.MaxScore
-                });
+                };
+                closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.Answers,
+                     closedQuestionModel.RightAnswers,
+                     closedQuestionModel.MaxScore,
+                     closedQuestionModel.PossibleAnswers.Length);
+                closedQuestions.Add(closedQuestionModel);
             }
 
             return new TestReviewViewModel()
@@ -243,6 +298,49 @@ namespace IntelliTest.Core.Services
                 ClosedQuestions = closedQuestions
             };
         }
+
+        public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
+                                        List<ClosedQuestionAnswerViewModel> closedQuestions, int studentId, int testId)
+        {
+            var open = openQuestions?.Select(q => new OpenQuestionAnswer()
+            {
+                Answer = q.Answer,
+                QuestionId = q.Id,
+                StudentId = studentId
+            });
+            var closed = closedQuestions?.Select(q => new ClosedQuestionAnswer()
+            {
+                AnswerIndexes = string.Join("&", q.Answers
+                                                  .Select((val, indx) => new { val, indx })
+                                                  .Where(q => q.val)
+                                                  .Select(q => q.indx)),
+                QuestionId = q.Id,
+                StudentId = studentId
+            });
+
+            if (open != null)
+            {
+                await context.OpenQuestionAnswers.AddRangeAsync(open);
+            }
+            if (closed != null)
+            {
+                await context.ClosedQuestionAnswers.AddRangeAsync(closed);
+            }
+            await context.SaveChangesAsync();
+            
+            var review = await TestResults(testId, studentId);
+            decimal socre = review.ClosedQuestions.Sum(q => q.Score) + review.OpenQuestions.Sum(q => q.Score);
+
+            await context.TestResults.AddAsync(new TestResult()
+            {
+                Grade = 0,
+                Score = socre,
+                StudentId = studentId,
+                TestId = testId,
+                TakenOn = DateTime.Now
+            });
+        }
+
         public static bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
         {
             var list = Enumerable.Repeat(false, answers.Length).ToArray();
@@ -269,13 +367,13 @@ namespace IntelliTest.Core.Services
             return closed || open;
         }
 
-        public TestStatsViewModel GetStatistics(int testId)
+        public async Task<TestStatsViewModel> GetStatistics(int testId)
         {
             var studentIds = GetStudentIds(testId);
             List<TestReviewViewModel> res = new List<TestReviewViewModel>();
             foreach (var studentId in studentIds)
             {
-                res.Add(TestResults(testId, studentId));
+                res.Add(await TestResults(testId, studentId));
             }
 
             TestStatsViewModel model = new TestStatsViewModel();
@@ -397,28 +495,6 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
             return e.Entity.Id;
         }
-
-        public Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId)
-        {
-            var tests = context.OpenQuestionAnswers
-                   .Where(q => q.StudentId == studentId)
-                   .Select(q => q.Question.Test)
-                   .Distinct()
-                   .Union(context.ClosedQuestionAnswers
-                                 .Where(q => q.StudentId == studentId)
-                                 .Select(q => q.Question.Test)
-                                 .Distinct());
-            return tests.Select(t=>new TestResultsViewModel()
-            {
-                CreatedOn = t.CreatedOn,
-                Grade = t.Grade,
-                Description = t.Description,
-                Title = t.Title,
-                School = t.School,
-                Score = t
-            })
-        }
-
 
         public async Task<bool> ExistsbyId(int id)
         {

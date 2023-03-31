@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -44,30 +45,6 @@ namespace IntelliTest.Core.Services
             return student.Id;
         }
 
-        public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
-                                        List<ClosedQuestionAnswerViewModel> closedQuestions, string userId, int testId)
-        {
-            int studentId = await GetStudentId(userId);
-            var open = openQuestions.Select(q => new OpenQuestionAnswer()
-            {
-                Answer = q.Answer,
-                QuestionId = q.Id,
-                StudentId = studentId
-            });
-            var closed = closedQuestions.Select(q => new ClosedQuestionAnswer()
-            {
-                AnswerIndexes = string.Join("&", q.Answers
-                                                 .Select((val, indx) => new { val, indx })
-                                                 .Where(q => q.val)
-                                                 .Select(q => q.indx)),
-                QuestionId = q.Id,
-                StudentId = studentId
-            });
-            context.OpenQuestionAnswers.AddRange(open);
-            context.ClosedQuestionAnswers.AddRange(closed);
-            await context.SaveChangesAsync();
-        }
-
         public async Task<Student> GetStudent(int studentId)
         {
             return await context.Students
@@ -76,6 +53,22 @@ namespace IntelliTest.Core.Services
                                 .Include(s=>s.OpenAnswers)
                                 .ThenInclude(q=>q.Question.Test)
                                 .FirstOrDefaultAsync(s=>s.Id==studentId);
+        }
+
+        public async Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId)
+        {
+            return await context.TestResults
+                         .Where(t => t.StudentId == studentId)
+                         .Select(t => new TestResultsViewModel()
+                         {
+                             TakenOn = t.TakenOn,
+                             Title = t.Test.Title,
+                             Description = t.Test.Description,
+                             Grade = t.Test.Grade,
+                             Mark = t.Grade,
+                             Score = t.Score,
+                             TestId = t.TestId
+                         }).ToListAsync();
         }
     }
 }

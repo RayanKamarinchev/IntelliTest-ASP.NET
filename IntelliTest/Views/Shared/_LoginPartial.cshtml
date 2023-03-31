@@ -13,9 +13,9 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item" style="display: flex;
+        <li style="display: flex;
                                     align-items: center;">
-                <a style="font-weight: 500">@(user.FirstName +" "+ user.LastName[0]+".")</a>
+                <a style="font-weight: 500;">@(user.FirstName +" "+ user.LastName[0]+".")</a>
         </li>
         <li class="nav-item">
 

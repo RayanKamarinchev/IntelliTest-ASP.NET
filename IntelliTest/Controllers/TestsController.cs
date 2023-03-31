@@ -269,7 +269,7 @@ namespace IntelliTest.Controllers
         public async Task<IActionResult> Take(TestSubmitViewModel model, int testId)
         {
             int studentId = await studentService.GetStudentId(User.Id());
-            await studentService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, User.Id(), testId);
+            await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 
@@ -291,7 +291,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            var test = testService.TestResults(testId, studentId);
+            var test = await testService.TestResults(testId, studentId);
             return View(test);
         }
 

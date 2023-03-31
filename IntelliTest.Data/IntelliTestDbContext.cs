@@ -23,6 +23,8 @@ namespace IntelliTest.Data
                    .HasKey(p => new { p.TestId, p.UserId });
             builder.Entity<Read>()
                    .HasKey(p => new { p.LessonId, p.UserId });
+            builder.Entity<TestResult>()
+                   .HasKey(p => new { p.TestId, p.StudentId });
 
             FirstTeacher = new Teacher()
             {
@@ -146,5 +148,6 @@ namespace IntelliTest.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Read> Reads { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
     }
 }

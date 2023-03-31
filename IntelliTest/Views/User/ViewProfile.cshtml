@@ -24,42 +24,50 @@
             </div>
         </div>
     </div>
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" id="tabs">
         <li class="nav-item">
-            <a href="" class="active nav-link" onclick="Info()">Profile Info</a>
+            <a class="active nav-link" onclick="Info()">Profile Info</a>
         </li>
         <li class="nav-item">
-            <a href="" class="active nav-link" onclick="TestsDone">Резултати</a>
+            <a class="nav-link" onclick="Results()">Резултати</a>
         </li>
     </ul>
     <div class="tab-content pt-3">
         <div class="tab-pane active" style="color: black !important" id="panels">
-
+            <partial name="UserInfoPartialView"/>
         </div>
     </div>
 </div>
 
 @section Scripts
 {
-    const panels = document.getElementById("panels");
-    fucntion Info(){
-        $.ajax({
-            type: 'get',
-            url: '@Url.Action("GetPanel")',
-            data: {type: "info"},
-            success: function(res){
-                panels.innerHtml = res;
-            }
-        });
-    }
-    fuctnion Results(){
-        $.ajax({
-            type: 'get',
-            url: '@Url.Action("GetPanel")',
-            data: {type: "results"},
-            success: function(res){
-                panels.innerHtml = res;
-            }
-        });
-    }
+    <script>
+        const panels = document.getElementById("panels");
+        const tabs = document.getElementById("tabs");
+        function Info(){
+            $.ajax({
+                type: 'get',
+                url: '@Url.Action("GetPanel")',
+                data: {type: "info"},
+                success: function(res){
+                    [...tabs.children].forEach(c=>c.children[0].classList.remove("active"))
+                    panels.innerHTML = res;
+                    tabs.children[0].children[0].classList.add("active");
+                }
+            });
+        }
+        function Results(){
+            $.ajax({
+                type: 'get',
+                url: '@Url.Action("GetPanel")',
+                data: {type: "results"},
+                success: function(res){
+                    [...tabs.children].forEach(c=>c.children[0].classList.remove("active"))
+                    panels.innerHTML = res;
+                    tabs.children[1].children[0].classList.add("active");
+                }
+            });
+        }
+    
+    </script>
 }

@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Core.Models.Users;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Data.Entities;
+using IntelliTest.Core.Models.Tests;
 
 namespace IntelliTest.Core.Contracts
 {
@@ -10,11 +11,7 @@ namespace IntelliTest.Core.Contracts
         Task AddStudent(UserType model, string userId);
         Task<int> GetStudentId(string userId);
 
-        Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
-                           List<ClosedQuestionAnswerViewModel> closedQuestions,
-                           string userId,
-                           int testId);
-
         Task<Student> GetStudent(int studentId);
+        Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId);
     }
 }
