@@ -13,7 +13,7 @@ namespace IntelliTest.Data.Migrations
                 columns: table => new
                 {
                     TestId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<Guid>(type: "int", nullable: false),
                     Grade = table.Column<int>(type: "int", nullable: false),
                     Score = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },

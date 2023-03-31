@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    [Migration("20230331202956_IdsRenamed")]
-    partial class IdsRenamed
+    [Migration("20230331204958_fixes3")]
+    partial class fixes3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -346,9 +346,6 @@ namespace IntelliTest.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int>("Likes")
-                        .HasColumnType("int");
 
                     b.Property<bool>("MultiSubmission")
                         .HasColumnType("bit");

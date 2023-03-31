@@ -159,6 +159,7 @@ namespace IntelliTest.Core.Services
         public async Task<IEnumerable<LessonViewModel>> ReadLessons(string userId)
         {
             List<LessonViewModel> model = new List<LessonViewModel>();
+            var mock = await context.Lessons.ToListAsync();
             var lessons = await context.Lessons
                                  .Where(l => l.Reads.Any(r => r.UserId == userId))
                                  .Include(l => l.LessonLikes)

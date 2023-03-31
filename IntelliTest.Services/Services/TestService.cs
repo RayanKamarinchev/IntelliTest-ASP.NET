@@ -22,6 +22,7 @@ namespace IntelliTest.Core.Services
 
         public async Task<IEnumerable<TestViewModel>> GetAll()
         {
+            var tests = await context.Tests.ToListAsync();
             return await context.Tests.Where(t=>!t.IsDeleted)
                                 .Select(t=> new TestViewModel()
                                 {

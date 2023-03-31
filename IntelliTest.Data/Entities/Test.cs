@@ -40,8 +40,6 @@ namespace IntelliTest.Data.Entities
         public Teacher Creator { get; set; }
         [ForeignKey(nameof(Creator))]
         public Guid CreatorId { get; set; }
-
-        public int Likes { get; set; }
         public IEnumerable<ClassTest> ClassesWithAccess { get; set; }
         public PublicyLevel PublicyLevel { get; set; }
 
