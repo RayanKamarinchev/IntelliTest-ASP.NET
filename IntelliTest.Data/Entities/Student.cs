@@ -11,7 +11,7 @@ namespace IntelliTest.Data.Entities
     public class Student
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public User User { get; set; }
         [Required]
         [ForeignKey(nameof(User))]

@@ -1,29 +1,7 @@
 ﻿@model ClosedQuestionReviewViewModel
 
 <div class="questBox">
-    @{
-        double score = 0;
-        for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
-        {
-            if (Model.Answers[i])
-            {
-                if (Model.RightAnswers.Contains(i))
-                {
-                    score++;
-                }
-                else
-                {
-                    score--;
-                }
-            }
-        }
-        score *= Model.MaxScore*1.0 / Model.RightAnswers.Count();
-        if (score<0)
-        {
-            score = 0;
-        }
-    }
-    <p class="questionScore">@score/@Model.MaxScore</p>
+    <p class="questionScore">@Model.Score/@Model.MaxScore</p>
     <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">

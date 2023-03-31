@@ -8,22 +8,22 @@ namespace IntelliTest.Core.Contracts
     public interface ITestService
     {
         Task<IEnumerable<TestViewModel>> GetAll();
-        Task<IEnumerable<TestViewModel>> GetMy(int teacherId);
-        Task<TestViewModel> GetById(int id);
-        Task<bool> ExistsbyId(int id);
+        Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId);
+        Task<TestViewModel> GetById(Guid id);
+        Task<bool> ExistsbyId(Guid id);
         TestEditViewModel ToEdit(TestViewModel model);
-        Task Edit(int id, TestEditViewModel model, int teacherId);
+        Task Edit(Guid id, TestEditViewModel model, Guid teacherId);
         TestSubmitViewModel ToSubmit(TestViewModel model);
-        Task<TestReviewViewModel> TestResults(int testId, int studentId);
-        Task<bool> IsTestTakenByStudentId(int testId, Student student);
-        Task<TestStatsViewModel> GetStatistics(int testId);
+        Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId);
+        Task<bool> IsTestTakenByStudentId(Guid testId, Student student);
+        Task<TestStatsViewModel> GetStatistics(Guid testId);
         Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
                            List<ClosedQuestionAnswerViewModel> closedQuestions,
-                           int studentId,
-                           int testId);
-        int[] GetStudentIds(int testId);
-        Task<IEnumerable<TestViewModel>> TestsTakenByStudent(int studentId);
-        Task<int> Create(TestViewModel model, int teacherId);
+                           Guid studentId,
+                           Guid testId);
+        Guid[] GetStudentIds(Guid testId);
+        Task<IEnumerable<TestViewModel>> TestsTakenByStudent(Guid studentId);
+        Task<Guid> Create(TestViewModel model, Guid teacherId);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
 
         decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);

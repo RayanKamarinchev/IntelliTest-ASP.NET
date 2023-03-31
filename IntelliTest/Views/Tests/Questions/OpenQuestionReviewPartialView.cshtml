@@ -1,17 +1,6 @@
 ﻿@model OpenQuestionReviewViewModel
 <div class="questBox">
-    @{
-        int score = 0;
-        if (Model.Answer == "")
-        {
-            Model.Answer = "...";
-        }
-        if (Model.RightAnswer == Model.Answer)
-        {
-            score = Model.MaxScore;
-        }
-    }
-    <p class="questionScore">@score/@Model.MaxScore</p>
+    <p class="questionScore">@Model.Score/@Model.MaxScore</p>
     <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">
@@ -21,7 +10,7 @@
     <div class="questTextBox questAnswer">
         <div>
             @{
-                if (score!=0)
+                if (Model.Score!=0)
                 {
                     <div class="icon-answer option">
                         <i class="fa-solid fa-square-check" style="color: #358DF1;"></i>

@@ -11,11 +11,11 @@ namespace IntelliTest.Core.Models.Lessons
 {
     public class LessonViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime CreatedOn { get; set; }
-        public int CreatorId { get; set; }
+        public Guid CreatorId { get; set; }
         public int Readers { get; set; }
         public int Likes { get; set; }
         public int Grade { get; set; }

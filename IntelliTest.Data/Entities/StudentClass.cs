@@ -11,9 +11,9 @@ namespace IntelliTest.Data.Entities
     public class StudentClass
     {
         public Class Class { get; set; }
-        public int ClassId { get; set; }
+        public Guid ClassId { get; set; }
 
         public Student Student { get; set; }
-        public int StudentId { get; set; }
+        public Guid StudentId { get; set; }
     }
 }

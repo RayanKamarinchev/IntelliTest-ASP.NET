@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntelliTest.Data.Entities
+namespace IntelliTest.Data.Enums
 {
-    public enum Grade
+    public enum PublicyLevel
     {
-        Excellent, Great, Good, Average, Poor
+        Public, TeachersOnly, Link, ClassOnly, 
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using IntelliTest.Data.Enums;
 
 namespace IntelliTest.Data.Entities
 {
     public class Test
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         [StringLength(30)]
         public string Title { get; set; }
@@ -38,9 +39,12 @@ namespace IntelliTest.Data.Entities
         [Required]
         public Teacher Creator { get; set; }
         [ForeignKey(nameof(Creator))]
-        public int CreatorId { get; set; }
+        public Guid CreatorId { get; set; }
 
         public int Likes { get; set; }
+        public IEnumerable<ClassTest> ClassesWithAccess { get; set; }
+        public PublicyLevel PublicyLevel { get; set; }
+
         public IEnumerable<TestLike> TestLikes { get; set; }
         public IEnumerable<TestResult> TestResults { get; set; }
     }

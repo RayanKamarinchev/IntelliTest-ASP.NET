@@ -40,7 +40,7 @@ namespace IntelliTest.Core.Services
                            .ToListAsync();
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetMy(int teacherId)
+        public async Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId)
         {
             return await context.Tests
                                 .Where(t=>t.CreatorId== teacherId)
@@ -61,7 +61,7 @@ namespace IntelliTest.Core.Services
                                 .ToListAsync();
         }
 
-        public async Task<TestViewModel> GetById(int id)
+        public async Task<TestViewModel> GetById(Guid id)
         {
             var t = await context.Tests
                                  .Include(t=>t.OpenQuestions)
@@ -151,7 +151,7 @@ namespace IntelliTest.Core.Services
         }
 
 
-        public async Task Edit(int id, TestEditViewModel model, int teacherId)
+        public async Task Edit(Guid id, TestEditViewModel model, Guid teacherId)
         {
             var test = await context.Tests
                                     .Include(t=>t.OpenQuestions)
@@ -247,7 +247,7 @@ namespace IntelliTest.Core.Services
             return score;
         }
 
-        public async Task<TestReviewViewModel> TestResults(int testId, int studentId)
+        public async Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId)
         {
             var openQuestions = await context.OpenQuestionAnswers
                                        .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
@@ -300,7 +300,7 @@ namespace IntelliTest.Core.Services
         }
 
         public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
-                                        List<ClosedQuestionAnswerViewModel> closedQuestions, int studentId, int testId)
+                                        List<ClosedQuestionAnswerViewModel> closedQuestions, Guid studentId, Guid testId)
         {
             var open = openQuestions?.Select(q => new OpenQuestionAnswer()
             {
@@ -360,14 +360,14 @@ namespace IntelliTest.Core.Services
             return list;
         }
 
-        public async Task<bool> IsTestTakenByStudentId(int testId, Student student)
+        public async Task<bool> IsTestTakenByStudentId(Guid testId, Student student)
         {
             bool closed = (student?.ClosedAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
             bool open = (student?.OpenAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
             return closed || open;
         }
 
-        public async Task<TestStatsViewModel> GetStatistics(int testId)
+        public async Task<TestStatsViewModel> GetStatistics(Guid testId)
         {
             var studentIds = GetStudentIds(testId);
             List<TestReviewViewModel> res = new List<TestReviewViewModel>();
@@ -430,7 +430,7 @@ namespace IntelliTest.Core.Services
             return model;
         }
 
-        public int[] GetStudentIds(int testId)
+        public Guid[] GetStudentIds(Guid testId)
         {
             return context.OpenQuestionAnswers
                           .Where(q => q.Question.TestId == testId)
@@ -442,7 +442,7 @@ namespace IntelliTest.Core.Services
                           ).ToArray();
         }
 
-        public async Task<IEnumerable<TestViewModel>> TestsTakenByStudent(int studentId)
+        public async Task<IEnumerable<TestViewModel>> TestsTakenByStudent(Guid studentId)
         {
             var student = await context.Students
                                        .Include(s=>s.ClosedAnswers)
@@ -476,7 +476,7 @@ namespace IntelliTest.Core.Services
 
         }
 
-        public async Task<int> Create(TestViewModel model, int teacherId)
+        public async Task<Guid> Create(TestViewModel model, Guid teacherId)
         {
             Test test = new Test()
             {
@@ -496,7 +496,7 @@ namespace IntelliTest.Core.Services
             return e.Entity.Id;
         }
 
-        public async Task<bool> ExistsbyId(int id)
+        public async Task<bool> ExistsbyId(Guid id)
         {
             return await context.Tests.AnyAsync(t=>t.Id == id);
         }

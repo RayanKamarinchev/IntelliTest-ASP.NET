@@ -6,7 +6,7 @@ namespace IntelliTest.Data.Entities
     public class OpenQuestion
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         public string Text { get; set; }
         [Required]
@@ -15,13 +15,13 @@ namespace IntelliTest.Data.Entities
         public int Order { get; set; }
         public bool IsDeleted { get; set; }
         [Required]
-        public int TestId { get; set; }
+        public Guid TestId { get; set; }
         [ForeignKey(nameof(TestId))]
         public Test Test { get; set; }
 
         public IEnumerable<OpenQuestionAnswer> StudentAnswers { get; set; }
         public int MaxScore { get; set; }
-        public int? LessonId { get; set; }
+        public Guid? LessonId { get; set; }
         [ForeignKey(nameof(LessonId))]
         public Lesson? Lesson { get; set; }
     }

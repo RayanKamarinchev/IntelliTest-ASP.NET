@@ -46,7 +46,7 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Route("Details/{id}")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(Guid id)
         {
             if (!await lessonService.ExistsById(id))
             {
@@ -82,7 +82,7 @@ namespace IntelliTest.Controllers
                 return View("Edit", model);
             }
 
-            int teacherId = await teacherService.GetTeacherId(User.Id());
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
             await lessonService.Create(model, teacherId);
 
             return View("Index");
@@ -90,7 +90,7 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Route("Lessons/Edit/{id}")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(Guid id)
         {
             if (!await lessonService.ExistsById(id))
             {
@@ -102,7 +102,7 @@ namespace IntelliTest.Controllers
                 return RedirectToAction("Details", new { id = id });
             }
 
-            int teacherId = await teacherService.GetTeacherId(User.Id());
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
 
             if (!await teacherService.IsLessonCreator(id, teacherId))
             {
@@ -114,7 +114,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, LessonViewModel model)
+        public async Task<IActionResult> Edit(Guid id, LessonViewModel model)
         {
             if (!await lessonService.ExistsById(id))
             {
@@ -126,7 +126,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            int teacherId = await teacherService.GetTeacherId(User.Id());
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
 
             if (!await teacherService.IsLessonCreator(id, teacherId))
             {
@@ -138,13 +138,13 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Like(int lessonId, string userId)
+        public async Task<IActionResult> Like(Guid lessonId, string userId)
         {
             await lessonService.LikeLesson(lessonId, userId);
             return NoContent();
         }
         [HttpGet]
-        public async Task<IActionResult> Unlike(int lessonId, string userId)
+        public async Task<IActionResult> Unlike(Guid lessonId, string userId)
         {
             await lessonService.UnlikeLesson(lessonId, userId);
             return NoContent();

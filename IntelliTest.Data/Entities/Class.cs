@@ -11,13 +11,14 @@ namespace IntelliTest.Data.Entities
     public class Class
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public Teacher Teacher { get; set; }
         [ForeignKey(nameof(Teacher))]
-        public int TeacherId { get; set; }
+        public Guid TeacherId { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
+        public IEnumerable<ClassTest> ClassTests { get; set; }
         public IEnumerable<StudentClass> Students { get; set; }
     }
 }

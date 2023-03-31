@@ -6,7 +6,7 @@ namespace IntelliTest.Data.Entities
     public class ClosedQuestion
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         public string Text { get; set; }
         [Required]
@@ -18,12 +18,12 @@ namespace IntelliTest.Data.Entities
 
         public bool IsDeleted { get; set; }
         [Required]
-        public int TestId { get; set; }
+        public Guid TestId { get; set; }
         [ForeignKey(nameof(TestId))]
         public Test Test { get; set; }
         public IEnumerable<ClosedQuestionAnswer> StudentAnswers { get; set; }
         public int MaxScore { get; set; }
-        public int? LessonId { get; set; }
+        public Guid? LessonId { get; set; }
         [ForeignKey(nameof(LessonId))]
         public Lesson? Lesson { get; set; }
     }

@@ -10,15 +10,15 @@ namespace IntelliTest.Core.Contracts
     public interface ILessonService
     {
         Task<IEnumerable<LessonViewModel>> GetAll();
-        Task<LessonViewModel> GetById(int lessonId);
-        Task<bool> ExistsById(int lessonId);
-        Task Edit(int lessonId, LessonViewModel model);
+        Task<LessonViewModel> GetById(Guid lessonId);
+        Task<bool> ExistsById(Guid lessonId);
+        Task Edit(Guid lessonId, LessonViewModel model);
         EditLessonViewModel ToEdit(LessonViewModel model);
-        Task Create(EditLessonViewModel model, int teacherId);
-        Task LikeLesson(int lessonId, string userId);
-        Task UnlikeLesson(int lessonId, string userId);
-        Task<bool> IsLiked(int lessonId, string userId);
-        Task Read(int lessonId, string userId);
+        Task Create(EditLessonViewModel model, Guid teacherId);
+        Task LikeLesson(Guid lessonId, string userId);
+        Task UnlikeLesson(Guid lessonId, string userId);
+        Task<bool> IsLiked(Guid lessonId, string userId);
+        Task Read(Guid lessonId, string userId);
         Task<IEnumerable<LessonViewModel>> ReadLessons(string userId);
         Task<IEnumerable<LessonViewModel>> LikedLessons(string userId);
 

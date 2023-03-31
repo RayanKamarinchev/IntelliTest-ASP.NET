@@ -10,7 +10,7 @@ namespace IntelliTest.Core.Models.Lessons
 {
     public class EditLessonViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         public string Title { get; set; }
         [Required]

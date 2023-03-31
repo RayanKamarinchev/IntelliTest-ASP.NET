@@ -4,6 +4,7 @@ using IntelliTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IntelliTest.Data.Migrations
 {
     [DbContext(typeof(IntelliTestDbContext))]
-    partial class IntelliTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230331200328_FakeIds")]
+    partial class FakeIds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,13 +26,16 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Class", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -39,7 +44,7 @@ namespace IntelliTest.Data.Migrations
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("TeacherId");
 
@@ -63,7 +68,7 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestion", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -74,6 +79,9 @@ namespace IntelliTest.Data.Migrations
                     b.Property<string>("Answers")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -94,7 +102,7 @@ namespace IntelliTest.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("LessonId");
 
@@ -105,12 +113,15 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.ClosedQuestionAnswer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AnswerIndexes")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uniqueidentifier");
@@ -118,7 +129,7 @@ namespace IntelliTest.Data.Migrations
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("QuestionId");
 
@@ -129,7 +140,7 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Lesson", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -144,6 +155,9 @@ namespace IntelliTest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsPrivate")
@@ -161,7 +175,7 @@ namespace IntelliTest.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("CreatorId");
 
@@ -185,13 +199,16 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestion", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Answer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -212,7 +229,7 @@ namespace IntelliTest.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("LessonId");
 
@@ -223,12 +240,15 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.OpenQuestionAnswer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Answer")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uniqueidentifier");
@@ -236,7 +256,7 @@ namespace IntelliTest.Data.Migrations
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("QuestionId");
 
@@ -262,7 +282,7 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Student", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -272,6 +292,9 @@ namespace IntelliTest.Data.Migrations
                     b.Property<string>("Grades")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
                     b.Property<string>("School")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -280,7 +303,7 @@ namespace IntelliTest.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("UserId");
 
@@ -304,15 +327,18 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Teacher", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("UserId");
 
@@ -321,7 +347,7 @@ namespace IntelliTest.Data.Migrations
 
             modelBuilder.Entity("IntelliTest.Data.Entities.Test", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("FakeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -340,6 +366,9 @@ namespace IntelliTest.Data.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -372,7 +401,7 @@ namespace IntelliTest.Data.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.HasKey("Id");
+                    b.HasKey("FakeId");
 
                     b.HasIndex("CreatorId");
 

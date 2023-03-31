@@ -62,12 +62,12 @@ namespace IntelliTest.Controllers
             IEnumerable<TestViewModel> model = new List<TestViewModel>();
             if ((bool)TempData.Peek("isTeacher"))
             {
-                int teacherId = await teacherService.GetTeacherId(User.Id());
+                Guid teacherId = await teacherService.GetTeacherId(User.Id());
                 model = await testService.GetMy(teacherId);
             }
             else if ((bool)TempData.Peek("isStudent"))
             {
-                int studentId = await studentService.GetStudentId(User.Id());
+                Guid studentId = await studentService.GetStudentId(User.Id());
                 model = await testService.TestsTakenByStudent(studentId);
             }
             
@@ -75,9 +75,9 @@ namespace IntelliTest.Controllers
         }
         [Route("Tests/Edit/{id}")]
         [HttpGet]
-        public async Task<IActionResult> Edit(int id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
+        public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
         {
-            if (id!=-1)
+            if (id!= new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
             {
                 if (!await testService.ExistsbyId(id))
                 {
@@ -187,7 +187,7 @@ namespace IntelliTest.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> EditSubmit(int id, TestEditViewModel model)
+        public async Task<IActionResult> EditSubmit(Guid id, TestEditViewModel model)
         {
             if (model.ClosedQuestions == null)
             {
@@ -211,7 +211,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            int teacherId = await teacherService.GetTeacherId(User.Id());
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
             await testService.Edit(id, model, teacherId);
             return RedirectToAction("Index", testService.GetAll());
         }
@@ -230,14 +230,14 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TestViewModel model)
         {
-            int teacherId = await teacherService.GetTeacherId(User.Id());
-            int id = await testService.Create(model, teacherId);
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
+            Guid id = await testService.Create(model, teacherId);
             return RedirectToAction("Edit", new {id = id});
         }
 
         [HttpGet]
         [Route("Take/{testId}")]
-        public async Task<IActionResult> Take(int testId)
+        public async Task<IActionResult> Take(Guid testId)
         { 
             if (!(bool)TempData.Peek("isStudent"))
             {
@@ -266,16 +266,16 @@ namespace IntelliTest.Controllers
 
         [HttpPost]
         [Route("Take/{testId}")]
-        public async Task<IActionResult> Take(TestSubmitViewModel model, int testId)
+        public async Task<IActionResult> Take(TestSubmitViewModel model, Guid testId)
         {
-            int studentId = await studentService.GetStudentId(User.Id());
+            Guid studentId = await studentService.GetStudentId(User.Id());
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 
         [HttpGet]
         [Route("Review/{testId}-{studentId}")]
-        public async Task<IActionResult> ReviewAnswers(int testId, int studentId)
+        public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
             if (!(bool)TempData.Peek("isStudent"))
             {
@@ -296,7 +296,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Statistics(int testId)
+        public async Task<IActionResult> Statistics(Guid testId)
         {
             if (!(bool)TempData.Peek("isTeacher"))
             {
@@ -308,7 +308,7 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            var model = testService.GetStatistics(testId);
+            var model = await testService.GetStatistics(testId);
 
             return View(model);
         }

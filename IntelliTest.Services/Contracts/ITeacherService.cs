@@ -12,8 +12,8 @@ namespace IntelliTest.Core.Contracts
     {
         Task<bool> ExistsByUserId(string id);
         Task AddTeacher(string userId);
-        Task<bool> IsTestCreator(int testId, int teacherId);
-        Task<bool> IsLessonCreator(int lessonId, int teacherId);
-        Task<int> GetTeacherId(string userId);
+        Task<bool> IsTestCreator(Guid testId, Guid teacherId);
+        Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId);
+        Task<Guid> GetTeacherId(string userId);
     }
 }

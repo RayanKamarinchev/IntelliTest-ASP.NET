@@ -176,7 +176,7 @@ namespace Watchlist.Controllers
             switch (type)
             {
                 case "results":
-                    int studentId = await studentService.GetStudentId(User.Id());
+                    Guid studentId = await studentService.GetStudentId(User.Id());
                     var results = await studentService.GetAllResults(studentId);
                     return PartialView("Panels/UserTestResultsPartialView", results);
                 case "read":

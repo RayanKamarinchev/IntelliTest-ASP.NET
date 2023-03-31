@@ -44,7 +44,7 @@
                         <label style="display: flex"></label>
                         <textarea name="text"></textarea>
                     </div>
-                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="-1" class="btn btn-secondary">Генерирай</button>
+                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" class="btn btn-secondary">Генерирай</button>
                 </div>
             </div>
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)

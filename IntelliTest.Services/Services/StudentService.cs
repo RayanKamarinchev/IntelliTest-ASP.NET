@@ -39,13 +39,13 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<int> GetStudentId(string userId)
+        public async Task<Guid> GetStudentId(string userId)
         {
             var student = await context.Students.FirstOrDefaultAsync(u => u.UserId == userId);
             return student.Id;
         }
 
-        public async Task<Student> GetStudent(int studentId)
+        public async Task<Student> GetStudent(Guid studentId)
         {
             return await context.Students
                                 .Include(s=>s.ClosedAnswers)
@@ -55,7 +55,7 @@ namespace IntelliTest.Core.Services
                                 .FirstOrDefaultAsync(s=>s.Id==studentId);
         }
 
-        public async Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId)
+        public async Task<IEnumerable<TestResultsViewModel>> GetAllResults(Guid studentId)
         {
             return await context.TestResults
                          .Where(t => t.StudentId == studentId)

@@ -11,7 +11,7 @@ namespace IntelliTest.Data.Entities
     {
         public Lesson Lesson { get; set; }
         [ForeignKey(nameof(Lesson))]
-        public int LessonId { get; set; }
+        public Guid LessonId { get; set; }
 
         public User User { get; set; }
         [ForeignKey(nameof(User))]

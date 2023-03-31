@@ -34,7 +34,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsTestCreator(int testId, int teacherId)
+        public async Task<bool> IsTestCreator(Guid testId, Guid teacherId)
         {
             var teacher = await context.Teachers
                                        .Include(t => t.Tests)
@@ -43,7 +43,7 @@ namespace IntelliTest.Core.Services
 
         }
 
-        public async Task<bool> IsLessonCreator(int lessonId, int teacherId)
+        public async Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId)
         {
             var teacher = await context.Teachers
                                        .Include(t => t.Lessons)
@@ -51,7 +51,7 @@ namespace IntelliTest.Core.Services
             return teacher.Lessons.Any(t => t.Id == lessonId);
         }
 
-        public async Task<int> GetTeacherId(string userId)
+        public async Task<Guid> GetTeacherId(string userId)
         {
             var teacher = await context.Teachers
                                        .Include(t => t.Tests)

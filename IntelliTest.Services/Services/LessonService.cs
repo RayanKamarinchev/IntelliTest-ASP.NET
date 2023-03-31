@@ -52,7 +52,7 @@ namespace IntelliTest.Core.Services
             return model;
         }
 
-        public async Task<LessonViewModel> GetById(int lessonId)
+        public async Task<LessonViewModel> GetById(Guid lessonId)
         {
             var l = await context.Lessons
                                 .Include(l => l.OpenQuestions)
@@ -95,7 +95,7 @@ namespace IntelliTest.Core.Services
             };
         }
 
-        public async Task Create(EditLessonViewModel model, int teacherId)
+        public async Task Create(EditLessonViewModel model, Guid teacherId)
         {
             Lesson lesson = new Lesson()
             {
@@ -113,7 +113,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task LikeLesson(int lessonId, string userId)
+        public async Task LikeLesson(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
                                 .Include(l => l.LessonLikes)
@@ -125,7 +125,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task UnlikeLesson(int lessonId, string userId)
+        public async Task UnlikeLesson(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
                                       .Include(l => l.LessonLikes)
@@ -134,7 +134,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsLiked(int lessonId, string userId)
+        public async Task<bool> IsLiked(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
                                       .Include(l => l.LessonLikes)
@@ -142,7 +142,7 @@ namespace IntelliTest.Core.Services
             return lesson.LessonLikes.Any(l => l.UserId == userId);
         }
 
-        public async Task Read(int lessonId, string userId)
+        public async Task Read(Guid lessonId, string userId)
         {
             bool exists = await context.Reads.AnyAsync(r => r.LessonId == lessonId && r.UserId == userId);
             if (!exists)
@@ -240,12 +240,12 @@ namespace IntelliTest.Core.Services
             return model;
         }
 
-        public Task<bool> ExistsById(int lessonId)
+        public Task<bool> ExistsById(Guid lessonId)
         {
             return context.Lessons.AnyAsync(l => l.Id == lessonId);
         }
 
-        public async Task Edit(int lessonId, LessonViewModel model)
+        public async Task Edit(Guid lessonId, LessonViewModel model)
         {
             var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.Grade = model.Grade;

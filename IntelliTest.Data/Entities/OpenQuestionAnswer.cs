@@ -11,13 +11,14 @@ namespace IntelliTest.Data.Entities
     public class OpenQuestionAnswer
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
+        
         public string? Answer { get; set; }
         public OpenQuestion Question { get; set; }
         [ForeignKey(nameof(Question))]
-        public int QuestionId { get; set; }
+        public Guid QuestionId { get; set; }
         public Student Student { get; set; }
         [ForeignKey(nameof(Student))]
-        public int StudentId { get; set; }
+        public Guid StudentId { get; set; }
     }
 }

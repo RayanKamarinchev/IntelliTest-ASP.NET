@@ -9,9 +9,9 @@ namespace IntelliTest.Core.Contracts
     {
         Task<bool> ExistsByUserId(string id);
         Task AddStudent(UserType model, string userId);
-        Task<int> GetStudentId(string userId);
+        Task<Guid> GetStudentId(string userId);
 
-        Task<Student> GetStudent(int studentId);
-        Task<IEnumerable<TestResultsViewModel>> GetAllResults(int studentId);
+        Task<Student> GetStudent(Guid studentId);
+        Task<IEnumerable<TestResultsViewModel>> GetAllResults(Guid studentId);
     }
 }

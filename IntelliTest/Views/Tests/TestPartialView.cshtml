@@ -51,7 +51,7 @@
                     }
                     else
                     {
-                        int studentId = await studentService.GetStudentId(User.Id());
+                        Guid studentId = await studentService.GetStudentId(User.Id());
                         var student = await studentService.GetStudent(studentId);
                         if (await testService.IsTestTakenByStudentId(Model.Id, student))
                         {
