@@ -16,19 +16,20 @@ namespace Watchlist.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly ITeacherService teacherService;
         private readonly IStudentService studentService;
-        private readonly ITestService testService;
+        private readonly ILessonService lessonService;
+
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager,
                               ITeacherService _teacherService,
                               IStudentService _studentService,
-                              ITestService _testService)
+                              ILessonService _lessonService)
         {
             userManager = _userManager;
             signInManager = _signInManager;
             studentService = _studentService;
             teacherService = _teacherService;
-            testService = _testService;
+            lessonService = _lessonService;
         }
 
         public void ClearCookies()
@@ -177,7 +178,13 @@ namespace Watchlist.Controllers
                 case "results":
                     int studentId = await studentService.GetStudentId(User.Id());
                     var results = await studentService.GetAllResults(studentId);
-                    return PartialView("UserTestResultsPartialView", results);
+                    return PartialView("Panels/UserTestResultsPartialView", results);
+                case "read":
+                    var read = await lessonService.ReadLessons(User.Id());
+                    return PartialView("~/Views/Lessons/Index.cshtml", read);
+                case "like":
+                    var liked = await lessonService.LikedLessons(User.Id());
+                    return PartialView("~/Views/Lessons/Index.cshtml", liked);
                 default:
                     var user = await userManager.GetUserAsync(User);
                     EditUser model = new EditUser()
@@ -188,7 +195,7 @@ namespace Watchlist.Controllers
                         IsTeacher = (bool)TempData.Peek("IsTeacher"),
                         HasRole = (bool)TempData.Peek("IsTeacher") || (bool)TempData.Peek("IsStudent")
                     };
-                    return PartialView("UserInfoPartialView", model);
+                    return PartialView("Panels/UserInfoPartialView", model);
             }
         }
 

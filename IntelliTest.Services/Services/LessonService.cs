@@ -156,6 +156,90 @@ namespace IntelliTest.Core.Services
             }
         }
 
+        public async Task<IEnumerable<LessonViewModel>> ReadLessons(string userId)
+        {
+            List<LessonViewModel> model = new List<LessonViewModel>();
+            var lessons = await context.Lessons
+                                 .Where(l => l.Reads.Any(r => r.UserId == userId))
+                                 .Include(l => l.LessonLikes)
+                                 .Include(l => l.ClosedQuestions)
+                                 .Include(l => l.OpenQuestions)
+                                 .Include(l => l.Reads)
+                                 .Include(l => l.Creator)
+                                 .ThenInclude(c => c.User)
+                                 .ToListAsync();
+            foreach (var l in lessons)
+            {
+                var n = l.LessonLikes;
+                int c = 0;
+                if (n != null)
+                {
+                    c = n.Count();
+                }
+                model.Add(new LessonViewModel()
+                {
+                    ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
+                    OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
+                    Content = l.Content,
+                    CreatedOn = l.CreatedOn,
+                    CreatorId = l.CreatorId,
+                    Grade = l.Grade,
+                    Id = l.Id,
+                    Likes = c,
+                    Readers = l.Reads.Count(),
+                    Title = l.Title,
+                    School = l.School,
+                    Subject = l.Subject,
+                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
+                });
+            }
+
+            return model;
+        }
+
+        public async Task<IEnumerable<LessonViewModel>> LikedLessons(string userId)
+        {
+            List<LessonViewModel> model = new List<LessonViewModel>();
+            var lessons = await context.Lessons
+                                       .Where(l => l.LessonLikes != null)
+                                       .Where(l => l.LessonLikes.Any(l => l.UserId == userId))
+                                       .Include(l => l.LessonLikes)
+                                       .Include(l => l.ClosedQuestions)
+                                       .Include(l => l.OpenQuestions)
+                                       .Include(l => l.Reads)
+                                       .Include(l => l.Creator)
+                                       .ThenInclude(c => c.User)
+                                       .ToListAsync();
+
+            foreach (var l in lessons)
+            {
+                var n = l.LessonLikes;
+                int c = 0;
+                if (n != null)
+                {
+                    c = n.Count();
+                }
+                model.Add(new LessonViewModel()
+                {
+                    ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
+                    OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
+                    Content = l.Content,
+                    CreatedOn = l.CreatedOn,
+                    CreatorId = l.CreatorId,
+                    Grade = l.Grade,
+                    Id = l.Id,
+                    Likes = c,
+                    Readers = l.Reads.Count(),
+                    Title = l.Title,
+                    School = l.School,
+                    Subject = l.Subject,
+                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
+                });
+            }
+
+            return model;
+        }
+
         public Task<bool> ExistsById(int lessonId)
         {
             return context.Lessons.AnyAsync(l => l.Id == lessonId);

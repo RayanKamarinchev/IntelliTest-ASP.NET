@@ -1,4 +1,6 @@
-﻿@model EditUser
+﻿@using IntelliTest.Services.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model EditUser
 @{
     ViewBag.Title = "User Profile";
 }
@@ -31,10 +33,16 @@
         <li class="nav-item">
             <a class="nav-link" onclick="Results()">Резултати</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" onclick="Read()">История</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" onclick="Like()">Харесани</a>
+        </li>
     </ul>
     <div class="tab-content pt-3">
         <div class="tab-pane active" style="color: black !important" id="panels">
-            <partial name="UserInfoPartialView"/>
+            <partial name="Panels/UserInfoPartialView"/>
         </div>
     </div>
 </div>
@@ -67,6 +75,62 @@
                     tabs.children[1].children[0].classList.add("active");
                 }
             });
+        }
+
+        function Read(){
+            $.ajax({
+                type: 'get',
+                url: '@Url.Action("GetPanel")',
+                data: {type: "read"},
+                success: function(res){
+                    [...tabs.children].forEach(c=>c.children[0].classList.remove("active"));
+                    panels.innerHTML = res;
+                    tabs.children[2].children[0].classList.add("active");
+                    let e = document.getElementById("lessonHeading");
+                    e.parentNode.removeChild(e);
+                        
+                }
+            });
+        }
+        
+        function Like(){
+            $.ajax({
+                type: 'get',
+                url: '@Url.Action("GetPanel")',
+                data: {type: "like"},
+                success: function(res){
+                    [...tabs.children].forEach(c=>c.children[0].classList.remove("active"));
+                    panels.innerHTML = res;
+                    tabs.children[3].children[0].classList.add("active");
+                    let e = document.getElementById("lessonHeading");
+                    e.parentNode.removeChild(e);
+
+                }
+            });
+        }
+        
+            var root = document.querySelector(":root");
+
+        root.style.fontSize = "16px";
+        function onLike(e){
+            if (e.style.backgroundPositionX === "-2800px"){
+                $.ajax({
+                  type: 'get',
+                  url: `/Lessons/Unlike?lessonId=${e.id}&userId=@User.Id()`
+                });
+                e.parentNode.children[1].textContent = parseInt(e.parentNode.children[1].textContent.replace(" Likes", ""))-1 + " Likes";
+                e.style.transitionDuration = "0s";
+                e.style.backgroundPosition = '0 0';
+            }
+            else{
+                $.ajax({
+                  type: 'get',
+                  url: `/Lessons/Like?lessonId=${e.id}&userId=@User.Id()`
+                });
+                e.parentNode.children[1].textContent = parseInt(e.parentNode.children[1].textContent.replace(" Likes", ""))+1 + " Likes";
+                e.style.transitionDuration = "1s";
+                e.style.backgroundPosition = '-2800px 0';
+            }
         }
     
     </script>
