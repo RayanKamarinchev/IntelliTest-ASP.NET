@@ -8,35 +8,30 @@ namespace IntelliTest.Models.Tests
         [Required]
         public Guid Id { get; set; }
         [Required]
-        [StringLength(30)]
+        [StringLength(30,MinimumLength = 5)]
         [Display(Name = "Заглавие")]
         public string Title { get; set; }
         [Required]
-        [StringLength(30)]
+        [StringLength(30, MinimumLength = 5)]
         [Display(Name = "Предмет")]
         public string Subject { get; set; }
         [Required]
-        [Range(0, 12)]
+        [Range(1, 12)]
         [Display(Name = "Клас")]
         public int Grade { get; set; }
         [Required]
         [StringLength(1000)]
         [Display(Name = "Описание")]
         public string Description { get; set; }
-        [StringLength(50)]
+        [StringLength(50, MinimumLength = 10)]
         [Display(Name = "Училище")]
         public string School { get; set; }
-        [Required]
         public decimal AverageScore { get; set; }
-        [Required]
         public int MaxScore { get; set; }
-        [Required]
         public int Students { get; set; }
         [Required]
-        [Display(Name = "Време")]
+        [Display(Name = "Време (в минути)")]
         public int Time { get; set; }
-        [Required]
-        [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
         public IList<OpenQuestion> OpenQuestions { get; set; }
         public IList<ClosedQuestion> ClosedQuestions { get; set; }

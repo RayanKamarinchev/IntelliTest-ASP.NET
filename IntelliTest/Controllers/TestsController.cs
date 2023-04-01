@@ -278,6 +278,10 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TestViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
             Guid id = await testService.Create(model, teacherId);
             return RedirectToAction("Edit", new {id = id});

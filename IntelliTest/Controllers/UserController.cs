@@ -6,6 +6,7 @@ using System.Security.Claims;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Services.Infrastructure;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Watchlist.Controllers
 {
@@ -123,6 +124,19 @@ namespace Watchlist.Controllers
             await signInManager.SignOutAsync();
             ClearCookies();
             return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            //var user = await userManager.FindByEmailAsync(email);
+            //if (user != null)
+            //{
+            //    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            //    var link = Url.Action("ResetPassword", "User", new { token, email = user.Email }, Request.Scheme);
+            //    var message = new Messsage();
+                
+            //}
+            return NoContent();
         }
 
         [HttpGet]

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Builder;
+using IntelliTest.Core.Models;
+using MailKit;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -64,6 +66,7 @@ builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -75,6 +78,8 @@ builder.Services.AddMvc(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
 
 var app = builder.Build();
 

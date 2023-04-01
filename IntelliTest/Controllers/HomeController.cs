@@ -1,12 +1,20 @@
 ﻿using IntelliTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models;
 
 namespace Watchlist.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IEmailService emailService;
+
+        public HomeController(IEmailService _emailService)
+        {
+            emailService = _emailService;
+        }
+        public async Task<IActionResult> Index()
         {
             return View();
         }

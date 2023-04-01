@@ -30,7 +30,7 @@
                             <div class="form-inline">
                                 <input type="checkbox" name="remember" id="remember" asp-for="RememberMe">
                                 <label for="remember" class="text-muted">Запомни ме</label>
-                                <a asp-action="ForgotPassword" id="forgot" class="font-weight-bold">Забравена парола?</a>
+                                <a asp-action="ForgotPassword" asp-route-email="@Model.Username" id="forgot" class="font-weight-bold">Забравена парола?</a>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
                             <div class="text-center pt-4 text-muted">Нямаш акаунт? <a asp-action="Register">Регистрирай се</a> </div>
