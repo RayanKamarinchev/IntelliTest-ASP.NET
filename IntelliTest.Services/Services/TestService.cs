@@ -6,6 +6,7 @@ using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using IntelliTest.Data.Enums;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,10 +21,10 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetAll()
+        public async Task<IEnumerable<TestViewModel>> GetAll(bool isTeacher)
         {
             var tests = await context.Tests.ToListAsync();
-            return await context.Tests.Where(t=>!t.IsDeleted)
+            return await context.Tests.Where(t=>!t.IsDeleted && (t.PublicyLevel == PublicityLevel.Public||(isTeacher && t.PublicyLevel==PublicityLevel.TeachersOnly)))
                                 .Select(t=> new TestViewModel()
                                 {
                                     AverageScore = t.AverageScore,
@@ -500,6 +501,37 @@ namespace IntelliTest.Core.Services
         public async Task<bool> ExistsbyId(Guid id)
         {
             return await context.Tests.AnyAsync(t=>t.Id == id);
+        }
+
+        public async Task<bool> StudentHasAccess(Guid testId, Guid studentId)
+        {
+            Test? test = await context.Tests
+                                      .Include(t=>t.ClassesWithAccess)
+                                      .ThenInclude(ct=>ct.Class)
+                                      .ThenInclude(c=>c.Students)
+                                      .ThenInclude(cs=>cs.StudentId)
+                                      .FirstOrDefaultAsync(t => t.Id == testId);
+            if (test == null)
+            {
+                return false;
+            }
+
+            if (test.PublicyLevel == PublicityLevel.Public)
+            {
+                return true;
+            }
+
+            if (test.PublicyLevel == PublicityLevel.TeachersOnly)
+            {
+                return false;
+            }
+
+            if (test.PublicyLevel==PublicityLevel.ClassOnly)
+            {
+                return test.ClassesWithAccess.Any(c => c.Class.Students.Any(s => s.StudentId == studentId));
+            }
+
+            return false;
         }
     }
 }

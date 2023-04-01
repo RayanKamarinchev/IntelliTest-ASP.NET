@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IntelliTest.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace Watchlist.Controllers
@@ -7,11 +8,29 @@ namespace Watchlist.Controllers
     {
         public IActionResult Index()
         {
-            if (User?.Identity?.IsAuthenticated ?? false)
-            {
-                //return RedirectToAction("All", "Movies");
-            }
             return View();
+        }
+        [Route("/Error/{statusCode}")]
+        public IActionResult Error(int statusCode)
+        {
+            string message = "Опа... Нещо се обърка";
+            switch (statusCode)
+            {
+                case 401:
+                    message = "Отказан достъп!";
+                    break;
+                case 404:
+                    message = "Съдържанието което търсите не е намерено.";
+                    break;
+                case 500:
+                    message = "Грешка в сървъра";
+                    break;
+            }
+            return View("Error",new ErrorViewModel
+            {
+                StatusCode = statusCode,
+                Message = message
+            });
         }
     }
 }

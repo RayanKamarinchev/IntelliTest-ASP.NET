@@ -8,6 +8,7 @@ using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
 using IntelliTest.Data.Entities;
+using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using IntelliTest.Models.Tests;
 using IntelliTest.Services.Infrastructure;
@@ -48,7 +49,7 @@ namespace IntelliTest.Controllers
             }
             else
             {
-                model = await testService.GetAll();
+                model = await testService.GetAll((bool)TempData.Peek("isTeacher"));
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
                                         .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 await cache.SetAsync("tests", model, cacheEntryOptions);
@@ -77,6 +78,51 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
         {
+            if (viewModel.PublicityLevel!=PublicityLevel.Link && viewModel.PublicityLevel != PublicityLevel.Public)
+            {
+                if (viewModel.PublicityLevel == PublicityLevel.TeachersOnly)
+                {
+                    if (!(bool)TempData.Peek("isTeacher"))
+                    {
+                        return Unauthorized();
+                    }
+                }
+                else if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
+                {
+                    Guid testId = id;
+                    Guid studentId = await studentService.GetStudentId(User.Id());
+                    if (id == new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
+                    {
+                        testId = (Guid)TempData.Peek("testId");
+                    }
+
+                    bool studentHasAccess = await testService.StudentHasAccess(testId, studentId);
+                    if (!studentHasAccess)
+                    {
+                        return Unauthorized();
+                    }
+                }
+
+                else if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
+                {
+                    if (!(bool)TempData.Peek("isTeacher"))
+                    {
+                        return Unauthorized();
+                    }
+
+                    Guid testId = id;
+                    if (id == new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
+                    {
+                        testId = (Guid)TempData.Peek("testId");
+                    }
+                    Guid teacherId = await teacherService.GetTeacherId(User.Id());
+                    bool isCreator = await teacherService.IsTestCreator(testId, teacherId);
+                    if (!isCreator)
+                    {
+                        return Unauthorized();
+                    }
+                }
+            }
             if (id!= new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
             {
                 if (!await testService.ExistsbyId(id))
@@ -85,6 +131,7 @@ namespace IntelliTest.Controllers
                 }
                 var model = await testService.GetById(id);
                 var testEdit = testService.ToEdit(model);
+                TempData["PublicityLevel"] = testEdit.PublicityLevel;
                 TempData["editModel"] = JsonSerializer.Serialize(testEdit);
                 TempData["testId"] = id;
                 return View("Edit", testEdit);
@@ -96,7 +143,7 @@ namespace IntelliTest.Controllers
                 model.Description = viewModel.Description;
                 model.Time = viewModel.Time;
                 model.Grade = viewModel.Grade;
-
+                model.PublicityLevel = (PublicityLevel)Math.Max((int)viewModel.PublicityLevel, (int)TempData.Peek("PublicityLevel"));
                 model.Title = viewModel.Title;
                 if (viewModel.OpenQuestions != null)
                 {
@@ -213,7 +260,8 @@ namespace IntelliTest.Controllers
 
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
             await testService.Edit(id, model, teacherId);
-            return RedirectToAction("Index", testService.GetAll());
+            TempData["message"] = "Успешно редактира тест!";
+            return RedirectToAction("Index", testService.GetAll((bool)TempData.Peek("isTeacher")));
         }
 
         [HttpGet]
@@ -270,6 +318,7 @@ namespace IntelliTest.Controllers
         {
             Guid studentId = await studentService.GetStudentId(User.Id());
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
+            TempData["message"] = "Успешно предаде теста!";
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 

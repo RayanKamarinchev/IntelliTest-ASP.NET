@@ -7,7 +7,7 @@ namespace IntelliTest.Core.Contracts
 {
     public interface ITestService
     {
-        Task<IEnumerable<TestViewModel>> GetAll();
+        Task<IEnumerable<TestViewModel>> GetAll(bool isTeacher);
         Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId);
         Task<TestViewModel> GetById(Guid id);
         Task<bool> ExistsbyId(Guid id);
@@ -27,5 +27,6 @@ namespace IntelliTest.Core.Contracts
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
 
         decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
+        public Task<bool> StudentHasAccess(Guid testId, Guid studentId);
     }
 }

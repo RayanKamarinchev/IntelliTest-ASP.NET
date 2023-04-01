@@ -23,6 +23,62 @@
   display: none;
 }
 
+#error-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#error-page .error-content {
+    max-width: 600px;
+    text-align: center;
+}
+.error-content h2 {
+    font-size: 6rem;
+}
+
+@keyframes animate {
+    0% {
+        background-position: 0 0;
+    }
+
+    25% {
+        background-position: 100% 0;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.error-content h4 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    color: #000;
+    font-size: 2em;
+    max-width: 600px;
+    position: relative;
+}
+
+.error-content p {
+    font-size: 1.2em;
+    color: #0d0d0d;
+}
+
+.error-content .btns {
+    margin: 25px 0;
+    display: inline-flex;
+}
+
 .container-mother {
     max-width: 10000px;
     width: 100%;

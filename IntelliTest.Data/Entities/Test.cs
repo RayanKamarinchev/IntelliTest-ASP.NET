@@ -41,7 +41,7 @@ namespace IntelliTest.Data.Entities
         [ForeignKey(nameof(Creator))]
         public Guid CreatorId { get; set; }
         public IEnumerable<ClassTest> ClassesWithAccess { get; set; }
-        public PublicyLevel PublicyLevel { get; set; }
+        public PublicityLevel PublicyLevel { get; set; }
 
         public IEnumerable<TestLike> TestLikes { get; set; }
         public IEnumerable<TestResult> TestResults { get; set; }

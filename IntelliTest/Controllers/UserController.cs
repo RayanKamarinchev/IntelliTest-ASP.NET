@@ -156,6 +156,7 @@ namespace Watchlist.Controllers
                 if (model.IsTeacher)
                 {
                     await teacherService.AddTeacher(User.Id());
+                    TempData["IsTeacher"] = true;
                 }
                 else
                 {
@@ -165,7 +166,10 @@ namespace Watchlist.Controllers
                         IsStudent = true,
                         School = ""
                     }, User.Id());
+                    TempData["isStudent"] = true;
                 }
+
+                model.HasRole = true;
             }
             return View(model);
         }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Data.Enums
 {
-    public enum PublicyLevel
+    public enum PublicityLevel
     {
-        Public, TeachersOnly, Link, ClassOnly, 
+        Public, TeachersOnly, Link, ClassOnly, Private
     }
 }

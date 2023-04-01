@@ -5,9 +5,12 @@
 
 <div>
     <main class="cd-main-content">
-        <div class="floating-container">
-            <a class="floating-button" asp-action="Create">+</a>
-        </div>
+        @if ((bool)TempData.Peek("isTeacher"))
+        {
+            <div class="floating-container">
+                <a class="floating-button" asp-action="Create">+</a>
+            </div>
+        }
         <section class="cd-gallery">
             <ul style="width: 100%">
                 @foreach (var test in Model)

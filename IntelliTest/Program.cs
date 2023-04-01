@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -24,6 +25,16 @@ builder.Services.AddDefaultIdentity<User>(options =>
 })
        .AddRoles<IdentityRole>()
        .AddEntityFrameworkStores<IntelliTestDbContext>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("all", opt =>
+    {
+        opt.AllowAnyOrigin();
+        opt.AllowAnyMethod();
+    });
+});
+
 
 //External logins
 builder.Services.AddAuthentication()
@@ -50,9 +61,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<ITestService, TestService>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
-builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddTransient<IStudentService, StudentService>();
+builder.Services.AddTransient<ITeacherService, TeacherService>();
+builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -69,14 +80,19 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    //app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseDeveloperExceptionPage();
+app.UseMigrationsEndPoint();
 
+app.UseCors("all");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -91,6 +107,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+//Use different way to store connection string in production
 
 //TODO:Check ofr quotes in questions
 

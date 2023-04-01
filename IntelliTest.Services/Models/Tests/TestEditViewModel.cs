@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Data.Enums;
 
 namespace IntelliTest.Core.Models.Tests
 {
     public class TestEditViewModel
     {
+        public PublicityLevel PublicityLevel { get; set; }
         public List<OpenQuestionViewModel>? OpenQuestions { get; set; }
         public List<ClosedQuestionViewModel>? ClosedQuestions { get; set; }
         [Display(Name = "Заглавие: ")]
