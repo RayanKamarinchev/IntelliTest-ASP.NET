@@ -65,7 +65,7 @@
             <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
             <hr/>
             @{
-                int id = int.Parse(TempData.Peek("testId").ToString());
+                Guid id = new Guid(TempData.Peek("testId").ToString());
             }
             <button class="btn blue btn-primary" asp-action="EditSubmit" asp-route-id="@id" type="submit">Готово</button>
         </form>

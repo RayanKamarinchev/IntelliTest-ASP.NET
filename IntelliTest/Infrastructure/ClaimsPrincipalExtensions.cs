@@ -8,5 +8,14 @@ namespace IntelliTest.Services.Infrastructure
         {
             return user.FindFirstValue(ClaimTypes.NameIdentifier);
         }
+
+        public static bool IsTeacher(this ClaimsPrincipal user)
+        {
+            return user.IsInRole("Teacher");
+        }
+        public static bool IsStudent(this ClaimsPrincipal user)
+        {
+            return user.IsInRole("Student");
+        }
     }
 }

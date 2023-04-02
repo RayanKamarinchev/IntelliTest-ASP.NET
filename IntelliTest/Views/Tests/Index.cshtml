@@ -1,11 +1,12 @@
-﻿@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+﻿@using IntelliTest.Services.Infrastructure
+@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
 @{
     ViewBag.Title = "Tests Blog";
 }
 
 <div>
     <main class="cd-main-content">
-        @if ((bool)TempData.Peek("isTeacher"))
+        @if (User.IsTeacher())
         {
             <div class="floating-container">
                 <a class="floating-button" asp-action="Create">+</a>

@@ -33,8 +33,8 @@ namespace IntelliTest.Models.Tests
         [Display(Name = "Време (в минути)")]
         public int Time { get; set; }
         public DateTime CreatedOn { get; set; }
-        public IList<OpenQuestion> OpenQuestions { get; set; }
-        public IList<ClosedQuestion> ClosedQuestions { get; set; }
+        public IList<OpenQuestion>? OpenQuestions { get; set; }
+        public IList<ClosedQuestion>? ClosedQuestions { get; set; }
         public bool MultiSubmit { get; set; }
     }
 }

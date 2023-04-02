@@ -7,7 +7,6 @@ namespace IntelliTest.Core.Contracts
 {
     public interface IStudentService
     {
-        Task<bool> ExistsByUserId(string id);
         Task AddStudent(UserType model, string userId);
         Task<Guid> GetStudentId(string userId);
 

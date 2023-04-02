@@ -11,9 +11,8 @@ namespace IntelliTest.Core.Models.Users
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public bool IsTeacher { get; set; }
-        public bool HasRole { get; set; }
         public string Password { get; set; }
+        public bool IsTeacher { get; set; }
         public UserPanel UserPanel { get; set; }
     }
 }

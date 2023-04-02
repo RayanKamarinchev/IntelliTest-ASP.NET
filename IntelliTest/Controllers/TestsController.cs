@@ -44,12 +44,12 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if (cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
+            if (1==0 && cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
             {
             }
             else
             {
-                model = await testService.GetAll((bool)TempData.Peek("isTeacher"));
+                model = await testService.GetAll(User.IsTeacher());
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
                                         .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 await cache.SetAsync("tests", model, cacheEntryOptions);
@@ -61,12 +61,12 @@ namespace IntelliTest.Controllers
         public async Task<IActionResult> MyTests()
         {
             IEnumerable<TestViewModel> model = new List<TestViewModel>();
-            if ((bool)TempData.Peek("isTeacher"))
+            if (User.IsTeacher())
             {
                 Guid teacherId = await teacherService.GetTeacherId(User.Id());
                 model = await testService.GetMy(teacherId);
             }
-            else if ((bool)TempData.Peek("isStudent"))
+            else if (User.IsStudent())
             {
                 Guid studentId = await studentService.GetStudentId(User.Id());
                 model = await testService.TestsTakenByStudent(studentId);
@@ -82,7 +82,7 @@ namespace IntelliTest.Controllers
             {
                 if (viewModel.PublicityLevel == PublicityLevel.TeachersOnly)
                 {
-                    if (!(bool)TempData.Peek("isTeacher"))
+                    if (!User.IsTeacher())
                     {
                         return Unauthorized();
                     }
@@ -105,7 +105,7 @@ namespace IntelliTest.Controllers
 
                 else if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
                 {
-                    if (!(bool)TempData.Peek("isTeacher"))
+                    if (!User.IsTeacher())
                     {
                         return Unauthorized();
                     }
@@ -234,6 +234,7 @@ namespace IntelliTest.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> EditSubmit(Guid id, TestEditViewModel model)
         {
             if (model.ClosedQuestions == null)
@@ -246,32 +247,23 @@ namespace IntelliTest.Controllers
             }
             if (!await testService.ExistsbyId(id))
             {
-                return BadRequest();
+                return NotFound();
             }
             if (!ModelState.IsValid)
             {
                 return View("Edit", model);
             }
 
-            if (!(bool)TempData.Peek("isTeacher"))
-            {
-                return Unauthorized();
-            }
-
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
             await testService.Edit(id, model, teacherId);
             TempData["message"] = "Успешно редактира тест!";
-            return RedirectToAction("Index", testService.GetAll((bool)TempData.Peek("isTeacher")));
+            return RedirectToAction("Index", testService.GetAll(User.IsTeacher()));
         }
 
         [HttpGet]
+        [Authorize(Roles = "Teacher")]
         public IActionResult Create()
         {
-            if (!(bool)TempData.Peek("isTeacher"))
-            {
-                return Unauthorized();
-            }
-
             return View("Create", new TestViewModel());
         }
 
@@ -291,24 +283,24 @@ namespace IntelliTest.Controllers
         [Route("Take/{testId}")]
         public async Task<IActionResult> Take(Guid testId)
         { 
-            if (!(bool)TempData.Peek("isStudent"))
+            if (!User.IsStudent())
             {
                 return Unauthorized();
             }
             if (!await testService.ExistsbyId(testId))
             {
-                return BadRequest();
+                return NotFound();
             }
             if (await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
             {
                 return BadRequest();
             }
 
-            if ((bool)TempData.Peek("isTeacher"))
+            if (User.IsTeacher())
             {
                 if (await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
                 {
-                    return BadRequest();
+                    return NotFound();
                 }
             }
 
@@ -330,7 +322,7 @@ namespace IntelliTest.Controllers
         [Route("Review/{testId}-{studentId}")]
         public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
-            if (!(bool)TempData.Peek("isStudent"))
+            if (!User.IsStudent())
             {
                 return Unauthorized();
             }
@@ -349,12 +341,9 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Statistics(Guid testId)
         {
-            if (!(bool)TempData.Peek("isTeacher"))
-            {
-                return Unauthorized();
-            }
 
             if (!await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
             {

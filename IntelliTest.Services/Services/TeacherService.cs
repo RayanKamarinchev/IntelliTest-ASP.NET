@@ -19,11 +19,6 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        public async Task<bool> ExistsByUserId(string id)
-        {
-            return await context.Teachers.AnyAsync(x => x.UserId == id);
-        }
-
         public async Task AddTeacher(string userId)
         {
             Teacher teacher = new Teacher()

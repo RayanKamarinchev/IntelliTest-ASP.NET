@@ -6,19 +6,20 @@
     <div class="propMenu" style="margin-bottom: 15px;">
         <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
         <div class="propMenu-description">
+
         </div>
     </div>
-    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%" class="questBox lessonBox">
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem;" class="questBox lessonBox">
         <form method="post" asp-route-id="@Model.Id">
                 <div class="editor-container">
-                    <div class="editor">
-                        <h1 data-placeholder="Напишете заглавието си" class="editor-title">@Model.Title</h1>
+                    <div class="editor lessonEditor">
+                        <h1 data-placeholder="Напишете заглавието си">@Model.Title</h1>
                         <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
                     </div>
                 </div>
             <br/>
             <div class="button-container">
-                <button class="btn-hover color-2" type="submit">SEND</button>
+                <button class="btn-hover color-2" type="submit">Създай</button>
             </div>
         </form>
     </div>

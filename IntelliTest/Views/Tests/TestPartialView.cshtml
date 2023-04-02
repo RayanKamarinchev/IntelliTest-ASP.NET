@@ -34,7 +34,7 @@
             </ol>
             <div class="widget-49-meeting-action d-flex justify-content-end">
                 @{
-                    if ((bool)TempData.Peek("isTeacher"))
+                    if (User.IsTeacher())
                     {
                         bool isOwner = await teacherService.IsTestCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
                         if (isOwner)

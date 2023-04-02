@@ -81,12 +81,7 @@
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        if (TempData.Peek("isStudent") == null)
-                        {
-                            TempData["isStudent"] = await studentService.ExistsByUserId(User.Id());
-                            TempData["isTeacher"] = await teacherService.ExistsByUserId(User.Id());
-                        }
-                        if ((bool)TempData.Peek("isStudent") || (bool)TempData.Peek("isTeacher"))
+                            if (User.IsTeacher() || User.IsStudent())
                         {
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
@@ -98,7 +93,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Lessons" asp-action="Index">Уроци</a>
                             </li>
                         }
-                        if ((bool)TempData.Peek("isTeacher"))
+                        if (User.IsTeacher())
                         {
                             <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
@@ -111,7 +106,7 @@
         </div>
     </nav>
 </header>
-<div class="container-mother">
+<div class="container-mother" style="margin-bottom: 50px">
     <main role="main">
         @if (TempData["message"] != null)
         {
@@ -126,7 +121,7 @@
     </main>
 </div>
 
-<footer class="border-top footer text-muted" style="margin-top: 50px">
+<footer class="border-top footer text-muted">
     <div class="container  text-center">
         &copy; 2022 - IntelliTest
     </div>

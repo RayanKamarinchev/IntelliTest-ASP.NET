@@ -31,7 +31,7 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if (cache.TryGetValue("lessons", out IEnumerable<LessonViewModel>? model) && 0==1)
+            if (0 == 1 && cache.TryGetValue("lessons", out IEnumerable<LessonViewModel>? model))
             {
             }
             else
@@ -61,7 +61,7 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            if (!(bool)TempData.Peek("IsTeacher"))
+            if (!User.IsTeacher())
             {
                 return Unauthorized();
             }
@@ -72,7 +72,7 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EditLessonViewModel model)
         {
-            if (!(bool)TempData.Peek("IsTeacher"))
+            if (!User.IsTeacher())
             {
                 return Unauthorized();
             }
@@ -97,7 +97,7 @@ namespace IntelliTest.Controllers
                 return RedirectToAction("Details", new { id = id });
             }
 
-            if (!(bool)TempData.Peek("isTeacher"))
+            if (!User.IsTeacher())
             {
                 return RedirectToAction("Details", new { id = id });
             }
@@ -118,10 +118,10 @@ namespace IntelliTest.Controllers
         {
             if (!await lessonService.ExistsById(id))
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            if (!(bool)TempData.Peek("isTeacher"))
+            if (!User.IsTeacher())
             {
                 return Unauthorized();
             }
@@ -130,7 +130,7 @@ namespace IntelliTest.Controllers
 
             if (!await teacherService.IsLessonCreator(id, teacherId))
             {
-                return Unauthorized();
+                return NotFound();
             }
 
             await lessonService.Edit(id, model);

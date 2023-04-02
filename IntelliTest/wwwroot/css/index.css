@@ -654,3 +654,10 @@ body {
 .e-profile {
     padding: 70px;
 }
+
+.ck .ck-placeholder:nth-child(1):before {
+    font-size: 1.5rem;
+}
+.lessonEditor > h1 {
+    font-size: 1.5rem;
+}

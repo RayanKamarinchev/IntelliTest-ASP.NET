@@ -10,6 +10,10 @@ using StackExchange.Redis;
 using Microsoft.AspNetCore.Builder;
 using MailKit;
 using IntelliTest.Core.Models.Mails;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Google;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -17,7 +21,7 @@ builder.Services.AddDbContext<IntelliTestDbContext>(options =>
                                                         options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<User>(options =>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireLowercase = false;
@@ -25,7 +29,6 @@ builder.Services.AddDefaultIdentity<User>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireDigit = false;
 })
-       .AddRoles<IdentityRole>()
        .AddEntityFrameworkStores<IntelliTestDbContext>();
 
 builder.Services.AddCors(options =>
@@ -82,7 +85,23 @@ builder.Services.AddMvc(options =>
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
 builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
                                                                    o.TokenLifespan = TimeSpan.FromHours(3));
+
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var roleManager = (RoleManager<IdentityRole>)scope.ServiceProvider.GetService(typeof(RoleManager<IdentityRole>));
+string[] roleNames = { "Teacher", "Student" };
+IdentityResult roleResult;
+
+foreach (var roleName in roleNames)
+{
+    var roleExist = await roleManager.RoleExistsAsync(roleName);
+    if (!roleExist)
+    {
+        //create the roles and seed them to the database: Question 1
+        roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
