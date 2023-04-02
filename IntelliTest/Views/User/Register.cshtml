@@ -14,29 +14,37 @@
                     <div class="panel border bg-white">
                         <div class="panel-body p-3">
                             <div class="form-group py-2">
+                                    <label asp-for="FirstName"></label>
                                 <div class="input-field">
                                     <input asp-for="FirstName" type="text" placeholder="Име" required>
                                 </div>
+                                    <span asp-validation-for="FirstName" class="small text-danger"></span>
                             </div>
                             <div class="form-group py-2">
+                                    <label asp-for="LastName"></label>
                                 <div class="input-field">
                                     <input asp-for="LastName" type="text" placeholder="Фамилия" required>
                                 </div>
+                                    <span asp-validation-for="LastName" class="small text-danger"></span>
                             </div>
                             <div class="form-group py-2">
-                                <div class="input-field">
-                                    <input asp-for="Email" type="text" placeholder="Имейл" required>
-                                </div>
+                                    <label asp-for="Email"></label>
+                                    <input asp-for="Email" class="input-field" style="color: black; width: 100%" type="email" placeholder="Имайл" required>
+                                    <span asp-validation-for="Email" class="small text-danger"></span>
                             </div>
                             <div class="form-group py-1 pb-2">
+                                    <label asp-for="Password"></label>
                                 <div class="input-field">
                                     <input asp-for="Password" type="password" placeholder="Парола" required>
                                 </div>
+                                    <span asp-validation-for="Password" class="small text-danger"></span>
                             </div>
                             <div class="form-group py-1 pb-2">
+                                    <label asp-for="ConfirmPassword"></label>
                                 <div class="input-field">
                                     <input asp-for="ConfirmPassword" type="password" placeholder="Повтори Паролата" required>
                                 </div>
+                                    <span asp-validation-for="ConfirmPassword" class="small text-danger"></span>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block mt-3">Регистрирай се</button>
                         </div>

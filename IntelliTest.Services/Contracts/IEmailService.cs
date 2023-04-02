@@ -1,4 +1,4 @@
-﻿using IntelliTest.Core.Models;
+﻿using IntelliTest.Core.Models.Mails;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace IntelliTest.Core.Contracts
 {
     public interface IEmailService
     {
-        Task<bool> SendAsync(MailData mailData, CancellationToken ct);
+        Task<bool> SendAsync(EmailMessage emailMessage, CancellationToken token);
     }
 }

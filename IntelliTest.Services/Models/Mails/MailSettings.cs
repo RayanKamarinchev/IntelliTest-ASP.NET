@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntelliTest.Core.Models
+namespace IntelliTest.Core.Models.Mails
 {
     public class MailSettings
     {

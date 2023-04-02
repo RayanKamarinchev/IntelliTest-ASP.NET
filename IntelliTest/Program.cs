@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Builder;
-using IntelliTest.Core.Models;
 using MailKit;
+using IntelliTest.Core.Models.Mails;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -80,7 +80,8 @@ builder.Services.AddMvc(options =>
 });
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
-
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
+                                                                   o.TokenLifespan = TimeSpan.FromHours(3));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
