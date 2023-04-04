@@ -39,6 +39,9 @@
         <li class="nav-item">
             <a class="nav-link" onclick="Like()">Харесани</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" onclick="MyTests()">Харесани</a>
+        </li>
     </ul>
     <div class="tab-content pt-3">
         <div class="tab-pane active" style="color: black !important" id="panels">
@@ -102,6 +105,22 @@
                     [...tabs.children].forEach(c=>c.children[0].classList.remove("active"));
                     panels.innerHTML = res;
                     tabs.children[3].children[0].classList.add("active");
+                    let e = document.getElementById("lessonHeading");
+                    e.parentNode.removeChild(e);
+
+                }
+            });
+        }
+        
+        function MyTests(){
+            $.ajax({
+                type: 'get',
+                url: '@Url.Action("GetPanel")',
+                data: {type: "myTests"},
+                success: function(res){
+                    [...tabs.children].forEach(c=>c.children[0].classList.remove("active"));
+                    panels.innerHTML = res;
+                    tabs.children[4].children[0].classList.add("active");
                     let e = document.getElementById("lessonHeading");
                     e.parentNode.removeChild(e);
 

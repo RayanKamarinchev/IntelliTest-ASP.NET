@@ -309,7 +309,7 @@ textarea {
 .circle {
     border-radius: 50%;
     cursor: pointer;
-    width: 50px;
+    width: 48px;
     height: 50px;
     border: none;
     background-color: white;

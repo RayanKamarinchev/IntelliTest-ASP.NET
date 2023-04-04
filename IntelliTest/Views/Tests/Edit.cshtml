@@ -61,8 +61,8 @@
                             <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[q]"/>
                 }
             }
-            <button asp-action="Edit" asp-route-id="-1" asp-route-type="OpenQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
-            <button asp-action="Edit" asp-route-id="-1" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
+            <button asp-action="Edit" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" class="btn btn-secondary">Добави отворен въпрос</button>
+            <button asp-action="Edit" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
             <hr/>
             @{
                 Guid id = new Guid(TempData.Peek("testId").ToString());

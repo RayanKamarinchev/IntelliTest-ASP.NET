@@ -284,6 +284,8 @@ namespace Watchlist.Controllers
                 case "like":
                     var liked = await lessonService.LikedLessons(User.Id());
                     return PartialView("~/Views/Lessons/Index.cshtml", liked);
+                case "myTests":
+
                 default:
                     var user = await userManager.GetUserAsync(User);
                     EditUser model = new EditUser()

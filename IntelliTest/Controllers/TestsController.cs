@@ -75,7 +75,6 @@ namespace IntelliTest.Controllers
             return View("Index", model);
         }
         [Route("Tests/Edit/{id}")]
-        [HttpGet]
         public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
         {
             if (viewModel.PublicityLevel!=PublicityLevel.Link && viewModel.PublicityLevel != PublicityLevel.Public)

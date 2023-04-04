@@ -6,22 +6,28 @@
     <div class="propMenu" style="margin-bottom: 15px;">
         <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
         <div class="propMenu-description">
-
+            <div class="form-group py-2">
+                <label asp-for="School"></label>
+                <input id="school" value="@Model.School" class="input-field" style="color: black; width: 100%" type="email" placeholder="Училище" required>
+            </div>
+            <div class="form-group py-2">
+                <label asp-for="Subject"></label>
+                <input id="subject" value="@Model.Subject" class="input-field" style="color: black; width: 100%" type="email" placeholder="Предмет" required>
+            </div>
         </div>
     </div>
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem;" class="questBox lessonBox">
-        <form method="post" asp-route-id="@Model.Id">
-                <div class="editor-container">
+        <div class="editor-container">
                     <div class="editor lessonEditor">
                         <h1 data-placeholder="Напишете заглавието си">@Model.Title</h1>
                         <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
                     </div>
                 </div>
             <br/>
+            <p id="validation" class="small text-danger"></p>
             <div class="button-container">
-                <button class="btn-hover color-2" type="submit">Създай</button>
+                <button class="btn-hover color-2" onclick="Submit()">Създай</button>
             </div>
-        </form>
     </div>
 </div>
 
@@ -36,5 +42,24 @@
 				.then( editor => {
 					window.editor = editor;
 				} )
+                    let validationSpan = document.getElementById("validation");
+                    function Submit(){
+                        let titleText = document.querySelector(".lessonEditor h1").textContent;
+                        let contentText = [...document.querySelectorAll(".lessonEditor > *:not(h1)")].map(e=>e.textContent);
+                        console.log(contentText)
+                        let schoolText = document.querySelector("#school").value;
+                        let subjectText = document.querySelector("#subject").value;
+                        $.ajax({
+                        type: 'GET',
+                        url: `@Url.Action("SubmitEdit", "Lessons", new { id = Model.Id })?title=${titleText}&cotnent=${contentText}&school=${schoolText}&subject=${subjectText}&`,
+                          success: function(res){
+                              console.log(res);
+                              validationSpan.textContent = res;
+                          },
+                          error: function(er){
+                                window.location.href = "/Error/" + er.status;
+                            }
+                        });
+                    }
 		</script>
 }

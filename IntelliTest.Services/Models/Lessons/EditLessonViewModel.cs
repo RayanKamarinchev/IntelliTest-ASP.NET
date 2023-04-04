@@ -15,6 +15,8 @@ namespace IntelliTest.Core.Models.Lessons
         public string Title { get; set; }
         [Required]
         public string Content { get; set; }
+
+        public string HtmlContent { get; set; }
         public int Grade { get; set; }
         public string Subject { get; set; }
         public string School { get; set; }

@@ -17,6 +17,8 @@ namespace IntelliTest.Data.Entities
         [Required]
         public string Content { get; set; }
         [Required]
+        public string HtmlCotnent { get; set; }
+        [Required]
         public DateTime CreatedOn { get; set; }
         public Teacher Creator { get; set; }
         [ForeignKey(nameof(Creator))]

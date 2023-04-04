@@ -1,0 +1,23 @@
+﻿@using IntelliTest.Services.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+<div>
+    <main class="cd-main-content">
+        @if (User.IsTeacher())
+        {
+                <div class="floating-container">
+                    <a class="floating-button" asp-action="Create" asp-controller="Tests">+</a>
+                </div>
+        }
+        <section class="cd-gallery">
+            <ul style="width: 100%">
+                @foreach (var test in Model)
+                {
+                        <partial name="~/Views/Tests/TestCreatorPartialView.cshtml" for="@test"/>
+                }
+            </ul>
+            <div class="cd-fail-message">Няма резултати</div>
+        </section>
+        <partial name="FilterMenuPartialView"/>
+    </main>
+</div>

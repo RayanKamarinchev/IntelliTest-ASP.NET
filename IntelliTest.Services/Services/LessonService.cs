@@ -246,7 +246,7 @@ namespace IntelliTest.Core.Services
             return context.Lessons.AnyAsync(l => l.Id == lessonId);
         }
 
-        public async Task Edit(Guid lessonId, LessonViewModel model)
+        public async Task Edit(Guid lessonId, EditLessonViewModel model)
         {
             var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.Grade = model.Grade;

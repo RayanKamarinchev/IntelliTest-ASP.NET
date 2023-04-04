@@ -66,64 +66,56 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            return View("Edit", new EditLessonViewModel());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(EditLessonViewModel model)
-        {
-            if (!User.IsTeacher())
-            {
-                return Unauthorized();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View("Edit", model);
-            }
-
-            Guid teacherId = await teacherService.GetTeacherId(User.Id());
-            await lessonService.Create(model, teacherId);
-
-            return View("Index");
+            return RedirectToAction("Edit", new EditLessonViewModel());
         }
 
         [HttpGet]
         [Route("Lessons/Edit/{id}")]
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id, EditLessonViewModel model)
         {
-            if (!await lessonService.ExistsById(id))
-            {
-                return RedirectToAction("Details", new { id = id });
-            }
-
             if (!User.IsTeacher())
             {
                 return RedirectToAction("Details", new { id = id });
             }
 
-            Guid teacherId = await teacherService.GetTeacherId(User.Id());
-
-            if (!await teacherService.IsLessonCreator(id, teacherId))
+            if (model == null)
             {
-                return RedirectToAction("Details", new { id = id });
-            }
+                Guid teacherId = await teacherService.GetTeacherId(User.Id());
 
-            EditLessonViewModel model = lessonService.ToEdit(await lessonService.GetById(id));
+                if (!await teacherService.IsLessonCreator(id, teacherId))
+                {
+                    return RedirectToAction("Details", new { id = id });
+                }
+
+                model = lessonService.ToEdit(await lessonService.GetById(id));
+            }
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(Guid id, LessonViewModel model)
+        [HttpGet]
+        [Route("Lessons/SubmitEdit/{id}")]
+        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string school, string subject)
         {
-            if (!await lessonService.ExistsById(id))
+            EditLessonViewModel model = new EditLessonViewModel()
             {
-                return NotFound();
+                Id = id,
+                Title = title,
+                Content = content,
+                School = school,
+                Subject = subject
+            };
+            if (!ModelState.IsValid)
+            {
+                return Content(string.Join('\n', ModelState.Values.SelectMany(v => v.Errors).Select(e=>e.ErrorMessage)));
             }
-
             if (!User.IsTeacher())
             {
                 return Unauthorized();
+            }
+            if (!await lessonService.ExistsById(id))
+            {
+                await lessonService.Create(model, await teacherService.GetTeacherId(User.Id()));
+                return RedirectToAction("Index");
             }
 
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
@@ -134,7 +126,7 @@ namespace IntelliTest.Controllers
             }
 
             await lessonService.Edit(id, model);
-            return View("Index");
+            return RedirectToAction("Index");
         }
 
         [HttpGet]

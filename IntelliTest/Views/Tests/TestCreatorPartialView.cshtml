@@ -1,0 +1,85 @@
+﻿@using IntelliTest.Services.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Core.Contracts
+@model TestViewModel
+@inject ITestService testService
+@inject IStudentService studentService
+@inject ITeacherService teacherService
+<div class="card card-margin">
+    <div class="card-header no-border">
+        <h5 class="card-title">@Model.Title - @Model.Grade</h5>
+    </div>
+    <div class="card-body pt-0">
+        <div class="widget-49">
+            <button class="circle">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+            <div class="widget-49-title-wrapper">
+                <div class="widget-49-date-primary">
+                    <span class="widget-49-date-day">@Model.AverageScore</span>
+                    <span class="widget-49-date-month">score</span>
+                </div>
+                <div class="widget-49-meeting-info">
+                    <span class="widget-49-pro-title">@Model.Description</span>
+                    <span class="widget-49-meeting-time">@Model.CreatedOn</span>
+                </div>
+            </div>
+            <ol class="widget-49-meeting-points">
+                <li class="widget-49-meeting-item">
+                    <span>Въпроси: <strong>@(Model.OpenQuestions.Count() + Model.ClosedQuestions.Count())</strong></span>
+                </li>
+                <li class="widget-49-meeting-item">
+                    <span>Време: <strong>@Model.Time мин</strong></span>
+                </li>
+                <li class="widget-49-meeting-item">
+                    <span>Изпитници: <strong>@Model.Students</strong></span>
+                </li>
+            </ol>
+            <div class="widget-49-meeting-action d-flex justify-content-end">
+                @{
+                    if (User.IsTeacher())
+                    {
+                        bool isOwner = await teacherService.IsTestCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
+                        if (isOwner)
+                        {
+                            <a asp-action="Statistics" asp-route-testId="@Model.Id"
+                               class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
+                                Статистика
+                            </a>
+                        }
+                        <a asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
+                           class="btn btn-sm btn-primary back-col">
+                            Редактирай
+                        </a>
+                    }
+                    else
+                    {
+                        Guid studentId = await studentService.GetStudentId(User.Id());
+                        var student = await studentService.GetStudent(studentId);
+                        if (await testService.IsTestTakenByStudentId(Model.Id, student))
+                        {
+                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@Model.Id"
+                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                                Резултати
+                            </a>
+                            @if (Model.MultiSubmit)
+                            {
+                                <a onClick="warn(@Model.Id, @Model.Time, '@Model.Title')"
+                                   class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                                    Направи
+                                </a>
+                            }
+                        }
+                        else
+                        {
+                            <a onClick="warn(@Model.Id, @Model.Time, '@Model.Title')"
+                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                                Направи
+                            </a>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

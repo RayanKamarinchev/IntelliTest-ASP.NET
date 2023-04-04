@@ -397,15 +397,18 @@ namespace IntelliTest.Core.Services
                 });
                 allClosedAnswers.Add(answers);
             });
-            for (int i = 0; i < allClosedAnswers[0].Count; i++)
+            if (allClosedAnswers.Count>0)
             {
-                model.ClosedQuestions.Add(new ClosedQuestionStatsViewModel()
+                for (int i = 0; i < allClosedAnswers[0].Count; i++)
                 {
-                    StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
-                    Text = res[0].ClosedQuestions[i].Text,
-                    Answers = res[0].ClosedQuestions[i].PossibleAnswers,
-                    Order = res[0].ClosedQuestions[i].Order
-                });
+                    model.ClosedQuestions.Add(new ClosedQuestionStatsViewModel()
+                    {
+                        StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
+                        Text = res[0].ClosedQuestions[i].Text,
+                        Answers = res[0].ClosedQuestions[i].PossibleAnswers,
+                        Order = res[0].ClosedQuestions[i].Order
+                    });
+                }
             }
 
             List<List<string>> allOpenAnswers = new List<List<string>>();
@@ -418,16 +421,18 @@ namespace IntelliTest.Core.Services
                 });
                 allOpenAnswers.Add(answers);
             });
-            for (int i = 0; i < allOpenAnswers[0].Count; i++)
+            if (allOpenAnswers.Count > 0)
             {
-                model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
+                for (int i = 0; i < allOpenAnswers[0].Count; i++)
                 {
-                    StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
-                    Text = res[0].OpenQuestions[i].Text,
-                    Order = res[0].OpenQuestions[i].Order
-                });
+                    model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
+                    {
+                        StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
+                        Text = res[0].OpenQuestions[i].Text,
+                        Order = res[0].OpenQuestions[i].Order
+                    });
+                }
             }
-
 
             return model;
         }
