@@ -22,6 +22,6 @@ namespace IntelliTest.Core.Models.Tests
         public int Grade { get; set; }
         [Display(Name = "Време (мин): ")]
         public int Time { get; set; }
-        public int? Id { get; set; }
+        public Guid? Id { get; set; }
     }
 }

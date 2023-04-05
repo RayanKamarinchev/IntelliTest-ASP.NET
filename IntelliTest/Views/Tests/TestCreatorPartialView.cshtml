@@ -11,9 +11,9 @@
     </div>
     <div class="card-body pt-0">
         <div class="widget-49">
-            <button class="circle">
+            <a class="btn circle test-trash" asp-action="Delete" asp-controller="Tests" asp-route-id="@Model.Id">
                 <i class="fa-solid fa-trash"></i>
-            </button>
+            </a>
             <div class="widget-49-title-wrapper">
                 <div class="widget-49-date-primary">
                     <span class="widget-49-date-day">@Model.AverageScore</span>

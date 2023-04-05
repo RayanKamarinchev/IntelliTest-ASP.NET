@@ -11,6 +11,7 @@ using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Mails;
 using IntelliTest.Core.Services;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
+using IntelliTest.Models.Tests;
 
 namespace Watchlist.Controllers
 {
@@ -24,6 +25,7 @@ namespace Watchlist.Controllers
         private readonly IStudentService studentService;
         private readonly ILessonService lessonService;
         private readonly IEmailService emailService;
+        private readonly ITestService testService;
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager,
@@ -31,7 +33,8 @@ namespace Watchlist.Controllers
                               ITeacherService _teacherService,
                               IStudentService _studentService,
                               ILessonService _lessonService,
-                              IEmailService email_service)
+                              IEmailService email_service,
+                              ITestService testService)
         {
             userManager = _userManager;
             signInManager = _signInManager;
@@ -40,6 +43,7 @@ namespace Watchlist.Controllers
             lessonService = _lessonService;
             this.emailService = email_service;
             roleManager = _roleManager;
+            this.testService = testService;
         }
 
         private string GetEmailTemplate(string link)
@@ -285,7 +289,19 @@ namespace Watchlist.Controllers
                     var liked = await lessonService.LikedLessons(User.Id());
                     return PartialView("~/Views/Lessons/Index.cshtml", liked);
                 case "myTests":
+                    IEnumerable<TestViewModel> myTests = new List<TestViewModel>();
+                    if (User.IsTeacher())
+                    {
+                        Guid teacherId = await teacherService.GetTeacherId(User.Id());
+                        myTests = await testService.GetMy(teacherId);
+                    }
+                    else if (User.IsStudent())
+                    {
+                        Guid studentOwnerId = await studentService.GetStudentId(User.Id());
+                        myTests = await testService.TestsTakenByStudent(studentOwnerId);
+                    }
 
+                    return PartialView("Panels/MyTestsPartialView", myTests);
                 default:
                     var user = await userManager.GetUserAsync(User);
                     EditUser model = new EditUser()

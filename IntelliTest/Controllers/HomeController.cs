@@ -8,12 +8,6 @@ namespace Watchlist.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IEmailService emailService;
-
-        public HomeController(IEmailService _emailService)
-        {
-            emailService = _emailService;
-        }
         public async Task<IActionResult> Index()
         {
             return View();

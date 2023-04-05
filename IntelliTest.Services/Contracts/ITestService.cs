@@ -28,5 +28,6 @@ namespace IntelliTest.Core.Contracts
 
         decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
         public Task<bool> StudentHasAccess(Guid testId, Guid studentId);
+        public Task DeleteTest(Guid id);
     }
 }

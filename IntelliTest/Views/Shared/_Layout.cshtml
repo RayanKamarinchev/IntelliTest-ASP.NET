@@ -87,9 +87,6 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
                             </li>
                             <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="MyTests">Мои тестове</a>
-                            </li>
-                            <li class="nav-item align-items-center d-flex">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Lessons" asp-action="Index">Уроци</a>
                             </li>
                         }
@@ -106,8 +103,8 @@
         </div>
     </nav>
 </header>
-<div class="container-mother" style="margin-bottom: 50px">
-    <main role="main">
+<div class="container-mother">
+    <main role="main" style="padding-bottom: 50px">
         @if (TempData["message"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">

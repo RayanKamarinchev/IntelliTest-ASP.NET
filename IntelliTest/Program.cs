@@ -14,11 +14,12 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Google;
 using System;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<IntelliTestDbContext>(options =>
-                                                        options.UseSqlServer(connectionString));
+                                                            options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -63,7 +64,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/User/Login";
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers()
+       .AddJsonOptions(x => 
+                           x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddTransient<IStudentService, StudentService>();

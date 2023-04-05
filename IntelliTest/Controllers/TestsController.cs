@@ -58,21 +58,13 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> MyTests()
         {
             IEnumerable<TestViewModel> model = new List<TestViewModel>();
-            if (User.IsTeacher())
-            {
                 Guid teacherId = await teacherService.GetTeacherId(User.Id());
                 model = await testService.GetMy(teacherId);
-            }
-            else if (User.IsStudent())
-            {
-                Guid studentId = await studentService.GetStudentId(User.Id());
-                model = await testService.TestsTakenByStudent(studentId);
-            }
-            
-            return View("Index", model);
+                return View("Index", model);
         }
         [Route("Tests/Edit/{id}")]
         public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
@@ -151,6 +143,7 @@ namespace IntelliTest.Controllers
                         model.OpenQuestions[i].Answer = viewModel.OpenQuestions[i].Answer;
                         model.OpenQuestions[i].Order = viewModel.OpenQuestions[i].Order;
                         model.OpenQuestions[i].Text = viewModel.OpenQuestions[i].Text;
+                        model.OpenQuestions[i].MaxScore = viewModel.OpenQuestions[i].MaxScore;
                     }
                 }
 
@@ -162,6 +155,7 @@ namespace IntelliTest.Controllers
                         model.ClosedQuestions[i].AnswerIndexes = viewModel.ClosedQuestions[i].AnswerIndexes;
                         model.ClosedQuestions[i].Order = viewModel.ClosedQuestions[i].Order;
                         model.ClosedQuestions[i].Text = viewModel.ClosedQuestions[i].Text;
+                        model.ClosedQuestions[i].MaxScore = viewModel.ClosedQuestions[i].MaxScore;
                     }
                 }
 
@@ -244,9 +238,32 @@ namespace IntelliTest.Controllers
             {
                 model.OpenQuestions = new List<OpenQuestionViewModel>();
             }
+
+            for (int i = 0; i < model.ClosedQuestions.Count; i++)
+            {
+                List<string> answers = new List<string>();
+                List<bool> answersIndexes = new List<bool>();
+                for (int j = 0; j < model.ClosedQuestions[i].Answers.Length; j++)
+                {
+                    if (model.ClosedQuestions[i].Answers[j]!=null)
+                    {
+                        answers.Add(model.ClosedQuestions[i].Answers[j]);
+                        answersIndexes.Add(model.ClosedQuestions[i].AnswerIndexes[j]);
+                    }
+                }
+
+                model.ClosedQuestions[i].Answers = answers.ToArray();
+                model.ClosedQuestions[i].AnswerIndexes = answersIndexes.ToArray();
+            }
+
             if (!await testService.ExistsbyId(id))
             {
                 return NotFound();
+            }
+
+            if (!model.ClosedQuestions.All(c=>c.AnswerIndexes.Any(ai=>ai)))
+            {
+                return View("Edit", model);
             }
             if (!ModelState.IsValid)
             {
@@ -256,6 +273,7 @@ namespace IntelliTest.Controllers
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
             await testService.Edit(id, model, teacherId);
             TempData["message"] = "Успешно редактира тест!";
+            TempData.Remove("editModel");
             return RedirectToAction("Index", testService.GetAll(User.IsTeacher()));
         }
 
@@ -343,15 +361,29 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Statistics(Guid testId)
         {
-
             if (!await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
             {
-                return Unauthorized();
+                return NotFound();
             }
 
             var model = await testService.GetStatistics(testId);
 
             return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        [Route("Test/Delete/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
+            if (!await teacherService.IsTestCreator(id, teacherId))
+            {
+                return NotFound();
+            }
+            await testService.DeleteTest(id);
+            TempData["message"] = "Успешно изтри тест";
+            return RedirectToAction("ViewProfile", "User");
         }
 
         public IActionResult AiGenerate(string text)

@@ -23,9 +23,10 @@ namespace IntelliTest.Core.Services
 
         public async Task<IEnumerable<TestViewModel>> GetAll(bool isTeacher)
         {
-            var tests = await context.Tests.ToListAsync();
-            return await context.Tests.Where(t=>!t.IsDeleted && (t.PublicyLevel == PublicityLevel.Public||(isTeacher && t.PublicyLevel==PublicityLevel.TeachersOnly)))
-                                .Select(t=> new TestViewModel()
+            return await context.Tests.Where(t => !t.IsDeleted
+                                               && (t.PublicyLevel == PublicityLevel.Public ||
+                                                   (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)))
+                                .Select(t => new TestViewModel()
                                 {
                                     AverageScore = t.AverageScore,
                                     ClosedQuestions = t.ClosedQuestions,
@@ -39,12 +40,13 @@ namespace IntelliTest.Core.Services
                                     Title = t.Title,
                                     MultiSubmit = t.MultiSubmission
                                 })
-                           .ToListAsync();
+                                .ToListAsync();
         }
 
         public async Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId)
         {
             return await context.Tests
+                                .Where(t=>!t.IsDeleted)
                                 .Where(t=>t.CreatorId== teacherId)
                                 .Select(t=> new TestViewModel()
                                 {
@@ -537,6 +539,13 @@ namespace IntelliTest.Core.Services
             }
 
             return false;
+        }
+
+        public async Task DeleteTest(Guid id)
+        {
+            var test = await context.Tests.FindAsync(id);
+            test.IsDeleted = true;
+            await context.SaveChangesAsync();
         }
     }
 }
