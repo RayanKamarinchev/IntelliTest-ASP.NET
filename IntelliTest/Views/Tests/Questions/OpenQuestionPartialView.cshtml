@@ -3,7 +3,7 @@
     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
         <span>Points:</span>
         <input type="text" value="@Model.MaxScore" asp-for="MaxScore" style="width: 20px; margin-right: 30px;"/>
-        <button asp-action="Edit" asp-controller="Tests" asp-route-id="-1" asp-route-type="Delete" asp-route-questionOrder="@Model.Order" class="circle">
+        <button asp-action="Edit" asp-controller="Tests" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-type="Delete" asp-route-questionOrder="@Model.Order" class="circle">
             <i class="fa-solid fa-trash"></i>
         </button>
     </div>

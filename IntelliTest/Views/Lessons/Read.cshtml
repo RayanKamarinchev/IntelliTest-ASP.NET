@@ -1,0 +1,44 @@
+﻿@model EditLessonViewModel
+@{
+    ViewBag.Title = "Reading";
+}
+<div class="editMain d-flex" style="flex-direction: row;align-items: start">
+    <div class="propMenu" style="margin-bottom: 15px;">
+        <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
+        <div class="propMenu-description">
+            <div class="form-group py-2">
+                <p style="color: black; width: 100%">@Model.School</p>
+            </div>
+            <div class="form-group py-2">
+                <p style="color: black; width: 100%">@Model.Subject</p>
+            </div>
+            <div class="form-group py-2">
+                <p style="color: black; width: 100%">@Model.Grade</p>
+            </div>
+        </div>
+    </div>
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem;" class="questBox lessonBox">
+        <div class="editor-container">
+            <div class="editor lessonEditor">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/ckeditor.js" asp-append-version="true"></script>
+    <script>
+        let decoded = $('<textarea/>').html("@Model.HtmlContent").text();
+        BalloonBlockEditor
+                    .create( document.querySelector( '.editor' ), {
+                        licenseKey: '',
+                    } )
+                    .then( editor => {
+                        const myFeatureLockId = Symbol( 'my-feature' );
+                        editor.enableReadOnlyMode( myFeatureLockId );
+                        window.editor = editor;
+                            editor.setData(decoded);
+                    } )
+    
+    </script>
+}

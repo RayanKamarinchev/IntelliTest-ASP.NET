@@ -41,10 +41,18 @@
             <div class="customRow">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
                     <div class="widthMax">
-                        <label style="display: flex"></label>
+                        <label style="display: flex">Текст</label>
                         <textarea name="text"></textarea>
                     </div>
-                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" class="btn btn-secondary">Генерирай</button>
+                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-isText="true" class="btn btn-secondary">Генерирай</button>
+                    <br/>
+                    <div class="widthMax">
+                        <label style="display: flex">От линк(URL) или заглавие</label>
+                        <input class="input-field widthMax" name="url" class="widthMax" style="color: black">
+                        <span class="text-danger" asp-validation-for="Title"></span>
+                    </div>
+                    <br/>
+                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-isText="false" class="btn btn-secondary">Генерирай</button>
                 </div>
             </div>
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)

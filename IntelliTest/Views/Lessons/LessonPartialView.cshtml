@@ -2,6 +2,7 @@
 @using IntelliTest.Services.Infrastructure
 @model LessonViewModel
 @inject ILessonService lessonService
+@inject ITeacherService teacherService
 @{
     string ShowTime()
     {
@@ -23,7 +24,7 @@
 <div class="row align-items-center">
     <div class="col-md-7 mb-3 mb-sm-0">
         <h2>
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="text-primary">@Model.Title</a>
+            <a asp-action="Read" asp-route-id="@Model.Id" class="text-primary" style="font-size: 1.7rem">@Model.Title</a>
         </h2>
         <p style="color: rgba(0, 0, 0, 0.6)">
             <span class="body_size">Posted</span>
@@ -34,6 +35,22 @@
         </p>
         <p style="color: rgba(0, 0, 0, 0.6)">училище: @Model.School</p>
         <a class="text-black body_size fs-5">#@Model.Subject</a>
+        @{
+            if (!User.IsTeacher())
+            {
+                return;
+            }
+        
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
+
+            if (Model.CreatorId == teacherId)
+            {
+                <a class="text-black body_size fs-5 btn btn-primary" asp-action="Edit" style="    color: white !important;
+                                                                                              position: absolute;
+                                                                                              right: 10px;
+                                                                                              bottom: 10px;">Редактирай</a>
+            }
+        }
     </div>
     <div class="col-md-5">
         <div class="row text-center op-7" style="height: 80px">

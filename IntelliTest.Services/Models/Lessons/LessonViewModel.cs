@@ -14,6 +14,8 @@ namespace IntelliTest.Core.Models.Lessons
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string HtmlContent { get; set; }
+        public bool IsPrivate { get; set; }
         public DateTime CreatedOn { get; set; }
         public Guid CreatorId { get; set; }
         public int Readers { get; set; }

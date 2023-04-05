@@ -17,14 +17,12 @@ namespace IntelliTest.Controllers
         const string SCRIPT_NAME = "script.py";
         private readonly ILessonService lessonService;
         private readonly IDistributedCache cache;
-        private readonly IStudentService studentService;
         private readonly ITeacherService teacherService;
 
-        public LessonsController(ILessonService _lessonService, IDistributedCache _cache, IStudentService _studentService, ITeacherService _teacherService)
+        public LessonsController(ILessonService _lessonService, IDistributedCache _cache, ITeacherService _teacherService)
         {
             lessonService = _lessonService;
             cache = _cache;
-            studentService = _studentService;
             teacherService = _teacherService;
         }
 
@@ -45,8 +43,8 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Details/{id}")]
-        public async Task<IActionResult> Details(Guid id)
+        [Route("Read/{id}")]
+        public async Task<IActionResult> Read(Guid id)
         {
             if (!await lessonService.ExistsById(id))
             {
@@ -75,7 +73,7 @@ namespace IntelliTest.Controllers
         {
             if (!User.IsTeacher())
             {
-                return RedirectToAction("Details", new { id = id });
+                return RedirectToAction("Read", new { id = id });
             }
 
             if (model == null)
@@ -84,7 +82,7 @@ namespace IntelliTest.Controllers
 
                 if (!await teacherService.IsLessonCreator(id, teacherId))
                 {
-                    return RedirectToAction("Details", new { id = id });
+                    return RedirectToAction("Read", new { id = id });
                 }
 
                 model = lessonService.ToEdit(await lessonService.GetById(id));
@@ -94,16 +92,22 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Route("Lessons/SubmitEdit/{id}")]
-        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string school, string subject)
+        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string htmlContent, string school, string subject, int grade)
         {
             EditLessonViewModel model = new EditLessonViewModel()
             {
                 Id = id,
                 Title = title,
                 Content = content,
+                HtmlContent = htmlContent,
                 School = school,
-                Subject = subject
+                Subject = subject,
+                Grade = grade
             };
+            if (grade < 1 || grade > 12)
+            {
+                return Content("Класът трябва да е между 1 и 12");
+            }
             if (!ModelState.IsValid)
             {
                 return Content(string.Join('\n', ModelState.Values.SelectMany(v => v.Errors).Select(e=>e.ErrorMessage)));
@@ -126,7 +130,7 @@ namespace IntelliTest.Controllers
             }
 
             await lessonService.Edit(id, model);
-            return RedirectToAction("Index");
+            return Content($"/Lessons/Read/{id}");
         }
 
         [HttpGet]

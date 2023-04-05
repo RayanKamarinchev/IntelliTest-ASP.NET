@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Lessons;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
@@ -32,13 +33,15 @@ namespace IntelliTest.Controllers
         private readonly IDistributedCache cache;
         private readonly IStudentService studentService;
         private readonly ITeacherService teacherService;
+        private readonly ILessonService lessonService;
 
-        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService, ITeacherService _teacherService)
+        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService, ITeacherService _teacherService, ILessonService _lessonService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             teacherService = _teacherService;
+            lessonService = _lessonService;
         }
 
         [HttpGet]
@@ -66,8 +69,9 @@ namespace IntelliTest.Controllers
                 model = await testService.GetMy(teacherId);
                 return View("Index", model);
         }
+
         [Route("Tests/Edit/{id}")]
-        public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text, int questionOrder)
+        public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text,string url, int questionOrder, bool isText)
         {
             if (viewModel.PublicityLevel!=PublicityLevel.Link && viewModel.PublicityLevel != PublicityLevel.Public)
             {
@@ -125,6 +129,7 @@ namespace IntelliTest.Controllers
                 TempData["PublicityLevel"] = testEdit.PublicityLevel;
                 TempData["editModel"] = JsonSerializer.Serialize(testEdit);
                 TempData["testId"] = id;
+                ModelState["Title"].Errors.Clear();
                 return View("Edit", testEdit);
             }
             else
@@ -178,6 +183,35 @@ namespace IntelliTest.Controllers
                 }
                 else if (type == EditType.AiGenerate)
                 {
+                    if (!isText)
+                    {
+                        string guidString = url.Split('/').Last();
+                        Guid guidResult;
+                        bool isValid = Guid.TryParse(guidString, out guidResult);
+                        if (isValid)
+                        {
+                            var lesson = await lessonService.GetById(guidResult);
+                            if (lesson.IsPrivate)
+                            {
+                                ModelState.AddModelError("Title", "Урокът не е открит.");
+                                TempData["editModel"] = JsonSerializer.Serialize(model);
+                                return View("Edit", model);
+                            }
+                            text = lesson.Content;
+                        }
+                        else
+                        {
+                            var lesson = await lessonService.GetByName(url)!;
+                            if (lesson==null)
+                            {
+                                ModelState.AddModelError("Title", "Урокът не е открит.");
+                                TempData["editModel"] = JsonSerializer.Serialize(model);
+                                return View("Edit", model);
+                            }
+
+                            text = lesson.Content;
+                        }
+                    }
                     var res = run_cmd(SCRIPT_NAME, text);
                     foreach (var se in res)
                     {
@@ -226,6 +260,7 @@ namespace IntelliTest.Controllers
                 return View("Edit", model);
             }
         }
+
         [HttpPost]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> EditSubmit(Guid id, TestEditViewModel model)
@@ -419,13 +454,6 @@ namespace IntelliTest.Controllers
             all = all.Replace("<pad> въпрос: ", "");
             all = all.Replace("</s>", "");
             var res = all.Split("&").Select(qa => qa.Split("|"));
-            //foreach (var qa in res)
-            //{
-            //    Console.WriteLine("Въпрос: ");
-            //    Console.WriteLine(qa[0]);
-            //    Console.WriteLine("Отговор: ");
-            //    Console.WriteLine(qa[1]);
-            //}
             return res;
         }
     }
