@@ -27,6 +27,15 @@
       "provider": "unpkg",
       "library": "@ckeditor/ckeditor5-basic-styles@34.1.0",
       "destination": "wwwroot/lib/ckeditor/ckeditor5-basic-styles/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@6.0.6",
+      "destination": "wwwroot/lib/microsoft/signalr/",
+      "files": [
+        "dist/browser/signalr.min.js",
+        "dist/browser/signalr.js"
+      ]
     }
   ]
 }

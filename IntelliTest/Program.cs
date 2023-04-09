@@ -73,6 +73,7 @@ builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
