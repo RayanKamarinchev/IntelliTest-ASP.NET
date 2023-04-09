@@ -151,5 +151,8 @@ namespace IntelliTest.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Read> Reads { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+
     }
 }

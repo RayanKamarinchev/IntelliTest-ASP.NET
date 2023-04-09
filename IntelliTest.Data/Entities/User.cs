@@ -10,5 +10,7 @@ namespace IntelliTest.Data.Entities
         public IEnumerable<Read> Reads { get; set; }
         public IEnumerable<LessonLike> LessonLikes { get; set; }
         public IEnumerable<TestLike> TestLikes { get; set; }
+        public ICollection<Room> Rooms { get; set; }
+        public ICollection<Message> Messages { get; set; }
     }
 }
