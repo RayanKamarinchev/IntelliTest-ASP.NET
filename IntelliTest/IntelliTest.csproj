@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\chat.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\home.css" />
     <_ContentIncludedByDefault Remove="wwwroot\css\index.css" />
     <_ContentIncludedByDefault Remove="wwwroot\img\ai-chip.png" />
@@ -29,6 +33,7 @@
     <_ContentIncludedByDefault Remove="wwwroot\img\img-9.jpg" />
     <_ContentIncludedByDefault Remove="wwwroot\img\question-feedback.png" />
     <_ContentIncludedByDefault Remove="wwwroot\img\users-line.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\chat.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -309,6 +314,10 @@
 
   <ItemGroup>
     <Folder Include="Areas\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\chat.js" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
-    <link rel="stylesheet" href="~/css/editorStyles.css"/>
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/chat2.css" asp-append-version="true"/>
     <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
     <script src="~/lib/font-awesome/js/all.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
@@ -84,16 +85,19 @@
                             if (User.IsTeacher() || User.IsStudent())
                         {
                             <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Tests" asp-action="Index">Блог</a>
+                                <a class="nav-link text-dark" asp-controller="Tests" asp-action="Index">Блог</a>
                             </li>
                             <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Lessons" asp-action="Index">Уроци</a>
+                                <a class="nav-link text-dark" asp-controller="Lessons" asp-action="Index">Уроци</a>
+                            </li>
+                            <li class="nav-item align-items-center d-flex">
+                                <a class="nav-link text-dark" asp-controller="Chat" asp-action="Index">Чат</a>
                             </li>
                         }
                         if (User.IsTeacher())
                         {
                             <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Classes" asp-action="Index">Класове</a>
+                                <a class="nav-link text-dark" asp-controller="Classes" asp-action="Index">Класове</a>
                             </li>
                         }
                     }

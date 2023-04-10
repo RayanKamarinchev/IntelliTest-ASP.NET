@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Google;
 using System;
 using System.Text.Json.Serialization;
+using IntelliTest.Core.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -68,12 +69,16 @@ builder.Services.AddControllers()
        .AddJsonOptions(x => 
                            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+builder.Services.AddTransient<IMessageService, MessageService>();
+builder.Services.AddTransient<IRoomService, RoomService>();
 builder.Services.AddTransient<ITestService, TestService>();
 builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddTransient<IMessageService, MessageService>();
+
+builder.Services.AddSignalR();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -134,6 +139,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 //Use different way to store connection string in production

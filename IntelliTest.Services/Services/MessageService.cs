@@ -22,16 +22,17 @@ namespace IntelliTest.Core.Services
         private readonly IHubContext<ChatHub> _hubContext;
 
         public MessageService(IntelliTestDbContext _context,
-                              IMapper mapper,
                               IHubContext<ChatHub> hubContext)
         {
             context = _context;
             _hubContext = hubContext;
         }
 
-        public async Task<MessageViewModel> GetById(Guid id)
+        public async Task<MessageViewModel?> GetById(Guid id)
         {
-            var message = await context.Messages.FindAsync(id);
+            var message = await context.Messages
+                                       .Where(m=>!m.IsDeleted)
+                                       .FirstOrDefaultAsync(m=>m.Id == id);
             return new MessageViewModel()
             {
                 Content = message.Content,
@@ -51,14 +52,14 @@ namespace IntelliTest.Core.Services
             return room.Id;
         }
 
-        public async Task<IEnumerable<MessageViewModel>> GetMessages(string roomName)
+        public async Task<IEnumerable<MessageViewModel>?> GetMessages(string roomName)
         {
             Guid? roomId = await GetRoomIdByName(roomName);
             if (roomId==null)
             {
                 return null;
             }
-            var messages = await context.Messages.Where(m => m.ToRoomId == roomId)
+            var messages = await context.Messages.Where(m => m.ToRoomId == roomId && !m.IsDeleted)
                                    .Include(m => m.Sender)
                                    .Include(m => m.Room)
                                    .OrderByDescending(m => m.Timestamp)
@@ -77,7 +78,7 @@ namespace IntelliTest.Core.Services
                                    .ToListAsync();
             return messages;
         }
-        public async Task<MessageViewModel> Create(MessageViewModel viewModel, string userId)
+        public async Task<MessageViewModel?> Create(MessageViewModel viewModel, string userId)
         {
             var room = await context.Rooms.FirstOrDefaultAsync(r => r.Name == viewModel.Room);
             if (room == null)
@@ -95,7 +96,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
 
             // Broadcast the message
-            var createdMessage = new MessageViewModel()
+            MessageViewModel createdMessage = new MessageViewModel()
             {
                 Content = message.Content,
                 FromFullName = message.Sender.FirstName + " " + message.Sender.LastName,
@@ -114,7 +115,7 @@ namespace IntelliTest.Core.Services
         {
             var message = await context.Messages
                                         .Include(u => u.Sender)
-                                        .Where(m => m.Id == id && m.SenderId == userId)
+                                        .Where(m => m.Id == id && m.SenderId == userId && !m.IsDeleted)
                                         .FirstOrDefaultAsync();
 
             if (message == null)

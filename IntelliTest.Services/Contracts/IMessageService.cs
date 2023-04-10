@@ -9,9 +9,10 @@ namespace IntelliTest.Core.Contracts
 {
     public interface IMessageService
     {
-        public Task<MessageViewModel> GetById(Guid id);
+        public Task<MessageViewModel?> GetById(Guid id);
         public Task<Guid?>? GetRoomIdByName(string name);
-        public Task<MessageViewModel> Create(MessageViewModel viewModel, string userId);
+        public Task<IEnumerable<MessageViewModel>?> GetMessages(string roomName);
+        public Task<MessageViewModel?> Create(MessageViewModel viewModel, string userId);
         public Task<bool> Delete(Guid id, string userId);
     }
 }

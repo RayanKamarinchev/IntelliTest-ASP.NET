@@ -36,6 +36,14 @@
         "dist/browser/signalr.min.js",
         "dist/browser/signalr.js"
       ]
+    },
+    {
+      "library": "knockout@3.5.1",
+      "destination": "wwwroot/lib/knockout/",
+      "files": [
+        "knockout-latest.js",
+        "knockout-latest.min.js"
+      ]
     }
   ]
 }
