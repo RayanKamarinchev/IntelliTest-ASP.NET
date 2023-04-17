@@ -27,20 +27,22 @@ namespace IntelliTest.Core.Services
             context = _context;
             _hubContext = hubContext;
         }
-        
+
         public async Task<IEnumerable<RoomViewModel>> GetAll()
         {
             var rooms = await context.Rooms
-                .Include(r => r.Admin)
-                .Where(r=>!r.IsDeleted)
-                .Select(r=> new RoomViewModel()
-                {
-                    Admin = r.Admin.UserName,
-                    Id = r.Id,
-                    Name = r.Name
-                })
-                .ToListAsync();
-
+                                     .Include(r => r.Admin)
+                                     .Include(r => r.Messages)
+                                     .Where(r => !r.IsDeleted)
+                                     .Select(room => new RoomViewModel()
+                                     {
+                                         Admin = room.Admin.UserName,
+                                         Id = room.Id,
+                                         Name = room.Name,
+                                         LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
+                                         TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
+                                     })
+                                     .ToListAsync();
             return rooms;
         }
         
@@ -53,7 +55,9 @@ namespace IntelliTest.Core.Services
             {
                 Admin = room.Admin.UserName,
                 Id = room.Id,
-                Name = room.Name
+                Name = room.Name,
+                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
+                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
             };
         }
         
@@ -74,9 +78,11 @@ namespace IntelliTest.Core.Services
             var user = context.Users.Find(userId);
             var createdRoom = new RoomViewModel()
             {
-                Admin = user.FirstName + " " + user.LastName,
+                Admin = room.Admin.UserName,
                 Id = room.Id,
-                Name = room.Name
+                Name = room.Name,
+                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
+                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
             };
             await _hubContext.Clients.All.SendAsync("addChatRoom", createdRoom);
 
@@ -102,9 +108,11 @@ namespace IntelliTest.Core.Services
 
             var updatedRoom = new RoomViewModel()
             {
-                Admin = room.Admin.FirstName + " " + room.Admin.LastName,
+                Admin = room.Admin.UserName,
                 Id = room.Id,
-                Name = room.Name
+                Name = room.Name,
+                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
+                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
             };
             await _hubContext.Clients.All.SendAsync("updateChatRoom", updatedRoom);
 

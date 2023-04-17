@@ -521,3 +521,6 @@ form .btn {
     transform: translateY(-50%);
 }
 
+.message-text-tooltip {
+    font-size: 11px;
+}

@@ -59,7 +59,7 @@ namespace IntelliTest.Core.Services
             {
                 return null;
             }
-            var messages = await context.Messages.Where(m => m.ToRoomId == roomId && !m.IsDeleted)
+            var messages = await context.Messages.Where(m => m.RoomId == roomId && !m.IsDeleted)
                                    .Include(m => m.Sender)
                                    .Include(m => m.Room)
                                    .OrderByDescending(m => m.Timestamp)
@@ -88,21 +88,21 @@ namespace IntelliTest.Core.Services
             {
                 Content = Regex.Replace(viewModel.Content, @"<.*?>", string.Empty),
                 SenderId = userId,
-                Room = room,
+                RoomId = room.Id,
                 Timestamp = DateTime.Now
             };
 
             await context.Messages.AddAsync(message);
             await context.SaveChangesAsync();
-
+            var user = await context.Users.FindAsync(userId);
             // Broadcast the message
             MessageViewModel createdMessage = new MessageViewModel()
             {
                 Content = message.Content,
-                FromFullName = message.Sender.FirstName + " " + message.Sender.LastName,
-                FromUserName = message.Sender.UserName,
+                FromFullName = user.FirstName + " " + user.LastName,
+                FromUserName = user.UserName,
                 Id = message.Id,
-                Room = message.Room.Name,
+                Room = room.Name,
                 Timestamp = message.Timestamp,
                 Avatar = "fillUserAvatar"
             };

@@ -54,10 +54,13 @@ namespace IntelliTest.Controllers
             return CreatedAtAction(nameof(Get), new { id = createdRoom.Id }, createdRoom);
         }
 
-        [HttpPut("Edit/{id}")]
-        public async Task<IActionResult> Edit(Guid id, RoomViewModel viewModel)
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(Guid id,string name)
         {
-            var status = await roomService.Edit(id, viewModel, User.Id());
+            var status = await roomService.Edit(id, new RoomViewModel()
+            {
+                Name = name
+            }, User.Id());
             if (status==HttpError.NotFound)
             {
                 return NotFound();
@@ -70,7 +73,7 @@ namespace IntelliTest.Controllers
             return Ok();
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             bool isOkay = await roomService.Delete(id, User.Id());

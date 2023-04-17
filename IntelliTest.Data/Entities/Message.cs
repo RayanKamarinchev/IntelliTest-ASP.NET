@@ -13,7 +13,6 @@ namespace IntelliTest.Data.Entities
         public DateTime Timestamp { get; set; }
         public User Sender { get; set; }
         public string SenderId { get; set; }
-        public Guid ToRoomId { get; set; }
         public Room Room { get; set; }
         public Guid RoomId { get; set; }
         public bool IsDeleted { get; set; }

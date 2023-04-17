@@ -17,5 +17,7 @@ namespace IntelliTest.Core.Models.Chat
         public string Name { get; set; }
 
         public string Admin { get; set; }
+        public string? LastMessage { get; set; }
+        public string TimeStamp { get; set; }
     }
 }

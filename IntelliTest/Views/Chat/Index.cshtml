@@ -1,172 +1,187 @@
-﻿@{
+﻿@using IntelliTest.Core.Contracts
+@{
     ViewBag.Title = "Чат";
 }
-@*<div class="container mt-5 page-content container main-wrapper">
-        <div class="main-wrapper container page-content container mt-5 row">
+@inject IMessageService messageService;
+<div class="container mt-5 page-content container main-wrapper">
+    <div class="main-wrapper container page-content container mt-5 row">
         <div class="col-md-4 col-12 card-stacked">
             <div class="card shadow-line mb-3 chat">
 
-            <div class="p-3 chat-header">
-                <div class="d-flex">
-                <div class="w-100 d-flex pl-0">
-                    <img class="user-detail-trigger rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://user-images.githubusercontent.com/35243461/168796876-2e363a49-b32c-4218-b5a3-ce12493af69e.jpg" />
-                    <p>Ivaylo Bonev maika mu</p>
+                <div class="p-3 chat-header">
+                    <div class="d-flex">
+                        <div class="w-100 d-flex pl-0">
+                            <img class="user-detail-trigger rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://user-images.githubusercontent.com/35243461/168796876-2e363a49-b32c-4218-b5a3-ce12493af69e.jpg"/>
+                            <p data-bind="text: myProfile()?.fullName()"></p>
+                        </div>
+                        <div class="flex-shrink-0 margin-auto">
+                            <a id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex-shrink-0 margin-auto">
-                    <a href="#" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
-                    <i class="las la-arrow-left"></i>
-                    </a>
-                    <a href="#" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="feather">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                    </a>
-                </div>
-                </div>
-            </div>
-            <div class="chat-search pl-3 pr-3">
-                <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search a conversation">
-                <div class="input-group-append prepend-white">
-                    <span class="input-group-text pl-2 pr-2">
-                    <i class="fs-17 las la-search drop-shadow"></i>
-                    </span>
-                </div>
-                </div>
-            </div>
-            <div class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll" style="overflow: auto;
-            overflow-x: hidden;">
-                <div class="chat-item d-flex pl-3 pr-0 pt-3 pb-3">
-                    <div class="w-100">
-                    <div class="d-flex pl-0">
-                        <img class="rounded-circle shadow avatar-sm mr-3" src="https://user-images.githubusercontent.com/35243461/168796884-ee3aafb6-8083-48ec-9cfb-51b95eae08fe.jpg">
-                        <div>
-                        <p class="margin-auto fw-400 text-dark-75">Emily Woods</p>
-                        <div class="d-flex flex-row mt-1">
-                            <span>
-                            <div class="svg15 double-check"></div>
+                <div class="chat-search pl-3 pr-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search a conversation">
+                        <div class="input-group-append prepend-white">
+                            <span class="input-group-text pl-2 pr-2">
+                                <i class="fs-17 las la-search drop-shadow"></i>
                             </span>
-                            <span class="message-shortcut margin-auto text-muted fs-13 ml-1 mr-4">I'm looking forward to it</span>
                         </div>
-                        </div>
-                    </div>
-                    </div>
-                    <div class="flex-shrink-0 margin-auto pl-2 pr-3">
-                    <div class="d-flex flex-column">
-                        <p class="text-muted text-right fs-13 mb-2">08:55</p>
-
-                    </div>
                     </div>
                 </div>
-            </div>
+                <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll" style="overflow: auto; overflow-x: hidden;" data-bind="foreach: chatRooms">
+                    <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-roomId': id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}">
+                        <div class="w-100">
+                            <div class="d-flex pl-0">
+                                <img class="rounded-circle shadow avatar-sm mr-3" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
+                                <div>
+                                    <p class="margin-auto fw-400 text-dark-75" data-bind="text: name"></p>
+                                    <div class="d-flex flex-row mt-1">
+                                        <span>
+                                            <div class="svg15 double-check"></div>
+                                        </span>
+                                        <span class="message-shortcut margin-auto text-muted fs-13 ml-1 mr-4" data-bind="text: lastMessage"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 margin-auto pl-2 pr-3">
+                            <div class="d-flex flex-column">
+                                <p class="text-muted text-right fs-13 mb-2" data-bind="text: date"></p>
+                            </div>
+                        </div>
+                    </il>
+                </ul>
             </div>
         </div>
-        <div class="col-md-8 col-12 card-stacked">
+        <div class="col-md-8 col-12 card-stacked" data-bind="visible: joinedRoom() == null">
+            <span class="m-auto">Please select room to join!</span>
+        </div>
+        <div class="col-md-8 col-12 card-stacked" data-bind="visible: joinedRoom() != null">
             <div class="card shadow-line mb-3 chat chat-panel">
-            <div class="p-3 chat-header">
-                <div class="d-flex">
-                <div class="w-100 d-flex pl-0" >
-                    <img class="rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://user-images.githubusercontent.com/35243461/168796877-f6c8819a-5d6e-4b2a-bd56-04963639239b.jpg">
-                    <div class="mr-3">
-                    <a href="!#">
-                        <p class="fw-400 mb-0 text-dark-75">Beate Lemoine</p>
-                    </a>
-                    <p class="sub-caption text-muted text-small mb-0"><i class="la la-clock mr-1"></i>last seen today at 09:15 PM</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <div class="d-flex flex-row mb-3 navigation-mobile scrollable-chat-panel chat-panel-scroll">
-                <div class="w-100 p-3" style="overflow: scroll;
-                overflow-x: hidden;">
-                <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
-                <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">Today</div>
-                <div class="left-chat-message fs-13 mb-2">
-                    <p class="mb-0 mr-3 pr-4">Hi, Quan</p>
-                    <div class="message-options">
-                    <div class="message-time">06:15</div>
-                    <div class="message-arrow"><i class="text-muted la la-angle-down fs-17"></i></div>
-                    </div>
-                </div>
-                <div class="d-flex flex-row-reverse mb-2">
-                    <div class="right-chat-message fs-13 mb-2">
-                    <div class="mb-0 mr-3 pr-4">
-                        <div class="d-flex flex-row">
-                        <div class="pr-2">Hey, Beate</div>
-                        <div class="pr-4"></div>
+                <div class="p-3 chat-header">
+                    <div class="d-flex">
+                        <div class="w-100 d-flex pl-0">
+                            <img class="rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
+                            <div class="mr-3">
+                                <a href="!#">
+                                    <p class="fw-400 mb-0 text-dark-75" data-bind="text: joinedRoom()?.name()"></p>
+                                </a>
+                            </div>
+                            <div class="flex-shrink-0 margin-auto" style="position: absolute;right: 20px;">
+                                <a data-bs-toggle="modal" data-bs-target="#remove-room-modal"class="btn btn-sm btn-icon btn-light active text-dark ml-2"> 
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </a>
+                                <a data-bs-toggle="modal" data-bs-target="#rename-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <div class="message-options dark">
-                        <div class="message-time">
-                        <div class="d-flex flex-row">
-                            <div class="mr-2">06:49</div>
-                            <div class="svg15 double-check"></div>
-                        </div>
-                        </div>
-                        <div class="message-arrow"><i class="las la-trash-alt text-muted fs-17"></i></div>
-                    </div>
-                    </div>
                 </div>
-                </div>
-            </div>
-            <div class="chat-search pl-3 pr-3">
-                <div class="input-group">
-                <input type="text" class="form-control" placeholder="Write a message">
-                <div class="input-group-append prepend-white">
-                    <span class="input-group-text pl-2 pr-2">
-                    <i class="chat-upload-trigger fs-19 bi bi-file-earmark-plus ml-2 mr-2"></i>
-                    <i class="fs-19 bi bi-cursor ml-2 mr-2"></i>
-                    <div class="chat-upload">
-                        <div class="d-flex flex-column">
-                        <div class="p-2">
-                            <button type="button" class="btn btn-secondary btn-md btn-icon btn-circle btn-blushing">
-                            <i class="fs-15 bi bi-camera"></i>
-                            </button>
-                        </div>
-                        <div class="p-2">
-                            <button type="button" class="btn btn-success btn-md btn-icon btn-circle btn-blushing">
-                            <i class="fs-15 bi bi-file-earmark-plus"></i>
-                            </button>
-                        </div>
-                        <div class="p-2">
-                            <button type="button" class="btn btn-warning btn-md btn-icon btn-circle btn-blushing">
-                            <i class="fs-15 bi bi-person"></i>
-                            </button>
-                        </div>
-                        <div class="p-2">
-                            <button type="button" class="btn btn-danger btn-md btn-icon btn-circle btn-blushing">
-                            <i class="fs-15 bi bi-card-image"></i>
-                            </button>
-                        </div>
+                <div class="d-flex flex-row mb-3 navigation-mobile scrollable-chat-panel chat-panel-scroll">
+                    <div class="w-100 p-3" style="overflow: scroll; overflow-x: hidden;">
+                        <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
+                        <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">Today</div>
+                        <div data-bind="foreach: chatMessages">
+                            <div>
+                                <div class="left-chat-message fs-13 mb-2">
+                                    <p class="mb-0 mr-3 pr-4" data-bind="html: content"></p>
+                                    <div class="message-options">
+                                        <div class="message-time" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row-reverse mb-2">
+                                <div class="right-chat-message fs-13 mb-2">
+                                    <div class="mb-0 mr-3 pr-4">
+                                        <div class="d-flex flex-row">
+                                            <div class="pr-2" data-bind="html: content"></div>
+                                            <div class="pr-4"></div>
+                                        </div>
+                                    </div>
+                                    <div class="message-options dark">
+                                        <div class="message-time">
+                                            <div class="d-flex flex-row">
+                                                <div class="mr-2 message-text-tooltip" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }" data-bs-toggle="tooltip" data-bs-placement="top"></div>
+                                                <div class="svg15 double-check"></div>
+                                            </div>
+                                        </div>
+                                        <div class="message-arrow">
+                                            <i class="fa-regular fa-trash-can fs-17" style="color: white;" data-bind="click: deleteMessage"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    </span>
                 </div>
+                <div class="chat-search pl-3 pr-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }"
+                               placeholder="Write a message">
+                        <div class="input-group-append prepend-white">
+                            <span class="input-group-text pl-2 pr-2">
+                                <i class="chat-upload-trigger fs-19 bi bi-file-earmark-plus ml-2 mr-2"></i>
+                                <i class="fs-19 bi bi-cursor ml-2 mr-2" data-bind="click: sendNewMessage"></i>
+                                <div class="chat-upload">
+                                    <div class="d-flex flex-column">
+                                        <div class="p-2">
+                                            <button type="button" class="btn btn-secondary btn-md btn-icon btn-circle btn-blushing">
+                                                <i class="fs-15 bi bi-camera"></i>
+                                            </button>
+                                        </div>
+                                        <div class="p-2">
+                                            <button type="button" class="btn btn-success btn-md btn-icon btn-circle btn-blushing">
+                                                <i class="fs-15 bi bi-file-earmark-plus"></i>
+                                            </button>
+                                        </div>
+                                        <div class="p-2">
+                                            <button type="button" class="btn btn-warning btn-md btn-icon btn-circle btn-blushing">
+                                                <i class="fs-15 bi bi-person"></i>
+                                            </button>
+                                        </div>
+                                        <div class="p-2">
+                                            <button type="button" class="btn btn-danger btn-md btn-icon btn-circle btn-blushing">
+                                                <i class="fs-15 bi bi-card-image"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
-        </div>
-  </div>*@
+    </div>
+    </div>
 
-<div class="app d-none" data-bind="css: isLoading() ? 'd-none' : ''">
+<div class="ap">
     <div class="sidebar">
         <div class="header">
             <h5>Chat Rooms</h5>
             <div class="actions">
                 <a role="button" id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle">
+                        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
                 </a>
                 <a role="button" class="ms-3" id="expand-users-list">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
                 </a>
                 <a role="button" id="expand-sidebar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+                        <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
                 </a>
             </div>
         </div>
-        
+
         <ul class="rooms list-unstyled" id="rooms-list" data-bind="foreach: chatRooms">
             <li>
                 <a href="#" data-bind="text: name, attr: { 'data-roomId': id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}"></a>
@@ -175,13 +190,14 @@
         <div class="profile">
             <div class="d-flex align-items-center flex-grow-1">
                 <span class="avatar me-2 text-uppercase" data-bind="visible: !showAvatar(), text: myProfile()?.fullName()[0]"></span>
-                @*<img class="avatar me-2" data-bind="visible: showAvatar(), attr: { src: showAvatar() ? '/avatars/' + myProfile()?.avatar() : '' }" />*@
-                <a asp-area="Identity" asp-page="/Account/Manage/Index" data-bind="text: myProfile()?.fullName()"></a>
+                <img class="avatar me-2" data-bind="visible: showAvatar(), attr: { src: showAvatar() ? '/avatars/' + myProfile()?.avatar() : '' }" />
             </div>
             <div>
                 <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
                     <button type="submit" class="btn-sign-out">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -195,10 +211,14 @@
             <h5 id="joinedRoom" data-bind="text: joinedRoom()?.name()">Lobby</h5>
             <div class="room-actions" data-bind="visible: showRoomActions()">
                 <button type="button" class="btn btn-link text-secondary px-1" data-bs-toggle="modal" data-bs-target="#rename-room-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3">
+                        <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
                 </button>
                 <button type="button" class="btn btn-link text-secondary px-1" data-bs-toggle="modal" data-bs-target="#remove-room-modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+                        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -208,7 +228,7 @@
                 <li>
                     <div class="message-item" data-bind="css: { ismine: isMine() === true }">
                         <span class="avatar avatar-lg mx-2 text-uppercase" data-bind="visible: avatar() == null, text: fromFullName()[0]"></span>
-                        <img class="avatar avatar-lg mx-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/avatars/' + avatar() : '' }" />
+                        <img class="avatar avatar-lg mx-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/avatars/' + avatar() : '' }"/>
                         <div class="message-content">
                             <div class="message-info d-flex flex-wrap align-items-center">
                                 <span class="author" data-bind="text: fromFullName"></span>
@@ -219,7 +239,9 @@
                         <div class="actions d-none">
                             <div class="dropdown dropstart">
                                 <a class="text-secondary" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical">
+                                        <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle>
+                                    </svg>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
@@ -233,23 +255,29 @@
             </ul>
         </div>
         <div class="message-input-container">
-            <input id="message-input" type="text" value="" maxlength="500" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }" placeholder="What's on your mind?" />
+            <input id="message-input" type="text" value="" maxlength="500" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }" placeholder="What's on your mind?"/>
             <div class="actions d-flex align-items-center">
                 <form method="post" asp-action="Upload" asp-controller="Upload" enctype="multipart/form-data" id="uploadForm">
                     <label for="UploadedFile" class="custom-file-upload">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
                     </label>
-                    <input type="hidden" name="RoomId" data-bind="value: joinedRoom()?.id()" />
+                    <input type="hidden" name="RoomId" data-bind="value: joinedRoom()?.id()"/>
                     <input type="file" id="UploadedFile" name="File" accept=".jpg,.jpeg,.png" data-bind="event: {change: uploadFiles}">
                 </form>
                 <a role="button" id="btn-show-emojis">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smile"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smile">
+                        <circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
                 </a>
                 <a role="button" id="btn-send-message" data-bind="click: sendNewMessage">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send">
+                        <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
                 </a>
             </div>
-            
+
         </div>
     </div>
     <div class="users-container">
@@ -260,7 +288,7 @@
             <li data-bind="attr: { 'data-username': userName }">
                 <div class="user">
                     <span class="avatar me-2 text-uppercase" data-bind="visible: avatar() == null, text: fullName()[0]"></span>
-                    <img class="avatar me-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/avatars/' + avatar() : '' }" />
+                    <img class="avatar me-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/avatars/' + avatar() : '' }"/>
                     <div class="user-info">
                         <span class="name" data-bind="text: fullName"></span>
                         <span class="device" data-bind="text: device"></span>
@@ -269,9 +297,9 @@
             </li>
         </ul>
         <div class="position-relative search-container text-secondary">
-            <input type="text" class="" placeholder="Search" data-bind="value: filter, valueUpdate: 'afterkeydown'" />
+            <input type="text" class="" placeholder="Search" data-bind="value: filter, valueUpdate: 'afterkeydown'"/>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
         </div>
     </div>
@@ -285,7 +313,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control" id="roomName" maxlength="100" placeholder="Enter room name..." />
+                <input type="text" class="form-control" id="roomName" maxlength="100" placeholder="Enter room name..."/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -303,7 +331,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="text" class="form-control" id="newRoomName" maxlength="100" data-bind="value: $root.joinedRoom()?.name()" />
+                <input type="text" class="form-control" id="newRoomName" maxlength="100" data-bind="value: $root.joinedRoom()?.name()"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -340,7 +368,7 @@
             </div>
             <div class="modal-body">
                 <p class="mb-0">Are you sure you want to delete this Message?</p>
-                <input type="hidden" class="form-control" id="itemToDelete" />
+                <input type="hidden" class="form-control" id="itemToDelete"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -349,6 +377,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts
 {
     <script src="~/lib/knockout/knockout-latest.min.js"></script>

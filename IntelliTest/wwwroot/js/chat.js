@@ -30,11 +30,11 @@
     });
 
     connection.on("addChatRoom", function (room) {
-        viewModel.roomAdded(new ChatRoom(room.id, room.name, room.admin));
+        viewModel.roomAdded(new ChatRoom(room.id, room.name, room.admin, room.lastMessage, room.timeStamp));
     });
 
     connection.on("updateChatRoom", function (room) {
-        viewModel.roomUpdated(new ChatRoom(room.id, room.name, room.admin));
+        viewModel.roomUpdated(new ChatRoom(room.id, room.name, room.admin, room.lastMessage, room.timeStamp));
     });
 
     connection.on("removeChatRoom", function (id) {
@@ -60,9 +60,9 @@
         }
     });
 
+
     function AppViewModel() {
         var self = this;
-
         self.message = ko.observable("");
         self.chatRooms = ko.observableArray([]);
         self.chatUsers = ko.observableArray([]);
@@ -71,6 +71,10 @@
         self.serverInfoMessage = ko.observable("");
         self.myProfile = ko.observable();
         self.isLoading = ko.observable(true);
+
+        self.ok = function () {
+            console.log("sheeees")
+        }
 
         self.showAvatar = ko.computed(function () {
             return self.isLoading() == false && self.myProfile().avatar() != null;
@@ -116,7 +120,7 @@
             if (room.name()?.length > 0 && message.length > 0) {
                 $.ajax({
                     url: `/api/Messages/Create?room=${room.name()}&content=${message}`,
-                    method: 'POST',
+                    method: 'GET',
                 });
             }
         }
@@ -141,7 +145,7 @@
                 .then(data => {
                     self.chatRooms.removeAll();
                     for (var i = 0; i < data.length; i++) {
-                        self.chatRooms.push(new ChatRoom(data[i].id, data[i].name, data[i].admin));
+                        self.chatRooms.push(new ChatRoom(data[i].id, data[i].name, data[i].admin, data[i].lastMessage, data[i].timeStamp));
                     }
 
                     if (self.chatRooms().length > 0)
@@ -173,29 +177,11 @@
         self.editRoom = function () {
             var roomId = self.joinedRoom().id();
             var roomName = $("#newRoomName").val();
-            fetch('/api/Rooms/Edit/' + roomId, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: roomId, name: roomName })
-            });
+            fetch('/api/Rooms/Edit/' + roomId + "?name=" + roomName);
         }
 
         self.deleteRoom = function () {
-            fetch('/api/Rooms/Delete/' + self.joinedRoom().id(), {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: self.joinedRoom().id() })
-            });
-        }
-
-        self.deleteMessage = function () {
-            var messageId = $("#itemToDelete").val();
-
-            fetch('/api/Messages/Delete/' + messageId, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: messageId })
-            });
+            fetch('/api/Rooms/Delete/' + self.joinedRoom().id());
         }
 
         self.messageHistory = function () {
@@ -283,11 +269,13 @@
         }
     }
 
-    function ChatRoom(id, name, admin) {
+    function ChatRoom(id, name, admin, lastMessage, date) {
         var self = this;
         self.id = ko.observable(id);
         self.name = ko.observable(name);
         self.admin = ko.observable(admin);
+        self.lastMessage = ko.observable(lastMessage);
+        self.date = ko.observable(date)
     }
 
     function ChatUser(userName, fullName, avatar, currentRoom, device) {
@@ -330,6 +318,10 @@
         self.fromFullName = ko.observable(fromFullName);
         self.isMine = ko.observable(isMine);
         self.avatar = ko.observable(avatar);
+        self.deleteMessage = function () {
+            console.log(id)
+            fetch('/api/Messages/Delete/' + id);
+        }
     }
 
     function ProfileInfo(userName, fullName, avatar) {

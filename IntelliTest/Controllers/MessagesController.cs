@@ -34,7 +34,6 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet("Room/{roomName}")]
-        //async
         public async Task<IActionResult> GetMessages(string roomName)
         {
             var messagesViewModel = await messageService.GetMessages(roomName);
@@ -45,19 +44,22 @@ namespace IntelliTest.Controllers
             return Ok(messagesViewModel);
         }
 
-        [HttpPost("Create")]
-        public IActionResult Create(string content, string room)
+        [HttpGet("Create")]
+        public async Task<IActionResult> Create(string content, string room)
         {
-            return Ok();
-            //var createdMessage = await messageService.Create(new MessageViewModel(), User.Id());
-            //if (createdMessage == null)
-            //{
-            //    return BadRequest();
-            //}
-            //return CreatedAtAction(nameof(Get), new { id = createdMessage.Id }, createdMessage);
+            var createdMessage = await messageService.Create(new MessageViewModel()
+            {
+                Content = content,
+                Room = room
+            }, User.Id());
+            if (createdMessage == null)
+            {
+                return BadRequest();
+            }
+            return CreatedAtAction(nameof(Get), new { id = createdMessage.Id }, createdMessage);
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpGet("Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             bool res = await messageService.Delete(id, User.Id());
