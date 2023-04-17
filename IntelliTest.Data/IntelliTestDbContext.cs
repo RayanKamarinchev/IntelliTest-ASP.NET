@@ -27,6 +27,8 @@ namespace IntelliTest.Data
                    .HasKey(p => new { p.TestId, p.StudentId });
             builder.Entity<ClassTest>()
                    .HasKey(p => new { p.TestId, p.ClassId });
+            builder.Entity<RoomUser>()
+                   .HasKey(p => new { p.RoomId, p.UserId });
 
             //FirstTeacher = new Teacher()
             //{

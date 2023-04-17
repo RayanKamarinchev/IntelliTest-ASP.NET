@@ -12,8 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace IntelliTest.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("Messages")]
     public class MessagesController : Controller
     {
         private readonly IMessageService messageService;

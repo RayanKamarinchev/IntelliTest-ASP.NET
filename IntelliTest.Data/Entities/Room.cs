@@ -13,6 +13,7 @@ namespace IntelliTest.Data.Entities
         public User Admin { get; set; }
         public string AdminId { get; set; }
         public ICollection<Message> Messages { get; set; }
+        public ICollection<RoomUser> Users { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

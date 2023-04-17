@@ -334,7 +334,7 @@ a.btn i, button.btn i {
 }
 
 .chat-user-scroll {
-    max-height: 620px;
+    max-height: 90vh;
     position: relative;
 }
 
@@ -433,7 +433,7 @@ img.shadow {
 }
 
 .chat-panel-scroll {
-    max-height: 680px;
+    max-height: calc(100vh - 213px);
     position: relative;
 }
 

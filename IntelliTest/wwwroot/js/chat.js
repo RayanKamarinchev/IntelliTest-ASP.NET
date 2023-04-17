@@ -72,10 +72,6 @@
         self.myProfile = ko.observable();
         self.isLoading = ko.observable(true);
 
-        self.ok = function () {
-            console.log("sheeees")
-        }
-
         self.showAvatar = ko.computed(function () {
             return self.isLoading() == false && self.myProfile().avatar() != null;
         });
@@ -119,7 +115,7 @@
         self.sendToRoom = function (room, message) {
             if (room.name()?.length > 0 && message.length > 0) {
                 $.ajax({
-                    url: `/api/Messages/Create?room=${room.name()}&content=${message}`,
+                    url: `/Messages/Create?room=${room.name()}&content=${message}`,
                     method: 'GET',
                 });
             }
@@ -140,7 +136,7 @@
         }
 
         self.roomList = function () {
-            fetch('/api/Rooms/Get')
+            fetch('/Rooms/Get')
                 .then(response => response.json())
                 .then(data => {
                     self.chatRooms.removeAll();
@@ -168,7 +164,7 @@
 
         self.createRoom = function () {
             var roomName = $("#roomName").val();
-            fetch('/api/Rooms/Create?name=' + roomName, {
+            fetch('/Rooms/Create?name=' + roomName, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -177,15 +173,15 @@
         self.editRoom = function () {
             var roomId = self.joinedRoom().id();
             var roomName = $("#newRoomName").val();
-            fetch('/api/Rooms/Edit/' + roomId + "?name=" + roomName);
+            fetch('/Rooms/Edit/' + roomId + "?name=" + roomName);
         }
 
         self.deleteRoom = function () {
-            fetch('/api/Rooms/Delete/' + self.joinedRoom().id());
+            fetch('/Rooms/Delete/' + self.joinedRoom().id());
         }
 
         self.messageHistory = function () {
-            fetch('/api/Messages/Room/' + viewModel.joinedRoom().name())
+            fetch('/Messages/Room/' + viewModel.joinedRoom().name())
                 .then(response => response.json())
                 .then(data => {
                     self.chatMessages.removeAll();
@@ -255,7 +251,7 @@
             var form = document.getElementById("uploadForm");
             $.ajax({
                 type: "POST",
-                url: '/api/Upload',
+                url: '/Upload',
                 data: new FormData(form),
                 contentType: false,
                 processData: false,
@@ -286,41 +282,53 @@
         self.currentRoom = ko.observable(currentRoom);
         self.device = ko.observable(device);
     }
+    function getTimestampRelative(timestamp) {
+        // Get diff
+        var date = new Date(timestamp());
+        var now = new Date();
+        var diff = Math.round((date.getTime() - now.getTime()) / (1000 * 3600 * 24));
 
+        // Format date
+        var { dateOnly, timeOnly } = formatDate(date);
+
+        // Generate relative datetime
+        if (diff == 0)
+            return `Today`;
+        if (diff == -1)
+            return `Yestrday`;
+
+        return `${dateOnly}`;
+    }
+   
     function ChatMessage(id, content, timestamp, fromUserName, fromFullName, isMine, avatar) {
         var self = this;
+       
         self.id = ko.observable(id);
         self.content = ko.observable(content);
-        self.timestamp = ko.observable(timestamp);
-        self.timestampRelative = ko.pureComputed(function () {
-            // Get diff
-            var date = new Date(self.timestamp());
-            var now = new Date();
-            var diff = Math.round((date.getTime() - now.getTime()) / (1000 * 3600 * 24));
+        self.timestamp = timestamp;
 
-            // Format date
-            var { dateOnly, timeOnly } = formatDate(date);
+        var date = new Date(timestamp);
+        var now = new Date();
+        var diff = Math.round((date.getTime() - now.getTime()) / (1000 * 3600 * 24));
 
-            // Generate relative datetime
-            if (diff == 0)
-                return `Today, ${timeOnly}`;
-            if (diff == -1)
-                return `Yestrday, ${timeOnly}`;
+        var { dateOnly, timeOnly } = formatDate(date);
+        if (diff == 0)
+            self.timestampRelative = `Today`;
+        else if (diff == -1)
+            self.timestampRelative = `Yestrday`;
+        else
+            self.timestampRelative = `${dateOnly}`;
 
-            return `${dateOnly}`;
-        });
-        self.timestampFull = ko.pureComputed(function () {
-            var date = new Date(self.timestamp());
-            var { fullDateTime } = formatDate(date);
-            return fullDateTime;
-        });
+        self.time = `${timeOnly}`
+        var { fullDateTime } = formatDate(date);
+        self.timestampFull = fullDateTime
         self.fromUserName = ko.observable(fromUserName);
         self.fromFullName = ko.observable(fromFullName);
         self.isMine = ko.observable(isMine);
         self.avatar = ko.observable(avatar);
         self.deleteMessage = function () {
             console.log(id)
-            fetch('/api/Messages/Delete/' + id);
+            fetch('/Messages/Delete/' + id);
         }
     }
 

@@ -28,12 +28,12 @@ namespace IntelliTest.Core.Services
             _hubContext = hubContext;
         }
 
-        public async Task<IEnumerable<RoomViewModel>> GetAll()
+        public async Task<IEnumerable<RoomViewModel>> GetAll(string userId)
         {
             var rooms = await context.Rooms
                                      .Include(r => r.Admin)
                                      .Include(r => r.Messages)
-                                     .Where(r => !r.IsDeleted)
+                                     .Where(r => !r.IsDeleted && r.Users.Any(u=>u.UserId==userId))
                                      .Select(room => new RoomViewModel()
                                      {
                                          Admin = room.Admin.UserName,
@@ -135,6 +135,29 @@ namespace IntelliTest.Core.Services
             await _hubContext.Clients.All.SendAsync("removeChatRoom", room.Id);
             await _hubContext.Clients.Group(room.Name).SendAsync("onRoomDeleted");
 
+            return true;
+        }
+
+        public async Task<bool> AddUser(Guid roomId, string userId)
+        {
+            var room = await context.Rooms
+                                    .Include(r => r.Users)
+                                    .Where(r => !r.IsDeleted && r.Id == roomId)
+                                    .FirstOrDefaultAsync();
+            if (room == null)
+            {
+                return false;
+            }
+
+            if (room.Users.Any(u=>u.UserId==userId))
+            {
+                return false;
+            }
+            room.Users.Add(new RoomUser()
+            {
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
             return true;
         }
     }

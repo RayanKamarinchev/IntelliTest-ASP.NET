@@ -11,8 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace IntelliTest.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("Rooms")]
     public class RoomsController : Controller
     {
         private readonly IRoomService roomService;
@@ -24,7 +23,7 @@ namespace IntelliTest.Controllers
         [HttpGet("Get")]
         public async Task<ActionResult<IEnumerable<RoomViewModel>>> Get()
         {
-            var roomsViewModel = await roomService.GetAll();
+            var roomsViewModel = await roomService.GetAll(User.Id());
             return Ok(roomsViewModel);
         }
 
@@ -82,6 +81,16 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
             return Ok();
+        }
+        [HttpGet("Join/{id}")]
+        public async Task<IActionResult> Join(Guid id)
+        {
+            bool isOkay = await roomService.AddUser(id, User.Id());
+            if (!isOkay)
+            {
+                return NotFound();
+            }
+            return RedirectToAction("Index", "Chat");
         }
     }
 }

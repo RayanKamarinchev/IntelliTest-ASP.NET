@@ -2,10 +2,8 @@
 @{
     ViewBag.Title = "Чат";
 }
-@inject IMessageService messageService;
-<div class="container mt-5 page-content container main-wrapper">
-    <div class="main-wrapper container page-content container mt-5 row">
-        <div class="col-md-4 col-12 card-stacked">
+    <div class="col-12 row" style="height: calc(100vh - 80px); margin-top: 9px">
+        <div class="col-md-3 col-12 card-stacked">
             <div class="card shadow-line mb-3 chat">
 
                 <div class="p-3 chat-header">
@@ -31,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll" style="overflow: auto; overflow-x: hidden;" data-bind="foreach: chatRooms">
+                <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll" style="overflow: auto; overflow: hidden;" data-bind="foreach: chatRooms">
                     <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-roomId': id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}">
                         <div class="w-100">
                             <div class="d-flex pl-0">
@@ -56,17 +54,17 @@
                 </ul>
             </div>
         </div>
-        <div class="col-md-8 col-12 card-stacked" data-bind="visible: joinedRoom() == null">
+        <div class="col-md-6 col-12 card-stacked" data-bind="visible: joinedRoom() == null">
             <span class="m-auto">Please select room to join!</span>
         </div>
-        <div class="col-md-8 col-12 card-stacked" data-bind="visible: joinedRoom() != null">
+        <div class="col-md-6 col-12 card-stacked" data-bind="visible: joinedRoom() != null">
             <div class="card shadow-line mb-3 chat chat-panel">
                 <div class="p-3 chat-header">
                     <div class="d-flex">
                         <div class="w-100 d-flex pl-0">
                             <img class="rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
                             <div class="mr-3">
-                                <a href="!#">
+                                <a href="#">
                                     <p class="fw-400 mb-0 text-dark-75" data-bind="text: joinedRoom()?.name()"></p>
                                 </a>
                             </div>
@@ -83,14 +81,20 @@
                 </div>
                 <div class="d-flex flex-row mb-3 navigation-mobile scrollable-chat-panel chat-panel-scroll">
                     <div class="w-100 p-3" style="overflow: scroll; overflow-x: hidden;">
-                        <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
-                        <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">Today</div>
+                        <div data-bind="if: chatMessages().length > 0">
+                            <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
+                            <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3" data-bind="text: chatMessages()[0].timestampRelative"></div>
+                        </div>
                         <div data-bind="foreach: chatMessages">
+                            <p data-bind="if:$index ===0 && $parent.chatMessages()[$index].timestampRelative != timestampRelative"
+                               class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">
+                                <span data-bind="text: timestampRelative"></span>
+                            </p>
                             <div data-bind="if: !isMine()">
                                 <div class="left-chat-message fs-13 mb-2">
                                     <p class="mb-0 mr-3 pr-4" data-bind="html: content"></p>
                                     <div class="message-options">
-                                        <div class="message-time" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }"></div>
+                                        <div class="message-time" data-bind="text: timestampRelative, attr: { 'data-bs-title': time }"></div>
                                     </div>
                                 </div>
                             </div>
@@ -105,7 +109,7 @@
                                     <div class="message-options dark">
                                         <div class="message-time">
                                             <div class="d-flex flex-row">
-                                                <div class="mr-2 message-text-tooltip" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }" data-bs-toggle="tooltip" data-bs-placement="top"></div>
+                                                <div class="mr-2 message-text-tooltip" data-bind="text: time, attr: { 'data-bs-title': timestampFull }" data-bs-toggle="tooltip" data-bs-placement="top"></div>
                                                 <div class="svg15 double-check"></div>
                                             </div>
                                         </div>
@@ -156,7 +160,25 @@
                 </div>
             </div>
         </div>
-    </div>
+        <ul class="col-md-3 col-12 chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
+            style="overflow: auto; overflow-x: hidden;background-color: white"
+            id="users-list" data-bind="foreach: filteredChatUsers">
+            <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-username': userName }">
+                <div class="w-100">
+                    <div class="d-flex pl-0">
+                        <img class="rounded-circle shadow avatar-sm mr-3" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
+                        <div>
+                            <p class="margin-auto fw-400 text-dark-75" data-bind="text: fullName"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-shrink-0 margin-auto pl-2 pr-3">
+                    <div class="d-flex flex-column">
+                        <p class="text-muted text-right fs-13 mb-2" data-bind="text: date"></p>
+                    </div>
+                </div>
+            </il>
+        </ul>
     </div>
 
 <div class="ap">
