@@ -86,7 +86,7 @@
                         <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
                         <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">Today</div>
                         <div data-bind="foreach: chatMessages">
-                            <div>
+                            <div data-bind="if: !isMine()">
                                 <div class="left-chat-message fs-13 mb-2">
                                     <p class="mb-0 mr-3 pr-4" data-bind="html: content"></p>
                                     <div class="message-options">
@@ -94,7 +94,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-row-reverse mb-2">
+                            <div class="d-flex flex-row-reverse mb-2" data-bind="if: isMine()">
                                 <div class="right-chat-message fs-13 mb-2">
                                     <div class="mb-0 mr-3 pr-4">
                                         <div class="d-flex flex-row">
@@ -118,7 +118,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="chat-search pl-3 pr-3">
+                <div class="chat-search pl-3 pr-3" id="send-message">
                     <div class="input-group">
                         <input type="text" class="form-control" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }"
                                placeholder="Write a message">
