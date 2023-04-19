@@ -1,16 +1,32 @@
-﻿@using IntelliTest.Data.Enums
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model TestViewModel
-@{
-    ViewBag.Title = "Creating test";
+﻿@{
+    ViewBag.Title = "Създай Курс";
 }
+@using IntelliTest.Data.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ClassViewModel
 <div class="row">
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
         <form method="post">
             <div class="form-group">
-                <label asp-for="Title"></label>
-                <input asp-for="Title" class="form-control" placeholder="Заглавие...">
-                <span asp-validation-for="Title" class="small text-danger"></span>
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" placeholder="Заглавие...">
+                <span asp-validation-for="Name" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Subject"></label>
+                <select asp-for="Subject" class="form-control">
+                    @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
+                    {
+                        string name = Enum.GetName(typeof(Subject), subjectValue);
+                            <option value="@subjectValue">@name</option>
+                    }
+                </select>
+                <span asp-validation-for="Subject" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea style="margin-left: 0" asp-for="Description" rows="4" class="form-control" placeholder="Описание..."></textarea>
+                <span asp-validation-for="Description" class="small text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Subject"></label>
@@ -22,31 +38,6 @@
                     }
                 </select>
                 <span asp-validation-for="Subject" class="small text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Time"></label>
-                <input asp-for="Time" class="form-control">
-                <span asp-validation-for="Time" class="small text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="School"></label>
-                <input asp-for="School" class="form-control" placeholder="Училище...">
-                <span asp-validation-for="School" class="small text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description"></label>
-                <textarea style="margin-left: 0" asp-for="Description" rows="4" class="form-control" placeholder="Описание..."></textarea>
-                <span asp-validation-for="Description" class="small text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Grade"></label>
-                <select asp-for="Grade" class="form-control">
-                    @for (int i = 1; i <= 12; i++)
-                    {
-                        <option value="@i">@i</option>
-                    }
-                </select>
-                <span asp-validation-for="Grade" class="small text-danger"></span>
             </div>
             <div class="text-center">
                 <button class="btn btn-primary mt-3" type="submit" value="Save">Продължи</button>

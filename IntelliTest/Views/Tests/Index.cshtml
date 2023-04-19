@@ -1,7 +1,15 @@
-﻿@using IntelliTest.Services.Infrastructure
-@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+﻿@using IntelliTest.Infrastructure
+@model QueryModel<TestViewModel>
 @{
     ViewBag.Title = "Tests Blog";
+        var previousPage = Model.CurrentPage - 1;
+        if (previousPage < 1)
+        {
+            previousPage = 1;
+        }
+
+        var maxPage = Math.Ceiling((double)Model.TotalItemsCount /
+                                   Model.ItemsPerPage);
 }
 
 <div>
@@ -14,17 +22,20 @@
         }
         <section class="cd-gallery">
             <ul style="width: 100%">
-                @foreach (var test in Model)
+                @foreach (var test in Model.Items)
                 {
                     <partial name="TestPartialView" for="@test"/>
                 }
             </ul>
             <div class="cd-fail-message">Няма резултати</div>
         </section>
-        <partial name="FilterMenuPartialView"/>
+        <partial model="Model.Filters" name="FilterMenuPartialView"/>
     </main>
 </div>
 @section Scripts
 {
     <script src="~/js/filter.js"></script>
+    <script>
+        OnTrigger();
+    </script>
 }

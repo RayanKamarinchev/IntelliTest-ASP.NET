@@ -1,6 +1,6 @@
-﻿@using IntelliTest.Services.Infrastructure
-@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Core.Contracts
+@using IntelliTest.Infrastructure
 @model TestViewModel
 @inject ITestService testService
 @inject IStudentService studentService
@@ -17,7 +17,7 @@
                     <span class="widget-49-date-month">score</span>
                 </div>
                 <div class="widget-49-meeting-info">
-                    <span class="widget-49-pro-title">@Model.Description</span>
+                    <span class="widget-49-pro-title">@Model.Subject.ToString()</span>
                     <span class="widget-49-meeting-time">@Model.CreatedOn</span>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                             </a>
                             @if (Model.MultiSubmit)
                             {
-                                <a onClick="warn(@Model.Id, @Model.Time, '@Model.Title')"
+                                <a onClick="warn('@Model.Id', @Model.Time, '@Model.Title')"
                                    class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                                     Направи
                                 </a>
@@ -69,7 +69,7 @@
                         }
                         else
                         {
-                            <a onClick="warn(@Model.Id, @Model.Time, '@Model.Title')"
+                            <a onClick="warn('@Model.Id', @Model.Time, '@Model.Title')"
                                class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                                 Направи
                             </a>

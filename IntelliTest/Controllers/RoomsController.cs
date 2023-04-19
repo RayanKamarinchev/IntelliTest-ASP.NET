@@ -2,7 +2,7 @@
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Chat;
 using IntelliTest.Data.Entities;
-using IntelliTest.Services.Infrastructure;
+using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;

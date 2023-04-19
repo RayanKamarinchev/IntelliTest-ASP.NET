@@ -1,19 +1,16 @@
-﻿using IntelliTest.Data.Entities;
+﻿using System.Security.Claims;
+using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Mails;
+using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Users;
+using IntelliTest.Data.Entities;
+using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using IntelliTest.Core.Contracts;
-using IntelliTest.Core.Models.Users;
-using IntelliTest.Services.Infrastructure;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using IntelliTest.Core.Models;
-using IntelliTest.Core.Models.Mails;
-using IntelliTest.Core.Services;
-using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
-using IntelliTest.Models.Tests;
 
-namespace Watchlist.Controllers
+namespace IntelliTest.Controllers
 {
     [Authorize]
     public class UserController : Controller
@@ -289,16 +286,16 @@ namespace Watchlist.Controllers
                     var liked = await lessonService.LikedLessons(User.Id());
                     return PartialView("~/Views/Lessons/Index.cshtml", liked);
                 case "myTests":
-                    IEnumerable<TestViewModel> myTests = new List<TestViewModel>();
+                    QueryModel<TestViewModel> myTests = new QueryModel<TestViewModel>();
                     if (User.IsTeacher())
                     {
                         Guid teacherId = await teacherService.GetTeacherId(User.Id());
-                        myTests = await testService.GetMy(teacherId);
+                        myTests = await testService.GetMy(teacherId, new QueryModel<TestViewModel>());
                     }
                     else if (User.IsStudent())
                     {
                         Guid studentOwnerId = await studentService.GetStudentId(User.Id());
-                        myTests = await testService.TestsTakenByStudent(studentOwnerId);
+                        myTests = await testService.TestsTakenByStudent(studentOwnerId, new QueryModel<TestViewModel>());
                     }
 
                     return PartialView("Panels/MyTestsPartialView", myTests);

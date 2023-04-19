@@ -1,6 +1,6 @@
-﻿@using IntelliTest.Services.Infrastructure
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<IntelliTest.Models.Tests.TestViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Infrastructure
+@model IEnumerable<TestViewModel>
 <div>
     <main class="cd-main-content">
         @if (User.IsTeacher())

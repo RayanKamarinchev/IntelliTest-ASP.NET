@@ -1,14 +1,15 @@
 ﻿using IntelliTest.Data;
-using IntelliTest.Models.Tests;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IntelliTest.Core.Services
 {
@@ -21,11 +22,45 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetAll(bool isTeacher)
+        public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query)
         {
-            return await context.Tests.Where(t => !t.IsDeleted
-                                               && (t.PublicyLevel == PublicityLevel.Public ||
-                                                   (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)))
+            if (query.Filters.Subject!=Subject.Няма)
+            {
+                testQuery = testQuery.Where(t => t.Subject == query.Filters.Subject);
+            }
+            if (query.Filters.Grade >= 1 && query.Filters.Grade <= 12)
+            {
+                testQuery = testQuery.Where(t => t.Grade == query.Filters.Grade);
+            }
+
+            if (string.IsNullOrEmpty(query.Filters.SearchTerm) == false)
+            {
+                query.Filters.SearchTerm = $"%{query.Filters.SearchTerm.ToLower()}%";
+
+                testQuery = testQuery
+                    .Where(t => EF.Functions.Like(t.Title.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(t.School.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(t.Description.ToLower(), query.Filters.SearchTerm));
+            }
+            if (query.Filters.Sorting == Sorting.Likes)
+            {
+                testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Examiners)
+            {
+                testQuery = testQuery.OrderBy(t => t.TestResults.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Questions)
+            {
+                testQuery = testQuery.OrderBy(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Score)
+            {
+                testQuery = testQuery.OrderBy(t => t.AverageScore);
+            }
+
+            var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
+                                .Take(query.ItemsPerPage)
                                 .Select(t => new TestViewModel()
                                 {
                                     AverageScore = t.AverageScore,
@@ -34,35 +69,32 @@ namespace IntelliTest.Core.Services
                                     Description = t.Description,
                                     Grade = t.Grade,
                                     Id = t.Id,
-                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
+                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
+                                               t.OpenQuestions.Sum(q => q.MaxScore),
                                     OpenQuestions = t.OpenQuestions,
                                     Time = t.Time,
                                     Title = t.Title,
                                     MultiSubmit = t.MultiSubmission
-                                })
-                                .ToListAsync();
+                                });
+            var tests =await test.ToListAsync();
+            query.Items = tests;
+            query.TotalItemsCount = tests.Count;
+            return query;
         }
 
-        public async Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId)
+        public async Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query)
         {
-            return await context.Tests
-                                .Where(t=>!t.IsDeleted)
-                                .Where(t=>t.CreatorId== teacherId)
-                                .Select(t=> new TestViewModel()
-                                {
-                                    AverageScore = t.AverageScore,
-                                    ClosedQuestions = t.ClosedQuestions,
-                                    CreatedOn = t.CreatedOn,
-                                    Description = t.Description,
-                                    Grade = t.Grade,
-                                    Id = t.Id,
-                                    MaxScore = t.ClosedQuestions.Sum(q=>q.MaxScore) + t.OpenQuestions.Sum(q=>q.MaxScore),
-                                    OpenQuestions = t.OpenQuestions,
-                                    Time = t.Time,
-                                    Title = t.Title,
-                                    MultiSubmit = t.MultiSubmission
-                                })
-                                .ToListAsync();
+            var testQuery = context.Tests.Where(t => !t.IsDeleted
+                                                  && (t.PublicyLevel == PublicityLevel.Public ||
+                                                      (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)));
+            return await Filter(testQuery, query);
+        }
+
+        public async Task<QueryModel<TestViewModel>> GetMy(Guid teacherId, QueryModel<TestViewModel> query)
+        {
+            var testQuery = context.Tests.Where(t => !t.IsDeleted
+                                                  && t.CreatorId == teacherId);
+            return await Filter(testQuery, query);
         }
 
         public async Task<TestViewModel> GetById(Guid id)
@@ -451,7 +483,7 @@ namespace IntelliTest.Core.Services
                           ).ToArray();
         }
 
-        public async Task<IEnumerable<TestViewModel>> TestsTakenByStudent(Guid studentId)
+        public async Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query)
         {
             var student = await context.Students
                                        .Include(s=>s.ClosedAnswers)
@@ -467,22 +499,8 @@ namespace IntelliTest.Core.Services
             var openIds = student?.OpenAnswers
                                   ?.Select(a => a.Question.Test)
                                   ?.Distinct() ?? new List<Test>();
-            return closedIds.Union(openIds)
-                            .Select(t => new TestViewModel()
-                            {
-                                AverageScore = t.AverageScore,
-                                ClosedQuestions = t.ClosedQuestions,
-                                CreatedOn = t.CreatedOn,
-                                Description = t.Description,
-                                Grade = t.Grade,
-                                Id = t.Id,
-                                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
-                                OpenQuestions = t.OpenQuestions,
-                                Time = t.Time,
-                                Title = t.Title,
-                                MultiSubmit = t.MultiSubmission
-                            });
-
+            var testsQuery = closedIds.Union(openIds).AsQueryable();
+            return await Filter(testsQuery, query);
         }
 
         public async Task<Guid> Create(TestViewModel model, Guid teacherId)

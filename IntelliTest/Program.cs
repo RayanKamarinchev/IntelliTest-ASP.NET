@@ -76,6 +76,7 @@ builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IClassService, ClassService>();
 
 builder.Services.AddSignalR();
 

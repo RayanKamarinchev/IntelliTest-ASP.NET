@@ -38,13 +38,13 @@
                 e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
             }
             var timer = document.getElementById("timer");
-            var interval = 1000; // ms
+            var interval = 1000; 
             var expected = Date.now() + interval;
             var min = @Model.Time;
             var sec = 0;
             setTimeout(step, interval);
             function step() {
-                var dt = Date.now() - expected; // the drift (positive for overshooting)
+                var dt = Date.now() - expected;
                 sec--;
                 if(sec < 0){
                     sec+=60;
@@ -55,7 +55,7 @@
                 }
                 timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
                 expected += interval;
-                setTimeout(step, Math.max(0, interval - dt)); // take into account drift
+                setTimeout(step, Math.max(0, interval - dt));
             }
             document.addEventListener("visibilitychange", () => {
                 if(document.hidden){

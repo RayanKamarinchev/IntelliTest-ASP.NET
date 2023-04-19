@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Lessons;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
@@ -11,12 +12,9 @@ using IntelliTest.Core.Services;
 using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
-using IntelliTest.Models.Tests;
-using IntelliTest.Services.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using StackExchange.Redis;
 
 namespace IntelliTest.Controllers
 {
@@ -45,14 +43,25 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult GetFilter(Filter model)
         {
-            if (1==0 && cache.TryGetValue("tests", out IEnumerable<TestViewModel>? model))
+            return PartialView("FilterMenuPartialView", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
+        {
+            if (1==0 && cache.TryGetValue("tests", out QueryModel<TestViewModel>? model))
             {
             }
             else
             {
-                model = await testService.GetAll(User.IsTeacher());
+                if (currentPage==0)
+                {
+                    currentPage = 1;
+                }
+                QueryModel<TestViewModel> query = new QueryModel<TestViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
+                model = await testService.GetAll(User.IsTeacher(), query);
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
                                         .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 await cache.SetAsync("tests", model, cacheEntryOptions);
@@ -62,12 +71,12 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public async Task<IActionResult> MyTests()
+        public async Task<IActionResult> MyTests([FromQuery] QueryModel<TestViewModel> query)
         {
-            IEnumerable<TestViewModel> model = new List<TestViewModel>();
-                Guid teacherId = await teacherService.GetTeacherId(User.Id());
-                model = await testService.GetMy(teacherId);
-                return View("Index", model);
+            QueryModel<TestViewModel> model = new QueryModel<TestViewModel>();
+            Guid teacherId = await teacherService.GetTeacherId(User.Id());
+            model = await testService.GetMy(teacherId, query);
+            return View("Index", model);
         }
 
         [Route("Tests/Edit/{id}")]
@@ -212,7 +221,7 @@ namespace IntelliTest.Controllers
                             text = lesson.Content;
                         }
                     }
-                    var res = run_cmd(SCRIPT_NAME, text);
+                    var res = run_cmd(text);
                     foreach (var se in res)
                     {
                         var q = new OpenQuestionViewModel()
@@ -309,7 +318,7 @@ namespace IntelliTest.Controllers
             await testService.Edit(id, model, teacherId);
             TempData["message"] = "Успешно редактира тест!";
             TempData.Remove("editModel");
-            return RedirectToAction("Index", testService.GetAll(User.IsTeacher()));
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -421,17 +430,11 @@ namespace IntelliTest.Controllers
             return RedirectToAction("ViewProfile", "User");
         }
 
-        public IActionResult AiGenerate(string text)
-        {
-            var res = run_cmd("script.py", text);
-            return Json(JsonSerializer.Serialize(res));
-        }
-
-        private IEnumerable<string[]> run_cmd(string cmd, string args)
+        private IEnumerable<string[]> run_cmd(string args)
         {
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            start.Arguments = string.Format("{0} \"{1}\"", cmd, args);
+            start.Arguments = string.Format("{0} \"{1}\"", SCRIPT_NAME, args);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             string last = "";
@@ -450,9 +453,7 @@ namespace IntelliTest.Controllers
             {
                 all += (char)int.Parse(splitted[i]);
             }
-
-            all = all.Replace("<pad> въпрос: ", "");
-            all = all.Replace("</s>", "");
+            
             var res = all.Split("&").Select(qa => qa.Split("|"));
             return res;
         }

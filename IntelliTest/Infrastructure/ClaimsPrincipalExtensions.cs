@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace IntelliTest.Services.Infrastructure
+namespace IntelliTest.Infrastructure
 {
     public static class ClaimsPrincipalExtensions
     {

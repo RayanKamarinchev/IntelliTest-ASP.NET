@@ -1,8 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Classes";
+    ViewBag.Title = "Класни стаи";
 }
+@using IntelliTest.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<ClassViewModel>
 <div class="container d-flex flex-row">
-            <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 200px; background-color: white;height: 100vh">
+    @*<div class="d-flex flex-column flex-shrink-0 p-3" style="width: 200px; background-color: white;height: 100vh">
                 <a class="d-flex align-items-center justify-content-center btn mb-3 mb-md-0 me-md-auto link-dark text-decoration-none ">
                     <h3 class="fs-4">Всички</h3>
                 </a>
@@ -59,57 +62,119 @@
                         </div>
                     </li>
                 </ul>
-            </div>
-        </div>
-        <script >
-            const options = {
-                plugins: {
-                    datalabels: {
-                        display: false
-                    }
+            </div>*@
+    <main class="cd-main-content">
+        @if (User.IsTeacher())
+        {
+                <div class="floating-container">
+                    <a class="floating-button" asp-action="Create">+</a>
+                </div>
+        }
+        <section class="cd-gallery">
+            <ul style="width: 100%">
+                @foreach (var classView in Model)  
+                {
+                    <partial name="ClassPartialView" model="classView"/>
                 }
-            };
-            function initGrades() {
-                // Chart declaration:
-                myBarGradeChart = new Chart(ctx, {
-                    type: gradeChartType,
-                    data: data,
-                    options: options
-                });
-            }
-            function ToggleChartGrades(e){
-                //destroy chart:
-                myBarGradeChart.destroy();
-                //change chart type:
-                e.innerHTML = (gradeChartType == 'bar') ? 'Линия' : 'Блок';
-                gradeChartType = (gradeChartType == 'bar') ? 'line' : 'bar';
-                //restart chart:
+            </ul>
+            <div class="cd-fail-message">Няма резултати</div>
+        </section>
+    </main>
+</div>
+@section Scripts
+{
+         <script >
+                const options = {
+                    plugins: {
+                        datalabels: {
+                            display: false
+                        }
+                    }
+                };
+                function initGrades() {
+                    // Chart declaration:
+                    myBarGradeChart = new Chart(ctx, {
+                        type: gradeChartType,
+                        data: data,
+                        options: options
+                    });
+                }
+                function ToggleChartGrades(e){
+                    //destroy chart:
+                    myBarGradeChart.destroy();
+                    //change chart type:
+                    e.innerHTML = (gradeChartType == 'bar') ? 'Линия' : 'Блок';
+                    gradeChartType = (gradeChartType == 'bar') ? 'line' : 'bar';
+                    //restart chart:
+                    initGrades();
+                }
+                const ctx =  document.getElementById('allClass');
+                let gradeChartType = 'bar';
+                let myBarGradeChart;
+
+                const data = {
+                    labels: ['Сеп', 'Окт', 'Нов', 'Дек', 'Ян', 'Фев'],
+                    datasets: [{
+                        label: "Клас 8а",
+                        data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
+                        fill: true,
+                        lineTension: 0.1,
+                        borderCapStyle: 'square',
+                        pointBorderColor: "white",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 8,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHitRadius: 10,
+                        spanGaps: true,
+                        backgroundColor:colors[0],
+                    },
+                        {
+                            label: "Клас 8в",
+                            data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
+                            fill: true,
+                            lineTension: 0.1,
+                            borderCapStyle: 'square',
+                            pointBorderColor: "white",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 8,
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHitRadius: 10,
+                            spanGaps: true,
+                            backgroundColor:colors[1],
+                        }]
+                };
                 initGrades();
-            }
-            const ctx =  document.getElementById('allClass');
-            let gradeChartType = 'bar';
-            let myBarGradeChart;
 
-            const data = {
-                labels: ['Сеп', 'Окт', 'Нов', 'Дек', 'Ян', 'Фев'],
-                datasets: [{
-                    label: "Клас 8а",
-                    data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
-                    fill: true,
-                    lineTension: 0.1,
-                    borderCapStyle: 'square',
-                    pointBorderColor: "white",
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 8,
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHitRadius: 10,
-                    spanGaps: true,
-                    backgroundColor:colors[0],
-                },
-                    {
-                        label: "Клас 8в",
-                        data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
+
+
+                function initTestGrades() {
+                    // Chart declaration:
+                    myBarTestGradeChart = new Chart(ctx2, {
+                        type: testGradeChartType,
+                        data: dataTest,
+                        options: options
+                    });
+                }
+                function ToggleChartTestGrades(e){
+                    //destroy chart:
+                    myBarTestGradeChart.destroy();
+                    //change chart type:
+                    e.innerHTML = (testGradeChartType == 'bar') ? 'Линия' : 'Блок';
+                    testGradeChartType = (testGradeChartType == 'bar') ? 'line' : 'bar';
+                    //restart chart:
+                    initTestGrades();
+                }
+                const ctx2 = document.getElementById('allTest');
+                let testGradeChartType = "bar";
+                let myBarTestGradeChart;
+
+                const dataTest = {
+                    labels: ['Тест 1', 'Тест 2', '5 минутка', 'Тест 3', 'Изпитване', 'Класна'],
+                    datasets: [{
+                        label: "Клас 8а",
+                        data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
                         fill: true,
                         lineTension: 0.1,
                         borderCapStyle: 'square',
@@ -120,66 +185,24 @@
                         pointRadius: 4,
                         pointHitRadius: 10,
                         spanGaps: true,
-                        backgroundColor:colors[1],
-                    }]
-            };
-            initGrades();
-
-
-
-            function initTestGrades() {
-                // Chart declaration:
-                myBarTestGradeChart = new Chart(ctx2, {
-                    type: testGradeChartType,
-                    data: dataTest,
-                    options: options
-                });
-            }
-            function ToggleChartTestGrades(e){
-                //destroy chart:
-                myBarTestGradeChart.destroy();
-                //change chart type:
-                e.innerHTML = (testGradeChartType == 'bar') ? 'Линия' : 'Блок';
-                testGradeChartType = (testGradeChartType == 'bar') ? 'line' : 'bar';
-                //restart chart:
+                        backgroundColor:colors[0],
+                    },
+                        {
+                            label: "Клас 8в",
+                            data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
+                            fill: true,
+                            lineTension: 0.1,
+                            borderCapStyle: 'square',
+                            pointBorderColor: "white",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 8,
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHitRadius: 10,
+                            spanGaps: true,
+                            backgroundColor:colors[1],
+                        }]
+                };
                 initTestGrades();
-            }
-            const ctx2 = document.getElementById('allTest');
-            let testGradeChartType = "bar";
-            let myBarTestGradeChart;
-
-            const dataTest = {
-                labels: ['Тест 1', 'Тест 2', '5 минутка', 'Тест 3', 'Изпитване', 'Класна'],
-                datasets: [{
-                    label: "Клас 8а",
-                    data: [4.40, 5.80, 3.20, 4.20, 4.90, 4.70],
-                    fill: true,
-                    lineTension: 0.1,
-                    borderCapStyle: 'square',
-                    pointBorderColor: "white",
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 8,
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHitRadius: 10,
-                    spanGaps: true,
-                    backgroundColor:colors[0],
-                },
-                    {
-                        label: "Клас 8в",
-                        data: [3.30, 4.20, 3.80, 5.20, 4.80, 5.30],
-                        fill: true,
-                        lineTension: 0.1,
-                        borderCapStyle: 'square',
-                        pointBorderColor: "white",
-                        pointBorderWidth: 1,
-                        pointHoverRadius: 8,
-                        pointHoverBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHitRadius: 10,
-                        spanGaps: true,
-                        backgroundColor:colors[1],
-                    }]
-            };
-            initTestGrades();
-        </script>
+            </script>
+}

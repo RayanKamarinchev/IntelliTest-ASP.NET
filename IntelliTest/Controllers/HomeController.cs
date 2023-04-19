@@ -1,10 +1,7 @@
-﻿using IntelliTest.Models;
+﻿using IntelliTest.Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using IntelliTest.Core.Contracts;
-using IntelliTest.Core.Models;
 
-namespace Watchlist.Controllers
+namespace IntelliTest.Controllers
 {
     public class HomeController : Controller
     {

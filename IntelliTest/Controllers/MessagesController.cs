@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Services;
-using IntelliTest.Services.Infrastructure;
+using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 
 namespace IntelliTest.Controllers

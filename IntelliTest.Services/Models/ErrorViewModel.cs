@@ -1,4 +1,4 @@
-namespace IntelliTest.Models
+namespace IntelliTest.Core.Models
 {
     public class ErrorViewModel
     {

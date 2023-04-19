@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IntelliTest.Data.Enums;
 
 namespace IntelliTest.Data.Entities
 {
@@ -19,6 +20,7 @@ namespace IntelliTest.Data.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsDeleted { get; set; }
+        public Subject Subject { get; set; }
         public IEnumerable<ClassTest> ClassTests { get; set; }
         public IEnumerable<StudentClass> Students { get; set; }
     }

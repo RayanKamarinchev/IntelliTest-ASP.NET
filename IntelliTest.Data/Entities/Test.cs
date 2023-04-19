@@ -12,8 +12,7 @@ namespace IntelliTest.Data.Entities
         [StringLength(30)]
         public string Title { get; set; }
         [Required]
-        [StringLength(30)]
-        public string Subject { get; set; }
+        public Subject Subject { get; set; }
         [Required]
         [Range(0, 12)]
         public int Grade { get; set; }

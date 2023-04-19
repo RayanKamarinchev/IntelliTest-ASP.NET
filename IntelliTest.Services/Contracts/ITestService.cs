@@ -1,14 +1,14 @@
-﻿using IntelliTest.Core.Models.Questions;
+﻿using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
-using IntelliTest.Models.Tests;
 
 namespace IntelliTest.Core.Contracts
 {
     public interface ITestService
     {
-        Task<IEnumerable<TestViewModel>> GetAll(bool isTeacher);
-        Task<IEnumerable<TestViewModel>> GetMy(Guid teacherId);
+        Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query);
+        Task<QueryModel<TestViewModel>> GetMy(Guid teacherId, QueryModel<TestViewModel> query);
         Task<TestViewModel> GetById(Guid id);
         Task<bool> ExistsbyId(Guid id);
         TestEditViewModel ToEdit(TestViewModel model);
@@ -22,7 +22,7 @@ namespace IntelliTest.Core.Contracts
                            Guid studentId,
                            Guid testId);
         Guid[] GetStudentIds(Guid testId);
-        Task<IEnumerable<TestViewModel>> TestsTakenByStudent(Guid studentId);
+        Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query);
         Task<Guid> Create(TestViewModel model, Guid teacherId);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
 

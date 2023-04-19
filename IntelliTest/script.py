@@ -1,179 +1,452 @@
 # coding=utf8
-import pke
-import string
-import re
-import nltk
-# nltk.download('stopwords')
-# nltk.download('brown')
-from nltk.tokenize import sent_tokenize
-from nltk.corpus import stopwords
-import time
+import datetime
+import sys
+
+date = datetime.datetime.now()
+from torch import no_grad
+from googletrans import Translator
+from transformers import T5ForConditionalGeneration, T5Tokenizer, pipeline
+import random
 import spacy
 from sense2vec import Sense2Vec
+from collections import OrderedDict
+import string
+import pke
+import numpy
 from nltk import FreqDist
+from nltk.corpus import stopwords
 from nltk.corpus import brown
 from similarity.normalized_levenshtein import NormalizedLevenshtein
-from torch import nn
-import torch
-from googletrans import Translator
-from transformers import AutoModelWithLMHead, AutoTokenizer
-
+from nltk.tokenize import sent_tokenize
+import time
+from flashtext import KeywordProcessor
+import re
 import datefinder
 
-class BgQuestion(nn.Module):
-    def is_far(self, words_list,currentword,thresh,normalized_levenshtein):
-        if sum(1 for c in currentword if c.isupper()) / (currentword.count(" ")+1) > 0.5:
-            return True
-        threshold = thresh
-        score_list =[]
-        for word in words_list:
-            score_list.append(normalized_levenshtein.distance(word.lower(),currentword.lower()))
-        if min(score_list)>=threshold:
-            return True
-        else:
-            return False
+def MCQs_available(word, s2v):
+    word = word.replace(" ", "_")
+    if sum(1 for c in word if c.isupper()) > 0:
+        return True
+    sense = s2v.get_best_sense(word)
+    if sense is not None:
+        return True
+    else:
+        return False
 
-    def MCQs_available(self, word,s2v):
-        word = word.replace(" ", "_")
-        if sum(1 for c in word if c.isupper()) > 0:
-            return True
-        sense = s2v.get_best_sense(word)
-        if sense is not None:
-            return True
-        else:
-            return False
 
-    def get_phrases(self, doc):
-        phrases={}
-        for np in doc.noun_chunks:
-            phrase =np.text
-            len_phrase = len(phrase.split())
-            if len_phrase > 1:
-                if phrase not in phrases:
-                    phrases[phrase]=1
-                else:
-                    phrases[phrase]=phrases[phrase]+1
+def edits(word):
+    "All edits that are one edit away from `word`."
+    letters = 'abcdefghijklmnopqrstuvwxyz ' + string.punctuation
+    splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
+    deletes = [L + R[1:] for L, R in splits if R]
+    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
+    replaces = [L + c + R[1:] for L, R in splits if R for c in letters]
+    inserts = [L + c + R for L, R in splits for c in letters]
+    return set(deletes + transposes + replaces + inserts)
 
-        phrase_keys=list(phrases.keys())
-        phrase_keys = sorted(phrase_keys, key= lambda x: len(x),reverse=True)
-        phrase_keys=phrase_keys[:50]
-        return phrase_keys
 
-    def filter_phrases(self, phrase_keys,max,normalized_levenshtein ):
-        filtered_phrases =[]
-        if len(phrase_keys)>0:
-            filtered_phrases.append(phrase_keys[0])
-            for ph in phrase_keys[1:]:
-                if self.is_far(filtered_phrases,ph,0.7,normalized_levenshtein ):
-                    filtered_phrases.append(ph)
-                if len(filtered_phrases)>=max:
-                    break
-        return filtered_phrases
+def sense2vec_get_words(word, s2v):
+    output = []
 
-    def get_nouns_multipartite(self, text):
-        out = []
+    word_preprocessed = word.translate(word.maketrans("", "", string.punctuation))
+    word_preprocessed = word_preprocessed.lower()
 
-        extractor = pke.unsupervised.MultipartiteRank()
-        extractor.load_document(input=text, language='en')
-        pos = {'PROPN', 'NOUN'}
-        stoplist = list(string.punctuation)
-        stoplist += stopwords.words('english')
-        extractor.candidate_selection(pos=pos)
-        # 4. build the Multipartite graph and rank candidates using random walk,
-        #    alpha controls the weight adjustment mechanism, see TopicRank for
-        #    threshold/method parameters.
-        extractor.candidate_weighting(alpha=1.1,
-                                      threshold=0.75,
-                                      method='average')
+    word_edits = edits(word_preprocessed)
 
-        keyphrases = extractor.get_n_best(n=100)
+    word = word.replace(" ", "_")
 
-        for key in keyphrases:
-            out.append(key[0])
+    sense = s2v.get_best_sense(word)
+    most_similar = s2v.most_similar(sense, n=15)
 
-        return out, extractor.weights
+    compare_list = [word_preprocessed]
+    for each_word in most_similar:
+        append_word = each_word[0].split("|")[0].replace("_", " ")
+        append_word = append_word.strip()
+        append_word_processed = append_word.lower()
+        append_word_processed = append_word_processed.translate(
+            append_word_processed.maketrans("", "", string.punctuation))
+        if append_word_processed not in compare_list and word_preprocessed not in append_word_processed and append_word_processed not in word_edits:
+            output.append(append_word.title())
+            compare_list.append(append_word_processed)
 
-    def tokenize_sentences(self, text):
-        sentences = [sent_tokenize(text)]
-        sentences = [y for x in sentences for y in x]
-        # Remove any short sentences less than 20 letters.
-        sentences = [sentence.strip() for sentence in sentences if len(sentence) > 20]
-        return sentences
+    out = list(OrderedDict.fromkeys(output))
 
-    def get_keywords(self, nlp,text,max_keywords,s2v,fdist,normalized_levenshtein,no_of_sentences):
-        doc = nlp(text)
-        max_keywords = int(max_keywords)
-        keywords, weights = self.get_nouns_multipartite(text)
-        keywords = sorted(keywords, key=lambda x: fdist[x])
-        keywords = self.filter_phrases(keywords, max_keywords,normalized_levenshtein )
+    return out
 
-        phrase_keys = self.get_phrases(doc)
 
-        filtered_phrases = self.filter_phrases(phrase_keys, max_keywords,normalized_levenshtein )
+def get_options(answer, s2v):
+    distractors = []
 
-        dates = datefinder.find_dates(text, False, True)
-        dateRanges = [(d[1][0]+1, d[1][1]-2) for d in dates]
-        datesText = [text[d[0]: d[1]] for d in dateRanges]
-        nums = []
-        indexes = re.finditer(r'\d+', text)
-        for i in indexes:
-            isDate = False
-            for d in dateRanges:
-                if d[0] <= i.start() <= d[1]:
-                    isDate = True
-            if not isDate:
-                nums.append(text[i.start():i.end()])
+    try:
+        distractors = sense2vec_get_words(answer, s2v)
+        if len(distractors) > 0:
+            return distractors, "sense2vec"
+    except:
+        pass
+    return distractors, "None"
 
-        total_phrases = keywords + filtered_phrases + datesText + nums
 
-        total_phrases_filtered = self.filter_phrases(total_phrases, min(max_keywords, 2*no_of_sentences),normalized_levenshtein )
+def tokenize_sentences(text):
+    sentences = [sent_tokenize(text)]
+    sentences = [y for x in sentences for y in x]
+    # Remove any short sentences less than 20 letters.
+    sentences = [sentence.strip() for sentence in sentences if len(sentence) > 20]
+    return sentences
 
-        answers = []
-        for answer in total_phrases_filtered:
-            if answer not in answers and self.MCQs_available(answer,s2v):
-                answers.append(answer)
 
-        answers = answers[:max_keywords]
-        return answers, weights
+def get_sentences_for_keyword(keywords, sentences):
+    keyword_processor = KeywordProcessor()
+    keyword_sentences = {}
+    for word in keywords:
+        # word = word.strip()
+        keyword_sentences[word] = []
+        keyword_processor.add_keyword(word)
+    for sentence in sentences:
+        keywords_found = keyword_processor.extract_keywords(sentence)
+        for key in keywords_found:
+            keyword_sentences[key].append(sentence)
 
-    def get_question(self, answer, context,tokenizer,model, max_length=64):
-        input_text = f"answer: {answer}  context: {context} </s>"
-        features = tokenizer([input_text], return_tensors='pt')
+    for key in keyword_sentences.keys():
+        values = keyword_sentences[key]
+        values = sorted(values, key=len, reverse=True)
+        keyword_sentences[key] = values
 
-        output = model.generate(input_ids=features['input_ids'],
-                                attention_mask=features['attention_mask'],
-                                max_length=max_length)
+    delete_keys = []
+    for k in keyword_sentences.keys():
+        if len(keyword_sentences[k]) == 0:
+            delete_keys.append(k)
+    for del_key in delete_keys:
+        del keyword_sentences[del_key]
 
-        return tokenizer.decode(output[0])
+    return keyword_sentences
+
+
+def is_far(words_list, currentword, thresh, normalized_levenshtein):
+    threshold = thresh
+    score_list = []
+    for word in words_list:
+        score_list.append(normalized_levenshtein.distance(word.lower(), currentword.lower()))
+    if min(score_list) >= threshold:
+        return True
+    else:
+        return False
+
+
+def filter_phrases(phrase_keys, max, normalized_levenshtein):
+    filtered_phrases = []
+    if len(phrase_keys) > 0:
+        filtered_phrases.append(phrase_keys[0])
+        for ph in phrase_keys[1:]:
+            if is_far(filtered_phrases, ph, 0.8, normalized_levenshtein):
+                filtered_phrases.append(ph)
+            if len(filtered_phrases) >= max:
+                break
+    return filtered_phrases
+
+
+def get_nouns_multipartite(text):
+    out = []
+
+    extractor = pke.unsupervised.MultipartiteRank()
+    extractor.load_document(input=text, language='en')
+    pos = {'PROPN', 'NOUN'}
+    stoplist = list(string.punctuation)
+    stoplist += stopwords.words('english')
+    extractor.candidate_selection(pos=pos)
+    # 4. build the Multipartite graph and rank candidates using random walk,
+    #    alpha controls the weight adjustment mechanism, see TopicRank for
+    #    threshold/method parameters.
+    extractor.candidate_weighting(alpha=1.1,
+                                  threshold=0.75,
+                                  method='average')
+
+    keyphrases = extractor.get_n_best(n=100)
+
+    for key in keyphrases:
+        out.append(key[0])
+
+    return out, extractor.weights
+
+
+def get_phrases(doc):
+    phrases = {}
+    for np in doc.noun_chunks:
+        phrase = np.text
+        len_phrase = len(phrase.split())
+        if len_phrase > 1:
+            if phrase not in phrases:
+                phrases[phrase] = 1
+            else:
+                phrases[phrase] = phrases[phrase] + 1
+
+    phrase_keys = list(phrases.keys())
+    phrase_keys = sorted(phrase_keys, key=lambda x: len(x), reverse=True)
+    phrase_keys = phrase_keys[:50]
+    return phrase_keys
+
+
+def get_keywords(nlp, text, max_keywords, s2v, fdist, normalized_levenshtein, no_of_sentences):
+    doc = nlp(text)
+    max_keywords = int(max_keywords)
+    keywords, weights = get_nouns_multipartite(text)
+    keywords = sorted(keywords, key=lambda x: fdist[x])
+    keywords = filter_phrases(keywords, max_keywords, normalized_levenshtein)
+
+    phrase_keys = get_phrases(doc)
+
+    filtered_phrases = filter_phrases(phrase_keys, max_keywords, normalized_levenshtein)
+
+    dates = datefinder.find_dates(text, False, True)
+    dateRanges = [(d[1][0] + 1, d[1][1] - 2) for d in dates]
+    datesText = [text[d[0]: d[1]] for d in dateRanges]
+    nums = []
+    indexes = re.finditer(r'\d+', text)
+    for i in indexes:
+        isDate = False
+        for d in dateRanges:
+            if d[0] <= i.start() <= d[1]:
+                isDate = True
+        if not isDate:
+            nums.append(text[i.start():i.end()])
+
+    total_phrases = keywords + filtered_phrases
+
+    total_phrases_filtered = filter_phrases(total_phrases, min(max_keywords, 2 * no_of_sentences),
+                                            normalized_levenshtein)
+    total_phrases_filtered += datesText + nums
+
+    answers = []
+    for answer in total_phrases_filtered:
+        if answer not in answers and MCQs_available(answer, s2v):
+            answers.append(answer)
+
+    answers = answers[:max_keywords]
+    return answers
+
+
+def generate_questions_mcq(keyword_sent_mapping, tokenizer, model, sense2vec, normalized_levenshtein):
+    batch_text = []
+    answers = keyword_sent_mapping.keys()
+    for answer in answers:
+        txt = keyword_sent_mapping[answer]
+        context = "context: " + txt
+        text = context + " " + "answer: " + answer + " </s>"
+        batch_text.append(text)
+
+    encoding = tokenizer.batch_encode_plus(batch_text, pad_to_max_length=True, return_tensors="pt")
+
+    input_ids, attention_masks = encoding["input_ids"], encoding["attention_mask"]
+
+    with no_grad():
+        outs = model.generate(input_ids=input_ids,
+                              attention_mask=attention_masks,
+                              max_length=150)
+
+    output_array = {}
+    output_array["questions"] = []
+    for index, val in enumerate(answers):
+        individual_question = {}
+        out = outs[index, :]
+        dec = tokenizer.decode(out, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+        Question = dec.replace("question:", "")
+        Question = Question.strip()
+        individual_question["question_statement"] = Question
+        individual_question["question_type"] = "MCQ"
+        individual_question["answer"] = val
+        individual_question["id"] = index + 1
+        individual_question["options"], individual_question["options_algorithm"] = get_options(val, sense2vec)
+
+        individual_question["options"] = filter_phrases(individual_question["options"], 10, normalized_levenshtein)
+        index = 3
+        individual_question["extra_options"] = individual_question["options"][index:]
+        individual_question["options"] = individual_question["options"][:index]
+        individual_question["context"] = keyword_sent_mapping[val]
+
+        if len(individual_question["options"]) > 0:
+            output_array["questions"].append(individual_question)
+
+    return output_array
+
+
+def generate_normal_questions(keyword_sent_mapping, tokenizer, model):  # for normal one word questions
+    batch_text = []
+    answers = keyword_sent_mapping.keys()
+    for answer in answers:
+        txt = keyword_sent_mapping[answer]
+        context = "context: " + txt
+        text = context + " " + "answer: " + answer + " </s>"
+        batch_text.append(text)
+
+    encoding = tokenizer.batch_encode_plus(batch_text, pad_to_max_length=True, return_tensors="pt")
+
+    input_ids, attention_masks = encoding["input_ids"], encoding["attention_mask"]
+
+    with no_grad():
+        outs = model.generate(input_ids=input_ids,
+                              attention_mask=attention_masks,
+                              max_length=150)
+
+    output_array = {}
+    output_array["questions"] = []
+
+    for index, val in enumerate(answers):
+        individual_quest = {}
+        out = outs[index, :]
+        dec = tokenizer.decode(out, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+        Question = dec.replace('question:', '')
+        Question = Question.strip()
+
+        individual_quest['Question'] = Question
+        individual_quest['Answer'] = val
+        individual_quest["id"] = index + 1
+        individual_quest["context"] = keyword_sent_mapping[val]
+
+        output_array["questions"].append(individual_quest)
+
+    return output_array
+
+
+def random_choice():
+    a = random.choice([0, 1])
+    return bool(a)
+
+
+class QGen:
+
     def __init__(self):
-        super().__init__()
+        self.tokenizer = T5Tokenizer.from_pretrained('t5-base')
+        model = T5ForConditionalGeneration.from_pretrained('Parth/result')
+        # model.eval()
+        self.model = model
         self.nlp = spacy.load('en_core_web_sm')
-        self.s2v = Sense2Vec()
-        self.dist = FreqDist(brown.words())
-        self.normalized_levenshtein = NormalizedLevenshtein()
         self.translator = Translator()
-        self.tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-question-generation-ap")
-        self.model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-question-generation-ap")
+        self.s2v = Sense2Vec().from_disk("s2v_reddit_2015_md (1)/s2v_old")
+        self.fdist = FreqDist(brown.words())
+        self.normalized_levenshtein = NormalizedLevenshtein()
+        self.answerer = pipeline("question-answering")
+        self.set_seed(42)
 
-    def forward(self, bg_text):
-        translated_text = self.translator.translate(bg_text, src="bg").text
-        modified_text = " ".join(self.tokenize_sentences(translated_text))
-        words, weights = self.get_keywords(self.nlp, modified_text, 10000, self.s2v, self.dist, self.normalized_levenshtein, 10000)
-        questions = []
-        for answer in words:
-            q = self.get_question(answer, modified_text, self.tokenizer, self.model)
-            q_translated = self.translator.translate(q, dest="bg").text
-            answer = self.translator.translate(answer, dest="bg").text
-            questions.append([q_translated, answer])
+    def set_seed(self, seed):
+        numpy.random.seed(seed)
+
+    def predict_mcq(self, payload):
+        start = time.time()
+        inp = {
+            "input_text": payload.get("input_text"),
+            "max_questions": payload.get("max_questions", 20)
+        }
+
+        text = inp['input_text']
+        sentences = tokenize_sentences(text)
+        joiner = " "
+        modified_text = joiner.join(sentences)
+
+        keywords = get_keywords(self.nlp, modified_text, inp['max_questions'], self.s2v, self.fdist,
+                                self.normalized_levenshtein, len(sentences))
+
+        keyword_sentence_mapping = get_sentences_for_keyword(keywords, sentences)
+
+        for k in keyword_sentence_mapping.keys():
+            text_snippet = " ".join(keyword_sentence_mapping[k][:3])
+            keyword_sentence_mapping[k] = text_snippet
+
+        final_output = {}
+
+        if len(keyword_sentence_mapping.keys()) == 0:
+            return final_output
+        else:
+            try:
+                generated_questions = generate_questions_mcq(keyword_sentence_mapping, self.tokenizer,
+                                                             self.model, self.s2v, self.normalized_levenshtein)
+
+            except:
+                return final_output
+            end = time.time()
+
+            final_output["statement"] = modified_text
+            final_output["questions"] = generated_questions["questions"]
+            final_output["time_taken"] = end - start
+
+            return final_output
+
+    def predict_shortq(self, payload):
+        payload = self.translator.translate(payload, src="bg").text
+        inp = {
+            "input_text": payload,
+            "max_questions": 20
+        }
+
+        text = inp['input_text']
+        sentences = tokenize_sentences(text)
+        joiner = " "
+        modified_text = joiner.join(sentences)
+
+        keywords = get_keywords(self.nlp, modified_text, inp['max_questions'], self.s2v, self.fdist,
+                                self.normalized_levenshtein, len(sentences))
+
+        keyword_sentence_mapping = get_sentences_for_keyword(keywords, sentences)
+
+        for k in keyword_sentence_mapping.keys():
+            text_snippet = " ".join(keyword_sentence_mapping[k][:3])
+            keyword_sentence_mapping[k] = text_snippet
+
+        final_output = {}
+
+        if len(keyword_sentence_mapping.keys()) == 0:
+            return final_output
+        else:
+
+            generated_questions = generate_normal_questions(keyword_sentence_mapping, self.tokenizer,
+                                                            self.model)
         q_out = []
-        for q in questions:
-            q_out.append("|".join(q))
+        for q in generated_questions["questions"]:
+            ans = self.answerer(question=q["Question"], context=payload)
+            q_out.append(self.translator.translate(q["Question"], dest="bg").text + "|" + self.translator.translate(ans["answer"], dest="bg").text)
         qi = "&".join(q_out)
         r = [str(ord(q)) for q in qi]
         return "*".join(r)
 
-import sys
-model = BgQuestion()
-model.eval()
-r = model("".join(sys.argv[1]))
-print(r)
+    def paraphrase(self, payload):
+        inp = {
+            "input_text": payload.get("input_text"),
+            "max_questions": payload.get("max_questions", 3)
+        }
+
+        text = inp['input_text']
+        num = inp['max_questions']
+
+        self.sentence = text
+        self.text = "paraphrase: " + self.sentence + " </s>"
+
+        encoding = self.tokenizer.encode_plus(self.text, pad_to_max_length=True, return_tensors="pt")
+        input_ids, attention_masks = encoding["input_ids"], encoding["attention_mask"]
+
+        beam_outputs = self.model.generate(
+            input_ids=input_ids,
+            attention_mask=attention_masks,
+            max_length=50,
+            num_beams=50,
+            num_return_sequences=num,
+            no_repeat_ngram_size=2,
+            early_stopping=True
+        )
+        final_outputs = []
+        for beam_output in beam_outputs:
+            sent = self.tokenizer.decode(beam_output, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+            if sent.lower() != self.sentence.lower() and sent not in final_outputs:
+                final_outputs.append(sent)
+
+        output = {}
+        output['Question'] = text
+        output['Count'] = num
+        output['Paraphrased Questions'] = final_outputs
+
+        return output
+
+
+q = QGen()
+text = "".join(sys.argv[1])
+res = q.predict_shortq(text)
+print(res)

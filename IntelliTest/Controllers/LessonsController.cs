@@ -2,8 +2,6 @@
 using IntelliTest.Core.Models.Lessons;
 using IntelliTest.Core.Services;
 using IntelliTest.Infrastructure;
-using IntelliTest.Models.Tests;
-using IntelliTest.Services.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Differencing;

@@ -16,6 +16,8 @@ namespace IntelliTest.Data.Entities
         [Required]
         [ForeignKey(nameof(User))]
         public string UserId { get; set; }
+
+        public string School { get; set; }
         public IEnumerable<Class> Classes { get; set; }
         public IEnumerable<Test> Tests { get; set; }
         public IEnumerable<Lesson> Lessons { get; set; }

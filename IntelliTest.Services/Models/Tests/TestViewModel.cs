@@ -1,7 +1,8 @@
-﻿using IntelliTest.Data.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using IntelliTest.Data.Entities;
+using IntelliTest.Data.Enums;
 
-namespace IntelliTest.Models.Tests
+namespace IntelliTest.Core.Models.Tests
 {
     public class TestViewModel
     {
@@ -12,9 +13,8 @@ namespace IntelliTest.Models.Tests
         [Display(Name = "Заглавие")]
         public string Title { get; set; }
         [Required]
-        [StringLength(30, MinimumLength = 5)]
         [Display(Name = "Предмет")]
-        public string Subject { get; set; }
+        public Subject Subject { get; set; }
         [Required]
         [Range(1, 12)]
         [Display(Name = "Клас")]
