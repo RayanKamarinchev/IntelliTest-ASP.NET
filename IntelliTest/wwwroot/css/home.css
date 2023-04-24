@@ -363,3 +363,179 @@ body {
     padding-right: 5px;
     padding-left: 5px;
 }
+
+.friend-list .friend-card {
+    border-radius: 4px;
+    border-bottom: 1px solid #f1f2f2;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.friend-list .friend-card .card-info {
+    padding: 0 20px 10px;
+}
+
+.friend-list .friend-card .card-info img.profile-photo-lg {
+    margin-top: -60px;
+    border: 7px solid #fff;
+}
+
+img.profile-photo-lg {
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+}
+
+.text-green {
+    color: #8dc63f;
+}
+
+.uploader {
+    display: block;
+    clear: both;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+
+    .uploader label {
+        float: left;
+        clear: both;
+        width: 100%;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        background: #fff;
+        border-radius: 7px;
+        border: 3px solid #eee;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+        .uploader label:hover {
+            border-color: #4797f2;
+        }
+
+        .uploader label.hover {
+            border: 3px solid #4797f2;
+            box-shadow: inset 0 0 0 6px #eee;
+        }
+
+            .uploader label.hover #start i.fa {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+
+    .uploader #start {
+        float: left;
+        clear: both;
+        width: 100%;
+    }
+
+        .uploader #start.hidden {
+            display: none;
+        }
+
+        .uploader #start i.fa {
+            font-size: 50px;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+    .uploader #response {
+        float: left;
+        clear: both;
+        width: 100%;
+    }
+
+        .uploader #response.hidden {
+            display: none;
+        }
+
+        .uploader #response #messages {
+            margin-bottom: 0.5rem;
+        }
+
+    .uploader #file-image {
+        display: inline;
+        margin: 0 auto 0.5rem auto;
+        width: auto;
+        height: auto;
+        max-width: 180px;
+    }
+
+        .uploader #file-image.hidden {
+            display: none;
+        }
+
+    .uploader #notimage {
+        display: block;
+        float: left;
+        clear: both;
+        width: 100%;
+    }
+
+        .uploader #notimage.hidden {
+            display: none;
+        }
+
+    .uploader progress, .uploader .progress {
+        display: inline;
+        clear: both;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 180px;
+        height: 8px;
+        border: 0;
+        border-radius: 4px;
+        background-color: #eee;
+        overflow: hidden;
+    }
+
+        .uploader .progress[value]::-webkit-progress-bar {
+            border-radius: 4px;
+            background-color: #eee;
+        }
+
+        .uploader .progress[value]::-webkit-progress-value {
+            background: linear-gradient(to right, #36afff 0%,#4797f2 50%);
+            border-radius: 4px;
+        }
+
+        .uploader .progress[value]::-moz-progress-bar {
+            background: linear-gradient(to right, #36afff 0%, #4797f2 50%);
+            border-radius: 4px;
+        }
+
+    .uploader input[type="file"] {
+        display: none;
+    }
+
+    .uploader div {
+        margin: 0 0 0.5rem 0;
+        color: #4797f2;
+    }
+
+    .uploader .btn {
+        display: inline-block;
+        margin: 0.5rem 0.5rem 1rem 0.5rem;
+        clear: both;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        text-transform: initial;
+        border: none;
+        border-radius: 0.2rem;
+        outline: none;
+        padding: 0 1rem;
+        height: 36px;
+        line-height: 36px;
+        color: #fff;
+        transition: all 0.2s ease-in-out;
+        box-sizing: border-box;
+        background: #4797f2;
+        border-color: #4797f2;
+        cursor: pointer;
+    }
+ 

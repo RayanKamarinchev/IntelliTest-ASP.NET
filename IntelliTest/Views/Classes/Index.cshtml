@@ -70,17 +70,20 @@
                     <a class="floating-button" asp-action="Create">+</a>
                 </div>
         }
-        <section class="cd-gallery">
+        <section>
             <ul style="width: 100%">
                 @foreach (var classView in Model)  
                 {
                     <partial name="ClassPartialView" model="classView"/>
                 }
             </ul>
-            <div class="cd-fail-message">Няма резултати</div>
         </section>
     </main>
 </div>
+            @if (Model.Count() == 0)
+            {
+                <div class="cd-fail-message">Няма резултати</div>
+            }
 @section Scripts
 {
          <script >

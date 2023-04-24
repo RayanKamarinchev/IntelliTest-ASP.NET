@@ -6,7 +6,7 @@
 @model ClassViewModel
 <div class="row">
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
-        <form method="post">
+        <form method="post"  enctype="multipart/form-data">
             <div class="form-group">
                 <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" placeholder="Заглавие...">
@@ -28,20 +28,32 @@
                 <textarea style="margin-left: 0" asp-for="Description" rows="4" class="form-control" placeholder="Описание..."></textarea>
                 <span asp-validation-for="Description" class="small text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Subject"></label>
-                <select asp-for="Subject" class="form-control">
-                    @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
-                    {
-                        string name = Enum.GetName(typeof(Subject), subjectValue);
-                        <option value="@subjectValue">@name</option>
-                    }
-                </select>
-                <span asp-validation-for="Subject" class="small text-danger"></span>
+            <label asp-for="Image"></label>
+            <div class="form-group uploader">
+                <input id="file-upload" onchange="console.log('herE')" type="file" accept="image/*" asp-for="Image"/>
+
+                <label for="file-upload" id="file-drag" ondrop="console.log('herE')">
+                    <img id="file-image" src="#" alt="Preview" class="hidden">
+                    <div id="start">
+                        <i class="fa fa-download" aria-hidden="true"></i>
+                        <div>Select a file or drag here</div>
+                        <div id="notimage" class="hidden">Please select an image</div>
+                        <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+                    </div>
+                    <div id="response" class="hidden">
+                        <div id="messages"></div>
+                    </div>
+                </label>
             </div>
-            <div class="text-center">
-                <button class="btn btn-primary mt-3" type="submit" value="Save">Продължи</button>
+            <br/>
+            <div class="text-center" style="margin-bottom: 50px">
+                <button style="margin-top: 200px;" class="btn btn-primary mt-3" type="submit" value="Save">Продължи</button>
             </div>
         </form>
     </div>
 </div>
+
+@section Scripts
+{
+    <script src="~/js/dragNdrop.js"></script>
+}

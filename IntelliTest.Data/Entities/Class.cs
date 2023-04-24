@@ -21,6 +21,7 @@ namespace IntelliTest.Data.Entities
         public string Description { get; set; }
         public bool IsDeleted { get; set; }
         public Subject Subject { get; set; }
+        public string ImageUrl { get; set; }
         public IEnumerable<ClassTest> ClassTests { get; set; }
         public IEnumerable<StudentClass> Students { get; set; }
     }

@@ -27,11 +27,14 @@
                     <partial name="TestPartialView" for="@test"/>
                 }
             </ul>
-            <div class="cd-fail-message">Няма резултати</div>
         </section>
         <partial model="Model.Filters" name="FilterMenuPartialView"/>
     </main>
 </div>
+            @if (Model.Items.Count() == 0)
+            {
+                    <div class="cd-fail-message">Няма резултати</div>
+            }
 @section Scripts
 {
     <script src="~/js/filter.js"></script>

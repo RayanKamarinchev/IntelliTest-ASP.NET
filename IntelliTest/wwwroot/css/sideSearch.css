@@ -247,12 +247,15 @@ xgallery
   display: block;
   width: 100%;
 }
-.cd-gallery .cd-fail-message {
-  display: none;
-  text-align: center;
+.cd-fail-message {
+    position: absolute;
+    left: calc(50% - 145px);
+    top: 50vh;
+    font-size: 2rem;
+    text-align: center;
 }
 @media only screen and (min-width: 768px) {
-  .cd-gallery {
+    .cd-gallery {
     padding: 40px 3%;
   }
     .cd-gallery ul {

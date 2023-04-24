@@ -34,7 +34,9 @@ namespace IntelliTest.Core.Services
                                         FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
                                         Id = c.TeacherId,
                                         School = c.Teacher.School
-                                    }
+                                    },
+                                    ImageUrl = c.ImageUrl,
+                                    Subject = c.Subject
                                 }).ToListAsync();
         }
 
@@ -45,7 +47,8 @@ namespace IntelliTest.Core.Services
                 Description = model.Description,
                 Name = model.Name,
                 TeacherId = model.Teacher.Id,
-                Subject = model.Subject
+                Subject = model.Subject,
+                ImageUrl = model.ImageUrl
             };
             await context.Classes.AddAsync(dbClass);
             await context.SaveChangesAsync();
