@@ -11,5 +11,6 @@ namespace IntelliTest.Core.Models.Tests
     {
         public List<ClosedQuestionReviewViewModel> ClosedQuestions { get; set; }
         public List<OpenQuestionReviewViewModel> OpenQuestions { get; set; }
+        public decimal Score { get; set; }
     }
 }

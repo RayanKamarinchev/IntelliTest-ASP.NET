@@ -4,19 +4,19 @@
 @model IEnumerable<TestResultsViewModel>
 @inject IStudentService studentService
 @{
-    string GetGrade(Grade mark)
+    string GetGrade(Mark mark)
     {
         switch (mark)
         {
-            case Grade.Poor:
+            case Mark.Poor:
                 return "Слаб 2";
-            case Grade.Average:
+            case Mark.Average:
                 return "Среден 3";
-            case Grade.Good:
+            case Mark.Good:
                 return "Добър 4";
-            case Grade.Great:
+            case Mark.Great:
                 return "Мн. Добър 5";
-            case Grade.Excellent:
+            case Mark.Excellent:
                 return "Отличен 6";
             default:
                 return "Неоценен";

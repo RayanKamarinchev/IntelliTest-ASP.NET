@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Data.Enums
 {
-    public enum Grade
+    public enum Mark
     {
-        Excellent, Great, Good, Average, Poor
+        Unmarked, Excellent, Great, Good, Average, Poor
     }
 }

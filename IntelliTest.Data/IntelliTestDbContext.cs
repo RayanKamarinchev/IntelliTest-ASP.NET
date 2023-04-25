@@ -48,7 +48,7 @@ namespace IntelliTest.Data
 
             //FirstStudent = new Student()
             //{
-            //    Grade = 8,
+            //    Mark = 8,
             //    Grades = "6&5",
             //    School = "PPMG Dobri Chintulov",
             //    UserId = "4fb46fcc-ad1d-4120-835d-d351849efc73",
@@ -117,7 +117,7 @@ namespace IntelliTest.Data
             //    Title = "Електромагнитни вълни",
             //    CreatedOn = new DateTime(2023, 2, 26, 19, 53, 6, 58, DateTimeKind.Local).AddTicks(7307),
             //    Description = "Просто тест",
-            //    Grade = 10,
+            //    Mark = 10,
             //    IsDeleted = false,
             //    School = "ППМГ Добри Чинтулов",
             //    Subject = "Физика",
@@ -155,6 +155,7 @@ namespace IntelliTest.Data
         public DbSet<TestResult> TestResults { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<ClassTest> ClassTests { get; set; }
 
     }
 }

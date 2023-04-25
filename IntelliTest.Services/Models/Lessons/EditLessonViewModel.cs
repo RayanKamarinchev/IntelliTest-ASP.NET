@@ -17,7 +17,7 @@ namespace IntelliTest.Core.Models.Lessons
         public string Content { get; set; }
 
         public string HtmlContent { get; set; }
-        [Range(1,12, ErrorMessage = "Grade between 1 to 12")]
+        [Range(1,12, ErrorMessage = "Mark between 1 to 12")]
         public int Grade { get; set; }
         public string Subject { get; set; }
         public string School { get; set; }

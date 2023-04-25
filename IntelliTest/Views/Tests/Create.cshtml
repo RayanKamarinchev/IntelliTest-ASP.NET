@@ -8,6 +8,36 @@
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
         <form method="post">
             <div class="form-group">
+                <label asp-for="PublicityLevel"></label>
+                <select asp-for="PublicityLevel" class="form-control" id="publicSelect">
+                    <option value="0">Публичен</option>
+                    <option value="1">Само за учители</option>
+                    <option value="2">Хора с линк</option>
+                    <option value="3">За моя клас</option>
+                    <option value="4">Скрит</option>
+                </select>
+                <span asp-validation-for="PublicityLevel" class="small text-danger"></span>
+            </div>
+            <div class="form-group" style="margin-top: 25px; margin-bottom: 25px; display: none" id="classSelect">
+                <div class="select-btn">
+                    <span class="btn-text">Избери класове</span>
+                </div>
+
+                <ul class="list-items" style="position: absolute; width: calc(50% - 16px)">
+                    @for (int i = 0; i < ((List<string>)TempData.Peek("Classes")).Count(); i++)
+                    {
+                        <li class="item">
+                            <span class="checkbox">
+                                <i class="fa-solid fa-check check-icon"></i>
+                                <input type="checkbox" asp-for="Selected[i]" style="display: none"/>
+                            </span>
+                            <span class="item-text">@(((List<string>)TempData.Peek("Classes"))[i])</span>
+                        </li>
+                    }
+                </ul>
+                <span asp-validation-for="Subject" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Title"></label>
                 <input asp-for="Title" class="form-control" placeholder="Заглавие...">
                 <span asp-validation-for="Title" class="small text-danger"></span>
@@ -54,3 +84,4 @@
         </form>
     </div>
 </div>
+<script src="~/js/testCreate.js"></script>

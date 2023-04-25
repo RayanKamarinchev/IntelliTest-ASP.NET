@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Създай Курс";
+    ViewBag.Title = "Редактирай Курс";
 }
 @using IntelliTest.Data.Enums
 @using Microsoft.AspNetCore.Mvc.TagHelpers
@@ -18,7 +18,7 @@
                     @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
                     {
                         string name = Enum.GetName(typeof(Subject), subjectValue);
-                            <option value="@subjectValue">@name</option>
+                        <option value="@subjectValue">@name</option>
                     }
                 </select>
                 <span asp-validation-for="Subject" class="small text-danger"></span>
@@ -30,7 +30,7 @@
             </div>
             <label asp-for="Image"></label>
             <div class="form-group uploader">
-                <input id="file-upload" onchange="console.log('herE')" type="file" accept="image/*" asp-for="Image"/>
+                <input id="file-upload" type="file" accept="image/*" asp-for="Image"/>
 
                 <label for="file-upload" id="file-drag" ondrop="console.log('herE')">
                     <img id="file-image" src="#" alt="Preview" class="hidden">
@@ -50,10 +50,28 @@
                 <button style="margin-top: 200px;" class="btn btn-primary" type="submit" value="Save">Продължи</button>
             </div>
         </form>
+        <form asp-action="Delete" method="post">
+            <a class="btn btn-danger">Изтрий</a>
+        </form>
     </div>
 </div>
 
 @section Scripts
 {
-    <script src="~/js/dragNdrop.js"></script>
+    <script>
+        Swal.fire({
+            title: 'Сигурен ли си че искаш да изтриеш курсът?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Да',
+            cancelButtonText: 'Не'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `Delete/${@Model.Id}`;
+            }
+        })
+    </script>
+        <script src="~/js/dragNdrop.js"></script>
 }

@@ -32,14 +32,17 @@ namespace IntelliTest.Controllers
         private readonly IStudentService studentService;
         private readonly ITeacherService teacherService;
         private readonly ILessonService lessonService;
+        private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService, ITeacherService _teacherService, ILessonService _lessonService)
+        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService,
+                               ITeacherService _teacherService, ILessonService _lessonService, IClassService _classService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             teacherService = _teacherService;
             lessonService = _lessonService;
+            classService = _classService;
         }
 
         [HttpGet]
@@ -323,8 +326,10 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            TempData["Classes"] = (await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher()))
+                                  .Select(c => c.Name).ToList();
             return View("Create", new TestViewModel());
         }
 
@@ -336,7 +341,9 @@ namespace IntelliTest.Controllers
                 return View(model);
             }
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
-            Guid id = await testService.Create(model, teacherId);
+            string[] allClasses = (string[])TempData["Classes"];
+            string[] classNames = allClasses.Where((c, i) => model.Selected[i]).ToArray();
+            Guid id = await testService.Create(model, teacherId, classNames);
             return RedirectToAction("Edit", new {id = id});
         }
 

@@ -14,7 +14,7 @@ namespace IntelliTest.Core.Models.Tests
         public string Title { get; set; }
         public string Description { get; set; }
         public int Grade { get; set; }
-        public Grade Mark { get; set; }
+        public Mark Mark { get; set; }
         public Guid StudentId { get; set; }
         public decimal Score { get; set; }
     }

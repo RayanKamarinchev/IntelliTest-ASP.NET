@@ -20,24 +20,66 @@ namespace IntelliTest.Core.Services
         {
             context = _context;
         }
-        public async Task<IEnumerable<ClassViewModel>> GetAll()
+        public async Task<IEnumerable<ClassViewModel>> GetAll(string userId, bool isStudent, bool isTeacher)
         {
-            return await context.Classes
-                                .Where(c => !c.IsDeleted)
-                                .Select(c => new ClassViewModel()
-                                {
-                                    Description = c.Description,
-                                    Name = c.Name,
-                                    Id = c.Id,
-                                    Teacher = new TeacherViewModel()
-                                    {
-                                        FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
-                                        Id = c.TeacherId,
-                                        School = c.Teacher.School
-                                    },
-                                    ImageUrl = c.ImageUrl,
-                                    Subject = c.Subject
-                                }).ToListAsync();
+            var query = context.Classes
+                               .Include(c=>c.Students)
+                               .Include(c=>c.Teacher)
+                               .Where(c => !c.IsDeleted);
+            if (isStudent)
+            {
+                query = query.Where(c => c.Students.Any(s => s.Student.UserId == userId));
+            }
+
+            if (isTeacher)
+            {
+                query = query.Where(c => c.Teacher.UserId == userId);
+            }
+
+            return await query.Select(c => new ClassViewModel()
+            {
+                Description = c.Description,
+                Name = c.Name,
+                Id = c.Id,
+                Teacher = new TeacherViewModel()
+                {
+                    FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
+                    Id = c.TeacherId,
+                    School = c.Teacher.School
+                },
+                ImageUrl = c.ImageUrl,
+                Subject = c.Subject
+            }).ToListAsync();
+        }
+
+        public async Task<ClassViewModel?> GetById(Guid id)
+        {
+            var c = await context.Classes
+                                 .Include(c=>c.Teacher)
+                                 .ThenInclude(t=>t.User)
+                                 .FirstOrDefaultAsync(c=>c.Id == id);
+            return new ClassViewModel()
+            {
+                Description = c.Description,
+                Name = c.Name,
+                Id = c.Id,
+                Teacher = new TeacherViewModel()
+                {
+                    FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
+                    Id = c.TeacherId,
+                    School = c.Teacher.School
+                },
+                ImageUrl = c.ImageUrl,
+                Subject = c.Subject
+            };
+        }
+
+        public async Task<bool> IsClassOwner(Guid id, string userId)
+        {
+            var c = await context.Classes
+                                 .Include(c=>c.Teacher)
+                                 .FirstOrDefaultAsync(c=>c.Id==id);
+            return c.Teacher.UserId == userId;
         }
 
         public async Task Create(ClassViewModel model)
@@ -52,6 +94,54 @@ namespace IntelliTest.Core.Services
             };
             await context.Classes.AddAsync(dbClass);
             await context.SaveChangesAsync();
+        }
+
+        public async Task Edit(ClassViewModel model, Guid id)
+        {
+            var c = await context.Classes.FindAsync(id);
+            c.Description = model.Description;
+            c.Name = model.Name;
+            c.Subject = model.Subject;
+            await context.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id)
+        {
+            var c = await context.Classes.FindAsync(id);
+            context.Classes.Remove(c);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<List<StudentViewModel>> getClassStudents(Guid id)
+        {
+            var clasDb = await context.Classes
+                                      .Include(c => c.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .ThenInclude(s => s.User)
+                                      .FirstOrDefaultAsync(c => c.Id == id);
+            return clasDb.Students.Select(s => new StudentViewModel()
+            {
+                Name = s.Student.User.FirstName + " " + s.Student.User.LastName
+            }).ToList();
+        }
+
+        public async Task<bool> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher)
+        {
+            if (isStudent)
+            {
+                var clasDb = await context.Classes
+                                    .Include(c => c.Students)
+                                    .ThenInclude(s=>s.Student)
+                                    .FirstOrDefaultAsync(c => c.Id == classId);
+                return clasDb.Students.Any(s => s.Student.UserId == userId);
+            }
+
+            if (isTeacher)
+            {
+                return await IsClassOwner(classId, userId);
+            }
+            //if admin in future
+            return true;
         }
     }
 }

@@ -22,8 +22,6 @@ namespace IntelliTest.Data.Entities
         [StringLength(50)]
         public string School { get; set; }
         [Required]
-        public decimal AverageScore { get; set; }
-        [Required]
         public int Time { get; set; }
         [Required]
         [DataType(DataType.DateTime)]
@@ -39,7 +37,7 @@ namespace IntelliTest.Data.Entities
         public Teacher Creator { get; set; }
         [ForeignKey(nameof(Creator))]
         public Guid CreatorId { get; set; }
-        public IEnumerable<ClassTest> ClassesWithAccess { get; set; }
+        public List<ClassTest> ClassesWithAccess { get; set; }
         public PublicityLevel PublicyLevel { get; set; }
 
         public IEnumerable<TestLike> TestLikes { get; set; }

@@ -60,7 +60,7 @@ namespace IntelliTest.Core.Services
                              Title = t.Test.Title,
                              Description = t.Test.Description,
                              Grade = t.Test.Grade,
-                             Mark = t.Grade,
+                             Mark = t.Mark,
                              Score = t.Score,
                              TestId = t.TestId
                          }).ToListAsync();

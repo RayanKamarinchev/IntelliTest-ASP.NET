@@ -4,12 +4,8 @@ using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IntelliTest.Core.Services
 {
@@ -56,14 +52,14 @@ namespace IntelliTest.Core.Services
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
-                testQuery = testQuery.OrderBy(t => t.AverageScore);
+                testQuery = testQuery.OrderBy(t => t.TestResults.Average(r=>r.Score));
             }
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
                                 .Select(t => new TestViewModel()
                                 {
-                                    AverageScore = t.AverageScore,
+                                    AverageScore = Math.Round(t.TestResults.Count()==0 ? 0 : t.TestResults.Average(r => r.Score),2),
                                     ClosedQuestions = t.ClosedQuestions,
                                     CreatedOn = t.CreatedOn,
                                     Description = t.Description,
@@ -84,7 +80,8 @@ namespace IntelliTest.Core.Services
 
         public async Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query)
         {
-            var testQuery = context.Tests.Where(t => !t.IsDeleted
+            var testQuery = context.Tests.Include(t=>t.TestResults)
+                                   .Where(t => !t.IsDeleted
                                                   && (t.PublicyLevel == PublicityLevel.Public ||
                                                       (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)));
             return await Filter(testQuery, query);
@@ -92,7 +89,9 @@ namespace IntelliTest.Core.Services
 
         public async Task<QueryModel<TestViewModel>> GetMy(Guid teacherId, QueryModel<TestViewModel> query)
         {
-            var testQuery = context.Tests.Where(t => !t.IsDeleted
+            var testQuery = context.Tests
+                                   .Include(t => t.TestResults)
+                                   .Where(t => !t.IsDeleted
                                                   && t.CreatorId == teacherId);
             return await Filter(testQuery, query);
         }
@@ -102,10 +101,11 @@ namespace IntelliTest.Core.Services
             var t = await context.Tests
                                  .Include(t=>t.OpenQuestions)
                                  .Include(t=>t.ClosedQuestions)
+                                 .Include(t=>t.TestResults)
                                  .FirstOrDefaultAsync(t=>t.Id == id);
             return new TestViewModel()
             {
-                AverageScore = t.AverageScore,
+                AverageScore = Math.Round(t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score), 2),
                 ClosedQuestions = t.ClosedQuestions,
                 CreatedOn = t.CreatedOn,
                 Description = t.Description,
@@ -331,7 +331,8 @@ namespace IntelliTest.Core.Services
             return new TestReviewViewModel()
             {
                 OpenQuestions = openQuestions,
-                ClosedQuestions = closedQuestions
+                ClosedQuestions = closedQuestions,
+                Score = closedQuestions.Sum(q => q.Score) + openQuestions.Sum(q => q.Score)
             };
         }
 
@@ -365,16 +366,16 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
             
             var review = await TestResults(testId, studentId);
-            decimal socre = review.ClosedQuestions.Sum(q => q.Score) + review.OpenQuestions.Sum(q => q.Score);
 
             await context.TestResults.AddAsync(new TestResult()
             {
-                Grade = 0,
-                Score = socre,
+                Mark = Mark.Unmarked,
+                Score = review.Score,
                 StudentId = studentId,
                 TestId = testId,
                 TakenOn = DateTime.Now
             });
+
         }
 
         public static bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
@@ -405,7 +406,7 @@ namespace IntelliTest.Core.Services
 
         public async Task<TestStatsViewModel> GetStatistics(Guid testId)
         {
-            var studentIds = GetStudentIds(testId);
+            var studentIds = GetExaminersIds(testId);
             List<TestReviewViewModel> res = new List<TestReviewViewModel>();
             foreach (var studentId in studentIds)
             {
@@ -413,6 +414,10 @@ namespace IntelliTest.Core.Services
             }
 
             TestStatsViewModel model = new TestStatsViewModel();
+            var test = await GetById(testId);
+            model.AverageScore = test.AverageScore;
+            model.Title = test.Title;
+            model.Examiners = test.Students;
 
             List<List<List<int>>> allClosedAnswers = new List<List<List<int>>>();
             res.ForEach(r =>
@@ -468,10 +473,11 @@ namespace IntelliTest.Core.Services
                 }
             }
 
+
             return model;
         }
 
-        public Guid[] GetStudentIds(Guid testId)
+        public Guid[] GetExaminersIds(Guid testId)
         {
             return context.OpenQuestionAnswers
                           .Where(q => q.Question.TestId == testId)
@@ -503,7 +509,7 @@ namespace IntelliTest.Core.Services
             return await Filter(testsQuery, query);
         }
 
-        public async Task<Guid> Create(TestViewModel model, Guid teacherId)
+        public async Task<Guid> Create(TestViewModel model, Guid teacherId, string[] classNames)
         {
             Test test = new Test()
             {
@@ -518,7 +524,13 @@ namespace IntelliTest.Core.Services
                 OpenQuestions = new List<OpenQuestion>(),
                 ClosedQuestions = new List<ClosedQuestion>()
             };
+            var classes = await context.Classes.Where(c => classNames.Contains(c.Name)).ToListAsync();
             var e = await context.Tests.AddAsync(test);
+            await context.ClassTests.AddRangeAsync(classes.Select(c => new ClassTest()
+            {
+                Class = c,
+                Test = test
+            }));
             await context.SaveChangesAsync();
             return e.Entity.Id;
         }
@@ -564,6 +576,26 @@ namespace IntelliTest.Core.Services
             var test = await context.Tests.FindAsync(id);
             test.IsDeleted = true;
             await context.SaveChangesAsync();
+        }
+
+        public async Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId)
+        {
+            Class? classDb = await context.Classes
+                                       .Include(c=>c.ClassTests)
+                                       .FirstOrDefaultAsync(c => c.Id == classId);
+            if (classDb == null)
+            {
+                return null;
+            }
+
+            var res = classDb.ClassTests.Select(async (ct) => await GetStatistics(ct.TestId));
+            List<TestStatsViewModel> model = new List<TestStatsViewModel>();
+            foreach (var test in res)
+            {
+                model.Add(await test);
+            }
+
+            return model;
         }
     }
 }

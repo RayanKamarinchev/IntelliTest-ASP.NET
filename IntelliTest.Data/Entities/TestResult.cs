@@ -11,7 +11,7 @@ namespace IntelliTest.Data.Entities
         [ForeignKey(nameof(Student))]
         public Guid StudentId { get; set; }
         public Student Student { get; set; }
-        public Grade Grade { get; set; }
+        public Mark Mark { get; set; }
         public decimal Score { get; set; }
         public DateTime TakenOn { get; set; }
     }

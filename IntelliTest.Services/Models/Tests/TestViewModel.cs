@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using IntelliTest.Core.Models.Classes;
 using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 
@@ -20,6 +21,9 @@ namespace IntelliTest.Core.Models.Tests
         [Display(Name = "Клас")]
         public int Grade { get; set; }
         [Required]
+        [Display(Name = "Публичност")]
+        public PublicityLevel PublicityLevel { get; set; }
+        [Required]
         [StringLength(1000)]
         [Display(Name = "Описание")]
         public string Description { get; set; }
@@ -35,6 +39,7 @@ namespace IntelliTest.Core.Models.Tests
         public DateTime CreatedOn { get; set; }
         public IList<OpenQuestion>? OpenQuestions { get; set; }
         public IList<ClosedQuestion>? ClosedQuestions { get; set; }
+        public IList<bool> Selected { get; set; }
         public bool MultiSubmit { get; set; }
     }
 }

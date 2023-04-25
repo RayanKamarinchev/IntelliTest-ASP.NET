@@ -15,5 +15,7 @@ namespace IntelliTest.Core.Models.Tests
         public List<OpenQuestionStatsViewModel> OpenQuestions { get; set; } =
             new List<OpenQuestionStatsViewModel>();
         public string Title { get; set; }
+        public decimal AverageScore { get; set; }
+        public int Examiners { get; set; }
     }
 }

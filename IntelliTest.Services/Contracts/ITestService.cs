@@ -21,13 +21,14 @@ namespace IntelliTest.Core.Contracts
                            List<ClosedQuestionAnswerViewModel> closedQuestions,
                            Guid studentId,
                            Guid testId);
-        Guid[] GetStudentIds(Guid testId);
+        Guid[] GetExaminersIds(Guid testId);
         Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query);
-        Task<Guid> Create(TestViewModel model, Guid teacherId);
+        Task<Guid> Create(TestViewModel model, Guid teacherId, string[] classNames);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
 
         decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
         public Task<bool> StudentHasAccess(Guid testId, Guid studentId);
         public Task DeleteTest(Guid id);
+        public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
     }
 }
