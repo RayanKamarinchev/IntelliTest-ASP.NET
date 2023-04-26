@@ -18,5 +18,7 @@ namespace IntelliTest.Core.Contracts
         Task Delete(Guid id);
         Task<List<StudentViewModel>> getClassStudents(Guid id);
         Task<bool> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher);
+        Task<bool> RemoveStudent(Guid studentId, Guid id);
+        Task<bool> AddStudent(Guid studentId, Guid id);
     }
 }

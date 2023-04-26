@@ -10,6 +10,7 @@ namespace IntelliTest.Core.Models.Classes
 {
     public class ClassDetailsModel
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<StudentViewModel> Students { get; set; }

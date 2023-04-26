@@ -1,4 +1,5 @@
-﻿@model ClassViewModel
+﻿@using IntelliTest.Infrastructure
+@model ClassViewModel
 <a asp-action="Details" asp-route-id="@Model.Id">
     <div class="col-md-12 col-sm-6 friend-list">
         <div class="friend-card">
@@ -7,7 +8,10 @@
             <div class="card-info" style="width: 400px; background-color: white">
                 <img style="max-width: None" src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="user" class="profile-photo-lg">
                 <div class="friend-info">
-                    <a class="pull-right btn btn-secondary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                    @if (User.IsTeacher())
+                    {
+                            <a class="pull-right btn btn-secondary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                    }
                     <h5>@Model.Name</h5>
                     <p>@Model.Subject</p>
                 </div>

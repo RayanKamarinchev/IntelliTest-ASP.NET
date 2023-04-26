@@ -23,6 +23,6 @@ namespace IntelliTest.Data.Entities
         public Subject Subject { get; set; }
         public string ImageUrl { get; set; }
         public IEnumerable<ClassTest> ClassTests { get; set; }
-        public IEnumerable<StudentClass> Students { get; set; }
+        public List<StudentClass> Students { get; set; }
     }
 }

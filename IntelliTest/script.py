@@ -1,23 +1,26 @@
 # coding=utf8
 import datetime
 import sys
-
 date = datetime.datetime.now()
 from torch import no_grad
 from googletrans import Translator
 from transformers import T5ForConditionalGeneration, T5Tokenizer, pipeline
-import random
-import spacy
+from random import choice
+from spacy import load
 from sense2vec import Sense2Vec
 from collections import OrderedDict
-import string
-import pke
-import numpy
+from string import punctuation
+from pke.unsupervised import MultipartiteRank
 from nltk import FreqDist
+# nltk.download('brown')
+# nltk.download('stopwords')
+# nltk.download('popular')
 from nltk.corpus import stopwords
 from nltk.corpus import brown
 from similarity.normalized_levenshtein import NormalizedLevenshtein
 from nltk.tokenize import sent_tokenize
+# from flashtext import KeywordProcessor
+# from Questgen.encoding.encoding import beam_search_decoding
 import time
 from flashtext import KeywordProcessor
 import re
@@ -36,7 +39,7 @@ def MCQs_available(word, s2v):
 
 def edits(word):
     "All edits that are one edit away from `word`."
-    letters = 'abcdefghijklmnopqrstuvwxyz ' + string.punctuation
+    letters = 'abcdefghijklmnopqrstuvwxyz ' + punctuation
     splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
     deletes = [L + R[1:] for L, R in splits if R]
     transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
@@ -48,7 +51,7 @@ def edits(word):
 def sense2vec_get_words(word, s2v):
     output = []
 
-    word_preprocessed = word.translate(word.maketrans("", "", string.punctuation))
+    word_preprocessed = word.translate(word.maketrans("", "", punctuation))
     word_preprocessed = word_preprocessed.lower()
 
     word_edits = edits(word_preprocessed)
@@ -64,7 +67,7 @@ def sense2vec_get_words(word, s2v):
         append_word = append_word.strip()
         append_word_processed = append_word.lower()
         append_word_processed = append_word_processed.translate(
-            append_word_processed.maketrans("", "", string.punctuation))
+            append_word_processed.maketrans("", "", punctuation))
         if append_word_processed not in compare_list and word_preprocessed not in append_word_processed and append_word_processed not in word_edits:
             output.append(append_word.title())
             compare_list.append(append_word_processed)
@@ -83,6 +86,7 @@ def get_options(answer, s2v):
             return distractors, "sense2vec"
     except:
         pass
+
     return distractors, "None"
 
 
@@ -147,10 +151,10 @@ def filter_phrases(phrase_keys, max, normalized_levenshtein):
 def get_nouns_multipartite(text):
     out = []
 
-    extractor = pke.unsupervised.MultipartiteRank()
+    extractor = MultipartiteRank()
     extractor.load_document(input=text, language='en')
     pos = {'PROPN', 'NOUN'}
-    stoplist = list(string.punctuation)
+    stoplist = list(punctuation)
     stoplist += stopwords.words('english')
     extractor.candidate_selection(pos=pos)
     # 4. build the Multipartite graph and rank candidates using random walk,
@@ -214,7 +218,6 @@ def get_keywords(nlp, text, max_keywords, s2v, fdist, normalized_levenshtein, no
     total_phrases_filtered = filter_phrases(total_phrases, min(max_keywords, 2 * no_of_sentences),
                                             normalized_levenshtein)
     total_phrases_filtered += datesText + nums
-
     answers = []
     for answer in total_phrases_filtered:
         if answer not in answers and MCQs_available(answer, s2v):
@@ -309,7 +312,7 @@ def generate_normal_questions(keyword_sent_mapping, tokenizer, model):  # for no
 
 
 def random_choice():
-    a = random.choice([0, 1])
+    a = choice([0, 1])
     return bool(a)
 
 
@@ -317,19 +320,16 @@ class QGen:
 
     def __init__(self):
         self.tokenizer = T5Tokenizer.from_pretrained('t5-base')
-        model = T5ForConditionalGeneration.from_pretrained('Parth/result')
+        #model = T5ForConditionalGeneration.from_pretrained('Parth/result')
+        model = T5ForConditionalGeneration.from_pretrained('mrm8488/t5-base-finetuned-question-generation-ap')
         # model.eval()
         self.model = model
-        self.nlp = spacy.load('en_core_web_sm')
+        self.nlp = load('en_core_web_sm')
         self.translator = Translator()
         self.s2v = Sense2Vec().from_disk("s2v_reddit_2015_md (1)/s2v_old")
         self.fdist = FreqDist(brown.words())
         self.normalized_levenshtein = NormalizedLevenshtein()
         self.answerer = pipeline("question-answering")
-        self.set_seed(42)
-
-    def set_seed(self, seed):
-        numpy.random.seed(seed)
 
     def predict_mcq(self, payload):
         start = time.time()
@@ -372,6 +372,7 @@ class QGen:
             return final_output
 
     def predict_shortq(self, payload):
+        #[payload]
         payload = self.translator.translate(payload, src="bg").text
         inp = {
             "input_text": payload,
@@ -385,25 +386,22 @@ class QGen:
 
         keywords = get_keywords(self.nlp, modified_text, inp['max_questions'], self.s2v, self.fdist,
                                 self.normalized_levenshtein, len(sentences))
-
         keyword_sentence_mapping = get_sentences_for_keyword(keywords, sentences)
-
         for k in keyword_sentence_mapping.keys():
             text_snippet = " ".join(keyword_sentence_mapping[k][:3])
             keyword_sentence_mapping[k] = text_snippet
 
         final_output = {}
-
         if len(keyword_sentence_mapping.keys()) == 0:
             return final_output
         else:
-
             generated_questions = generate_normal_questions(keyword_sentence_mapping, self.tokenizer,
                                                             self.model)
         q_out = []
         for q in generated_questions["questions"]:
             ans = self.answerer(question=q["Question"], context=payload)
-            q_out.append(self.translator.translate(q["Question"], dest="bg").text + "|" + self.translator.translate(ans["answer"], dest="bg").text)
+            q_out.append(self.translator.translate(q["Question"], dest="bg").text + "|" + self.translator.translate(
+                ans["answer"], dest="bg").text)
         qi = "&".join(q_out)
         r = [str(ord(q)) for q in qi]
         return "*".join(r)
@@ -443,10 +441,11 @@ class QGen:
         output['Count'] = num
         output['Paraphrased Questions'] = final_outputs
 
+
         return output
-
-
+date = datetime.datetime.now()
 q = QGen()
 text = "".join(sys.argv[1])
 res = q.predict_shortq(text)
+print(datetime.datetime.now() - date)
 print(res)

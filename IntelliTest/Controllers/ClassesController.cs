@@ -1,9 +1,11 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Classes;
 using IntelliTest.Core.Models.Users;
+using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace IntelliTest.Controllers
@@ -12,18 +14,21 @@ namespace IntelliTest.Controllers
     {
         private readonly IClassService classService;
         private readonly ITeacherService teacherService;
+        private readonly IStudentService studentService;
         private readonly ITestService testService;
         private readonly IDistributedCache cache;
         private readonly IWebHostEnvironment webHostEnvironment;
 
 
-        public ClassesController(IClassService _classService, IDistributedCache _cache, ITeacherService _teacherService, IWebHostEnvironment _webHostEnvironment, ITestService _testService)
+        public ClassesController(IClassService _classService, IDistributedCache _cache, ITeacherService _teacherService,
+                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService, IStudentService _studentService)
         {
             classService = _classService;
             cache = _cache;
             teacherService = _teacherService;
             webHostEnvironment = _webHostEnvironment;
             testService = _testService;
+            studentService = _studentService;
         }
         public async Task<IActionResult> Index()
         {
@@ -170,12 +175,82 @@ namespace IntelliTest.Controllers
 
             var students = await classService.getClassStudents(id);
             var classModel = await classService.GetById(id);
-            return View("ClassDetails", new ClassDetailsModel()
+            return View("Details", new ClassDetailsModel()
             {
                 Description = classModel.Description,
                 Name = classModel.Name,
                 Students = students,
-                Tests = tests
+                Tests = tests,
+                Id = id
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> RemoveStudent(Guid id,Guid studentId)
+        {
+            if (User.IsStudent())
+            {
+                return Unauthorized();
+            }
+            if (!await classService.IsClassOwner(id, User.Id()))
+            {
+                return NotFound();
+            }
+
+            bool success = await classService.RemoveStudent(studentId, id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return View("Details");
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddStudent(Guid id, Guid studentId)
+        {
+            if (User.IsStudent())
+            {
+                return Unauthorized();
+            }
+            if (!await classService.IsClassOwner(id, User.Id()))
+            {
+                return NotFound();
+            }
+
+            bool success = await classService.AddStudent(studentId, id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            return View("Details");
+        }
+        [HttpGet]
+        public IActionResult Join()
+        {
+            if (User.IsTeacher())
+            {
+                return Unauthorized();
+            }
+            return View();
+        }
+        [HttpPost]
+        //[Route("Join/{id}")]
+        public async Task<IActionResult> Join(JoinModel model)
+        {
+            if (User.IsTeacher())
+            {
+                return Unauthorized();
+            }
+
+            Guid studentId = await studentService.GetStudentId(User.Id());
+            bool success = await classService.AddStudent(studentId, model.Id);
+            if (!success)
+            {
+                ModelState.AddModelError("Id", "Курсът не е намерен");
+            }
+            return View( new JoinModel()
+            {
+                Id = model.Id
             });
         }
     }

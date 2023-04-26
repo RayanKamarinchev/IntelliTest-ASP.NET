@@ -81,24 +81,18 @@
                     </li>
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                            if (User.IsTeacher() || User.IsStudent())
-                        {
-                            <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-controller="Tests" asp-action="Index">Блог</a>
-                            </li>
-                            <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-controller="Lessons" asp-action="Index">Уроци</a>
-                            </li>
-                            <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-controller="Chat" asp-action="Index">Чат</a>
-                            </li>
-                        }
-                        if (User.IsTeacher())
-                        {
-                            <li class="nav-item align-items-center d-flex">
-                                <a class="nav-link text-dark" asp-controller="Classes" asp-action="Index">Класове</a>
-                            </li>
-                        }
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-controller="Tests" asp-action="Index">Тестове</a>
+                        </li>
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-controller="Lessons" asp-action="Index">Уроци</a>
+                        </li>
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-controller="Chat" asp-action="Index">Чат</a>
+                        </li>
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark" asp-controller="Classes" asp-action="Index">Класове</a>
+                        </li>
                     }
                 </ul>
                 <partial name="_LoginPartial"/>

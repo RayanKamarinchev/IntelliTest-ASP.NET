@@ -121,7 +121,12 @@ namespace IntelliTest.Core.Services
                                       .FirstOrDefaultAsync(c => c.Id == id);
             return clasDb.Students.Select(s => new StudentViewModel()
             {
-                Name = s.Student.User.FirstName + " " + s.Student.User.LastName
+                Name = s.Student.User.FirstName + " " + s.Student.User.LastName,
+                Email = s.Student.User.Email,
+                TestResults = s.Student.TestResults
+                               .Where(t=>clasDb.ClassTests.Any(ct=>ct.TestId == t.TestId))
+                               .Select(t=>t.Score)
+                               .ToList()
             }).ToList();
         }
 
@@ -141,6 +146,48 @@ namespace IntelliTest.Core.Services
                 return await IsClassOwner(classId, userId);
             }
             //if admin in future
+            return true;
+        }
+
+        public async Task<bool> RemoveStudent(Guid studentId, Guid id)
+        {
+            var clasDb = await context.Classes
+                                      .Include(c => c.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .FirstOrDefaultAsync(c => c.Id == id);
+            if (clasDb==null)
+            {
+                return false;
+            }
+
+            var student = clasDb.Students.FirstOrDefault(s => s.StudentId == studentId);
+            if (student == null)
+            {
+                return false;
+            }
+            return clasDb.Students.Remove(student);
+        }
+
+        public async Task<bool> AddStudent(Guid studentId, Guid id)
+        {
+            var clasDb = await context.Classes
+                                     .Include(c => c.Students)
+                                     .ThenInclude(s => s.Student)
+                                     .FirstOrDefaultAsync(c => c.Id == id);
+            if (clasDb == null)
+            {
+                return false;
+            }
+
+            if (!context.Students.Any(s=>s.Id==studentId))
+            {
+                return false;
+            }
+            
+            clasDb.Students.Add(new StudentClass()
+            {
+                StudentId = studentId
+            });
             return true;
         }
     }

@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = @Model.Name + " клас";
+}
+@model ClassDetailsModel
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Тестове</h3>
+            <div class="table-responsive">
+                <table class="table project-list-table table-nowrap align-middle table-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col">Заглавие</th>
+                        <th scope="col">Среден резултат</th>
+                        <th scope="col">Изпитници</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var test in Model.Tests)
+                    {
+                        <tr style="background-color: white">
+                            <td>@test.Title</td>
+                            <td>@test.AverageScore</td>
+                            <td>@test.Examiners</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <br/>
+            <h3>Ученици</h3>
+            <div class="table-responsive">
+                <table class="table project-list-table table-nowrap align-middle table-borderless">
+                        <thead>
+                            <tr>
+                                <th scope="col">Име</th>
+                                <th scope="col">Резултати</th>
+                                <th scope="col">Имейл</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var student in Model.Students)
+                            {
+                                <tr>
+                                    <td><img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="avatar-sm rounded-circle me-2"/><a href="#" class="text-body">Simon Ryles</a></td>
+                                    <td>@student.Name</td>
+                                                    <td>@string.Join(", ", student.TestResults) 34% 34% 34% 34% 34% 34% 34%</td>
+                                    <td>@student.Email</td>
+                                    <td>
+                                        <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a class="btn btn-danger" asp-action="RemoveStudent" asp-route-studentId="@student.Id" asp-route-id="@Model.Id">Remove</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+            </div>
+            <div class="text-center" style="margin-bottom: 50px">
+                <p>Код за курса: @Model.Id</p>
+                <button class="btn btn-primary" asp-action="AddStudent">Добави</button>
+            </div>
+        </div>
+    </div>
+</div>

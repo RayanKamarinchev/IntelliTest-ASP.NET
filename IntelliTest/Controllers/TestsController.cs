@@ -445,6 +445,7 @@ namespace IntelliTest.Controllers
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             string last = "";
+            DateTime dt = DateTime.Now;
             using (Process process = Process.Start(start))
             {
                 using (StreamReader reader = process.StandardOutput)
@@ -453,7 +454,7 @@ namespace IntelliTest.Controllers
                     last = result;
                 }
             }
-
+            DateTime end = DateTime.Now;
             string[] splitted = last.Split("*");
             string all = "";
             for (int i = 0; i < splitted.Length; i++)
