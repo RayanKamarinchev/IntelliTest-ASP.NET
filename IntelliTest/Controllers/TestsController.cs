@@ -59,6 +59,13 @@ namespace IntelliTest.Controllers
             }
             else
             {
+                ProcessStartInfo start = new ProcessStartInfo();
+                start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
+                start.Arguments = string.Format("{0}", "server.py");
+                start.UseShellExecute = false;
+                start.RedirectStandardOutput = true;
+                Process process = Process.Start(start);
+                process.Start();
                 if (currentPage==0)
                 {
                     currentPage = 1;
@@ -454,6 +461,8 @@ namespace IntelliTest.Controllers
                     last = result;
                 }
             }
+
+            last = last.Substring(2, last.Length-5);
             DateTime end = DateTime.Now;
             string[] splitted = last.Split("*");
             string all = "";
