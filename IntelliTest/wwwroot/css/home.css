@@ -806,3 +806,9 @@ a {
         width: 70%;
     }
 }
+
+.lessonSubmit {
+    display: flex;
+    align-self: center;
+    margin-left: 20px
+}

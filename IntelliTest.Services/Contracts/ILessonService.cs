@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Lessons;
 
 namespace IntelliTest.Core.Contracts
 {
     public interface ILessonService
     {
-        Task<IEnumerable<LessonViewModel>> GetAll();
+        Task<QueryModel<LessonViewModel>> GetAll(QueryModel<LessonViewModel> query);
         Task<LessonViewModel?>? GetById(Guid lessonId);
         Task<LessonViewModel?>? GetByName(string name);
         Task<bool> ExistsById(Guid lessonId);

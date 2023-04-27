@@ -663,3 +663,14 @@ body {
 .lessonEditor > h1 {
     font-size: 1.5rem;
 }
+
+.page-link:focus {
+    background-color: white;
+    box-shadow: none;
+}
+.page-link:hover {
+    background-color: #f7f7f7;
+}
+.page-link a {
+    font-size: 1.5rem
+}

@@ -1,7 +1,10 @@
 ﻿using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Lessons;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
+using IntelliTest.Data.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntelliTest.Core.Services
@@ -14,18 +17,47 @@ namespace IntelliTest.Core.Services
         {
             context = _context;
         }
-        public async Task<IEnumerable<LessonViewModel>> GetAll()
+
+        public async Task<QueryModel<LessonViewModel>> Filter(IQueryable<Lesson> lessonQuery,
+                                                              QueryModel<LessonViewModel> query)
         {
-            List<LessonViewModel> model = new List<LessonViewModel>();
-            var lessonsQuery = context.Lessons
-                                      .Include(l => l.LessonLikes)
-                                      .Include(l => l.ClosedQuestions)
-                                      .Include(l => l.OpenQuestions)
-                                      .Include(l => l.Reads)
-                                      .Include(l => l.Creator)
-                                      .ThenInclude(c => c.User)
-                                      .Where(l=>!l.IsPrivate);
-            foreach (var l in lessonsQuery)
+            if (query.Filters.Subject != Subject.Няма)
+            {
+                lessonQuery = lessonQuery.Where(l => l.Subject == query.Filters.Subject);
+            }
+
+            if (query.Filters.Grade >= 1 && query.Filters.Grade <= 12)
+            {
+                lessonQuery = lessonQuery.Where(t => t.Grade == query.Filters.Grade);
+            }
+
+            if (string.IsNullOrEmpty(query.Filters.SearchTerm) == false)
+            {
+                query.Filters.SearchTerm = $"%{query.Filters.SearchTerm.ToLower()}%";
+
+                lessonQuery = lessonQuery
+                    .Where(l => EF.Functions.Like(l.Title.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(l.School.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(l.Content.ToLower(), query.Filters.SearchTerm));
+            }
+
+            if (query.Filters.Sorting == Sorting.Likes)
+            {
+                lessonQuery = lessonQuery.OrderBy(l => l.LessonLikes.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Readers)
+            {
+                lessonQuery = lessonQuery.OrderBy(l => l.Reads.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.ReadingTime)
+            {
+                lessonQuery = lessonQuery.OrderBy(l => l.Content.Split().Length);
+            }
+
+            var lessonsDb = await lessonQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
+                                       .Take(query.ItemsPerPage).ToListAsync();
+            var lessons = new List<LessonViewModel>();
+            foreach (var l in lessonsDb)
             {
                 var n = l.LessonLikes;
                 int c = 0;
@@ -33,7 +65,8 @@ namespace IntelliTest.Core.Services
                 {
                     c = n.Count();
                 }
-                model.Add(new LessonViewModel()
+
+                lessons.Add(new LessonViewModel()
                 {
                     ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
                     OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
@@ -53,22 +86,39 @@ namespace IntelliTest.Core.Services
                 });
             }
 
-            return model;
+            query.Items = lessons;
+            query.TotalItemsCount = lessons.Count;
+            return query;
+        }
+
+        public async Task<QueryModel<LessonViewModel>> GetAll(QueryModel<LessonViewModel> query)
+        {
+            List<LessonViewModel> model = new List<LessonViewModel>();
+            var lessonsQuery = context.Lessons
+                                      .Include(l => l.LessonLikes)
+                                      .Include(l => l.ClosedQuestions)
+                                      .Include(l => l.OpenQuestions)
+                                      .Include(l => l.Reads)
+                                      .Include(l => l.Creator)
+                                      .ThenInclude(c => c.User)
+                                      .Where(l => !l.IsPrivate);
+            return await Filter(lessonsQuery, query);
         }
 
         public async Task<LessonViewModel?>? GetById(Guid lessonId)
         {
             var l = await context.Lessons
-                                .Include(l => l.OpenQuestions)
-                                .Include(l => l.ClosedQuestions)
-                                .Include(l => l.Reads)
-                                .Include(l=>l.Creator)
-                                .ThenInclude(t=>t.User)
-                                .FirstOrDefaultAsync(l => l.Id == lessonId);
+                                 .Include(l => l.OpenQuestions)
+                                 .Include(l => l.ClosedQuestions)
+                                 .Include(l => l.Reads)
+                                 .Include(l => l.Creator)
+                                 .ThenInclude(t => t.User)
+                                 .FirstOrDefaultAsync(l => l.Id == lessonId);
             if (l == null)
             {
                 return null;
             }
+
             return new LessonViewModel()
             {
                 ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -97,10 +147,11 @@ namespace IntelliTest.Core.Services
                                  .Include(l => l.Creator)
                                  .ThenInclude(t => t.User)
                                  .FirstOrDefaultAsync(l => l.Title == name);
-            if (l==null)
+            if (l == null)
             {
                 return null;
             }
+
             return new LessonViewModel()
             {
                 ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -150,7 +201,6 @@ namespace IntelliTest.Core.Services
                 School = model.School,
                 Subject = model.Subject,
                 Title = model.Title,
-
             };
             await context.Lessons.AddAsync(lesson);
             await context.SaveChangesAsync();
@@ -159,8 +209,8 @@ namespace IntelliTest.Core.Services
         public async Task LikeLesson(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
-                                .Include(l => l.LessonLikes)
-                                .FirstOrDefaultAsync(l => l.Id == lessonId);
+                                      .Include(l => l.LessonLikes)
+                                      .FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.LessonLikes.Add(new LessonLike()
             {
                 UserId = userId
@@ -204,14 +254,14 @@ namespace IntelliTest.Core.Services
             List<LessonViewModel> model = new List<LessonViewModel>();
             var mock = await context.Lessons.ToListAsync();
             var lessons = await context.Lessons
-                                 .Where(l => l.Reads.Any(r => r.UserId == userId))
-                                 .Include(l => l.LessonLikes)
-                                 .Include(l => l.ClosedQuestions)
-                                 .Include(l => l.OpenQuestions)
-                                 .Include(l => l.Reads)
-                                 .Include(l => l.Creator)
-                                 .ThenInclude(c => c.User)
-                                 .ToListAsync();
+                                       .Where(l => l.Reads.Any(r => r.UserId == userId))
+                                       .Include(l => l.LessonLikes)
+                                       .Include(l => l.ClosedQuestions)
+                                       .Include(l => l.OpenQuestions)
+                                       .Include(l => l.Reads)
+                                       .Include(l => l.Creator)
+                                       .ThenInclude(c => c.User)
+                                       .ToListAsync();
             foreach (var l in lessons)
             {
                 var n = l.LessonLikes;
@@ -220,6 +270,7 @@ namespace IntelliTest.Core.Services
                 {
                     c = n.Count();
                 }
+
                 model.Add(new LessonViewModel()
                 {
                     ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -263,6 +314,7 @@ namespace IntelliTest.Core.Services
                 {
                     c = n.Count();
                 }
+
                 model.Add(new LessonViewModel()
                 {
                     ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -288,8 +340,6 @@ namespace IntelliTest.Core.Services
         {
             return context.Lessons.AnyAsync(l => l.Id == lessonId);
         }
-
-        //TODO Search
 
         public async Task Edit(Guid lessonId, EditLessonViewModel model)
         {

@@ -8,6 +8,6 @@ namespace IntelliTest.Core.Models
 {
     public enum Sorting
     {
-        Likes, Examiners, Score, Questions
+        Likes, Examiners, Score, Questions, Readers, ReadingTime
     }
 }

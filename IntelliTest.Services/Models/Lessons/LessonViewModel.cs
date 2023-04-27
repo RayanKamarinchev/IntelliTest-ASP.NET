@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IntelliTest.Data.Enums;
 
 namespace IntelliTest.Core.Models.Lessons
 {
@@ -21,7 +22,7 @@ namespace IntelliTest.Core.Models.Lessons
         public int Readers { get; set; }
         public int Likes { get; set; }
         public int Grade { get; set; }
-        public string Subject { get; set; }
+        public Subject Subject { get; set; }
         public string School { get; set; }
         public string CreatorName { get; set; }
         public IEnumerable<OpenQuestion> OpenQuestions { get; set; }

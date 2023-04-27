@@ -1,6 +1,9 @@
 ﻿using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Lessons;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
+using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +15,6 @@ namespace IntelliTest.Controllers
     [Authorize]
     public class LessonsController : Controller
     {
-        const string SCRIPT_NAME = "script.py";
         private readonly ILessonService lessonService;
         private readonly IDistributedCache cache;
         private readonly ITeacherService teacherService;
@@ -25,14 +27,19 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
         {
-            if (0 == 1 && cache.TryGetValue("lessons", out IEnumerable<LessonViewModel>? model))
+            if (0 == 1 && cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model))
             {
             }
             else
             {
-                model = await lessonService.GetAll();
+                if (currentPage == 0)
+                {
+                    currentPage = 1;
+                }
+                QueryModel<LessonViewModel> query = new QueryModel<LessonViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
+                model = await lessonService.GetAll(query);
                 var cacheEntryOptions = new DistributedCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 await cache.SetAsync("lessons", model, cacheEntryOptions);
@@ -90,7 +97,7 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         [Route("Lessons/SubmitEdit/{id}")]
-        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string htmlContent, string school, string subject, int grade)
+        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string htmlContent, string school, Subject subject, int grade)
         {
             EditLessonViewModel model = new EditLessonViewModel()
             {

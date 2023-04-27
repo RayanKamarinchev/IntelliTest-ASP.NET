@@ -1,9 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Core.Contracts
+@using IntelliTest.Data.Enums
 @using IntelliTest.Infrastructure
-@model IEnumerable<LessonViewModel>
+@model QueryModel<LessonViewModel>
 @{
-    ViewBag.Title = "Tests Blog";
+    ViewBag.Title = "Уроци";
+    int maxPage = (int)Math.Ceiling((double)Model.TotalItemsCount /
+                                    Model.ItemsPerPage);
+    int paginationStart = Model.CurrentPage - (int)Math.Max(0, Math.Min(2, maxPage-1) - maxPage + Model.CurrentPage);
 }
 
 <div class="container" style="margin-top: 30px; margin-bottom: 0px">
@@ -13,45 +17,13 @@
             <a class="floating-button" asp-action="Create">+</a>
         </div>
         <div class="col-lg-12 mb-3">
-                <div class="row text-left mb-5">
-                <div class="col-lg-4 mb-3 mb-sm-0">
-                    <div class="dropdown form-control form-control-lg bg-white bg-op-9 text-sm w-lg-50" style="width: 100%; height: 100%;">
-                        <select class="form-control form-control-lg bg-white bg-op-9 text-sm w-lg-50" data-toggle="select" tabindex="-98">
-                            <option> Categories </option>
-                            <option> Learn </option>
-                            <option> Share </option>
-                            <option> Build </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="dropdown form-control form-control-lg bg-white bg-op-9 ml-auto text-sm w-lg-50" style="width: 100%; height: 100%;">
-                        <select class="form-control form-control-lg bg-white bg-op-9 ml-auto text-sm w-lg-50" data-toggle="select" tabindex="-98">
-                            <option> Filter by </option>
-                            <option> Votes </option>
-                            <option> Replys </option>
-                            <option> Views </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="dropdown bootstrap-select form-control form-control-lg bg-white" style="width: 100%; height: 100%;">
-                        <select class="form-control form-control-lg bg-white" data-toggle="select" tabindex="-98">
-                            <option> Mark</option>
-                            @for (int i = 1; i <= 12; i++)
-                            {
-                                    <option>@i</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-            @if (Model.Count() != 0)
+            <partial name="Filters" model="Model.Filters"/>
+            @if (Model.Items.Count() != 0)
             {
                 <div class="questBoxHover questBox card py-3 px-3 mb-3 border-top-0 border-bottom-0" style="width: 100%">
-                    @foreach (var lesson in Model)
+                    @foreach (var lesson in Model.Items)
                     {
-                            <partial name="~/Views/Lessons/LessonPartialView.cshtml" model="lesson"/>
+                        <partial name="~/Views/Lessons/LessonPartialView.cshtml" model="lesson"/>
                     }
                 </div>
             }
@@ -59,6 +31,40 @@
             {
                 <h2 style="text-align: center">Няма резултати...</h2>
             }
+            <nav aria-label="Page navigation example" style="position: absolute; bottom: 20px; width: 100%">
+                <ul class="pagination justify-content-center" style="font-size: 1.5rem">
+                    <li class="page-item disabled">
+                        <a class="page-link @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+                           asp-action="Index"
+                           asp-route-currentPage="@(Model.CurrentPage - 1)"
+                           asp-route-Subject="@Model.Filters.Subject"
+                           asp-route-Grade="@Model.Filters.Grade"
+                           asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                           asp-route-Sorting="@(Model.Filters.Sorting)">Previous</a>
+                    </li>
+                    @for (int i = paginationStart; i <= maxPage && i - paginationStart <= 3; i++)
+                    {
+                        <li class="page-item">
+                            <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)"
+                               asp-action="Index"
+                               asp-route-currentPage="@i"
+                               asp-route-Subject="@Model.Filters.Subject"
+                               asp-route-Grade="@Model.Filters.Grade"
+                               asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                               asp-route-Sorting="@(Model.Filters.Sorting)">@i</a>
+                        </li>
+                    }
+                    <li class="page-item disabled">
+                        <a class="page-link @(Model.CurrentPage == maxPage ? "disabled" : string.Empty)"
+                           asp-action="Index"
+                           asp-route-currentPage="@(Model.CurrentPage + 1)"
+                           asp-route-Subject="@Model.Filters.Subject"
+                           asp-route-Grade="@Model.Filters.Grade"
+                           asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                           asp-route-Sorting="@(Model.Filters.Sorting)">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
