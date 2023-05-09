@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace IntelliTest.Controllers
 {
@@ -16,11 +17,12 @@ namespace IntelliTest.Controllers
         private readonly ITeacherService teacherService;
         private readonly IStudentService studentService;
         private readonly ITestService testService;
-        private readonly IDistributedCache cache;
+        //private readonly IDistributedCache cache;
+        private readonly IMemoryCache cache;
         private readonly IWebHostEnvironment webHostEnvironment;
 
 
-        public ClassesController(IClassService _classService, IDistributedCache _cache, ITeacherService _teacherService,
+        public ClassesController(IClassService _classService, IMemoryCache _cache, ITeacherService _teacherService,
                                  IWebHostEnvironment _webHostEnvironment, ITestService _testService, IStudentService _studentService)
         {
             classService = _classService;
@@ -38,9 +40,11 @@ namespace IntelliTest.Controllers
             else
             {
                 model = await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher());
-                var cacheEntryOptions = new DistributedCacheEntryOptions()
+                //var cacheEntryOptions = new DistributedCacheEntryOptions()
+                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-                await cache.SetAsync("tests", model, cacheEntryOptions);
+                cache.SetAsync("tests", model, cacheEntryOptions);
             }
             return View(model);
         }

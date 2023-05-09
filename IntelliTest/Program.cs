@@ -80,7 +80,8 @@ builder.Services.AddTransient<IClassService, ClassService>();
 
 builder.Services.AddSignalR();
 
-builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddDistributedMemoryCache();
+builder.Services.AddMemoryCache();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "localhost:6379";

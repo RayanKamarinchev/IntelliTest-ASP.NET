@@ -15,6 +15,7 @@ using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace IntelliTest.Controllers
 {
@@ -28,13 +29,14 @@ namespace IntelliTest.Controllers
     {
         const string SCRIPT_NAME = "script.py";
         private readonly ITestService testService;
-        private readonly IDistributedCache cache;
+        //private readonly IDistributedCache cache;
+        private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly ITeacherService teacherService;
         private readonly ILessonService lessonService;
         private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IDistributedCache _cache, IStudentService _studentService,
+        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
                                ITeacherService _teacherService, ILessonService _lessonService, IClassService _classService)
         {
             testService = _testService;
@@ -72,9 +74,11 @@ namespace IntelliTest.Controllers
                 }
                 QueryModel<TestViewModel> query = new QueryModel<TestViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
                 model = await testService.GetAll(User.IsTeacher(), query);
-                var cacheEntryOptions = new DistributedCacheEntryOptions()
-                                        .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-                await cache.SetAsync("tests", model, cacheEntryOptions);
+                //var cacheEntryOptions = new DistributedCacheEntryOptions()
+                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                cache.SetAsync("tests", model, cacheEntryOptions);
             }
             return View(model);
         }

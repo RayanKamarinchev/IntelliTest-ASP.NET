@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace IntelliTest.Controllers
 {
@@ -16,10 +17,11 @@ namespace IntelliTest.Controllers
     public class LessonsController : Controller
     {
         private readonly ILessonService lessonService;
-        private readonly IDistributedCache cache;
+        //private readonly IDistributedCache cache;
+        private readonly IMemoryCache cache;
         private readonly ITeacherService teacherService;
 
-        public LessonsController(ILessonService _lessonService, IDistributedCache _cache, ITeacherService _teacherService)
+        public LessonsController(ILessonService _lessonService, IMemoryCache _cache, ITeacherService _teacherService)
         {
             lessonService = _lessonService;
             cache = _cache;
@@ -40,9 +42,11 @@ namespace IntelliTest.Controllers
                 }
                 QueryModel<LessonViewModel> query = new QueryModel<LessonViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
                 model = await lessonService.GetAll(query);
-                var cacheEntryOptions = new DistributedCacheEntryOptions()
+                //var cacheEntryOptions = new DistributedCacheEntryOptions()
+                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-                await cache.SetAsync("lessons", model, cacheEntryOptions);
+                cache.SetAsync("lessons", model, cacheEntryOptions);
             }
             return View(model);
         }
