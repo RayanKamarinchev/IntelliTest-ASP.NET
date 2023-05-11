@@ -269,18 +269,16 @@ xgallery
     clear: both;
   }
 }
-@media only screen and (min-width: 1170px) {
-  .cd-gallery {
-    padding: 50px 2%;
-    float: right;
-    -webkit-transition: width 0.3s;
-    -moz-transition: width 0.3s;
-    transition: width 0.3s;
-  }
-  .cd-gallery.filter-is-visible {
-    /* reduce width when filter is visible */
-    width: 80%;
-  }
+.cd-gallery {
+padding: 50px 2%;
+float: right;
+-webkit-transition: width 0.3s;
+-moz-transition: width 0.3s;
+transition: width 0.3s;
+}
+.cd-gallery.filter-is-visible {
+/* reduce width when filter is visible */
+width: 80%;
 }
 
 /* -------------------------------- 

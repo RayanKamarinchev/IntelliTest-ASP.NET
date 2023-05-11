@@ -7,17 +7,19 @@
     padding: 0;
     margin: 0;
     font-family: "Montserrat";
-    font-size: 1.1rem;
+    font-size: calc(15px + 0.390625vw)
+}
+@media screen and (min-width: 768px) {
+    *,
+    *::after,
+    *::before {
+        font-size: 18px
+    }
 }
 
 .body_size {
-    font-size: 1rem;
+    font-size: 90%;
 }
-
-.html{
-  font-size: 62.5%;
-}
-
 .navbar input[type="checkbox"],
 .navbar .hamburger-lines{
   display: none;
@@ -293,9 +295,28 @@ ul, il{
     width: 100px;
     height: 100px;
     background: url("https://cssanimation.rocks/images/posts/steps/heart.png") no-repeat;
-    cursor: pointer;
     transition: background-position 1s steps(28);
     transition-duration: 1s;
+}
+.heartClick {
+    z-index: 2;
+    position: absolute;
+    bottom: 75px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    align-self: center;
+}
+
+@media screen and (max-width: 768px) {
+    .iconText {
+        display: none
+    }
+}
+@media screen and (max-width: 390px) {
+    .lessImportant {
+        display: none !important
+    }
 }
 
 .likes {
@@ -329,7 +350,7 @@ body {
 }
 
 .card {
-    width: 450px;
+    width: 330px;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -339,6 +360,35 @@ body {
     background-clip: border-box;
     border: 1px solid #e6e4e9;
     border-radius: 10px;
+}
+
+.card-body {
+    padding: 4% 4%;
+}
+
+.left-btn {
+    margin-right: 30px;
+}
+
+@media screen and (max-width: 450px) {
+    .card {
+        width: 250px;
+    }
+    .left-btn {
+        margin-right: 10px;
+    }
+}
+
+.fs90 {
+    font-size: 90%;
+}
+
+.fs80 {
+    font-size: 80%;
+}
+
+.btn-sm {
+    font-size: 80%;
 }
 
 .card > img {
@@ -673,4 +723,14 @@ body {
 }
 .page-link a {
     font-size: 1.5rem
+}
+
+.contentOnly {
+    width: 80%;
+    margin: auto
+}
+@media screen and (max-width: 576px) {
+    .contentOnly {
+        width: 95%;
+    }
 }

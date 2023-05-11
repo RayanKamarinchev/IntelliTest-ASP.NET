@@ -5,7 +5,7 @@ img
 
 .splitter, .image-right
 {
-    margin: 1em 2em;
+    margin: 0.5em 1em;
 }
 
 @media (min-width: 20em)
@@ -123,8 +123,8 @@ img
     }
 }
 .logo {
-    margin-left: 50px;
-    margin-right: 100px;
+    margin-left: 25px;
+    margin-right: 25px;
 }
 
 .why {
@@ -811,4 +811,10 @@ a {
     display: flex;
     align-self: center;
     margin-left: 20px
+}
+
+@media screen and (max-width: 576px) {
+    #homeImg {
+        display: none
+    }
 }

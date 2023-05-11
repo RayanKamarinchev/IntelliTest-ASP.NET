@@ -3,6 +3,9 @@ using System.IO;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
+using AngleSharp;
+using Google.Apis.Auth.OAuth2;
+using GoogleTranslateFreeApi;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Lessons;
@@ -16,6 +19,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using NuGet.Packaging;
+using TiktokenSharp;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using Language = GoogleTranslateFreeApi.Language;
 
 namespace IntelliTest.Controllers
 {
@@ -35,9 +42,10 @@ namespace IntelliTest.Controllers
         private readonly ITeacherService teacherService;
         private readonly ILessonService lessonService;
         private readonly IClassService classService;
+        private readonly IConfiguration config;
 
         public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
-                               ITeacherService _teacherService, ILessonService _lessonService, IClassService _classService)
+                               ITeacherService _teacherService, ILessonService _lessonService, IClassService _classService, IConfiguration _config)
         {
             testService = _testService;
             cache = _cache;
@@ -45,6 +53,7 @@ namespace IntelliTest.Controllers
             teacherService = _teacherService;
             lessonService = _lessonService;
             classService = _classService;
+            config = _config;
         }
 
         [HttpGet]
@@ -61,13 +70,13 @@ namespace IntelliTest.Controllers
             }
             else
             {
-                ProcessStartInfo start = new ProcessStartInfo();
-                start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-                start.Arguments = string.Format("{0}", "server.py");
-                start.UseShellExecute = false;
-                start.RedirectStandardOutput = true;
-                Process process = Process.Start(start);
-                process.Start();
+                //ProcessStartInfo start = new ProcessStartInfo();
+                //start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
+                //start.Arguments = string.Format("{0}", "server.py");
+                //start.UseShellExecute = false;
+                //start.RedirectStandardOutput = true;
+                //Process process = Process.Start(start);
+                //process.Start();
                 if (currentPage==0)
                 {
                     currentPage = 1;
@@ -235,17 +244,20 @@ namespace IntelliTest.Controllers
                             text = lesson.Content;
                         }
                     }
-                    var res = run_cmd(text);
-                    foreach (var se in res)
-                    {
-                        var q = new OpenQuestionViewModel()
-                        {
-                            Order = model.ClosedQuestions.Count + model.OpenQuestions.Count,
-                            Text = se[0],
-                            Answer = se[1]
-                        };
-                        model.OpenQuestions.Add(q);
-                    }
+                    //var res = run_cmd(text);
+                    //foreach (var se in res)
+                    //{
+                    //    var q = new OpenQuestionViewModel()
+                    //    {
+                    //        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count,
+                    //        Text = se[0],
+                    //        Answer = se[1]
+                    //    };
+                    //    model.OpenQuestions.Add(q);
+                    //}
+                    var generatedQuestions =
+                        await GenQuestions(text, model.ClosedQuestions.Count + model.OpenQuestions.Count);
+                    model.OpenQuestions.AddRange(generatedQuestions);
                 }
                 else if (type == EditType.Delete)
                 {
@@ -282,6 +294,16 @@ namespace IntelliTest.Controllers
                 TempData["editModel"] = JsonSerializer.Serialize(model);
                 return View("Edit", model);
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        public IActionResult AddQuestion(OpenQuestionViewModel question)
+        {
+            var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
+            model.OpenQuestions.Add(question);
+            TempData["editModel"] = JsonSerializer.Serialize(model);
+            return View("Edit", model);
         }
 
         [HttpPost]
@@ -448,35 +470,111 @@ namespace IntelliTest.Controllers
             return RedirectToAction("ViewProfile", "User");
         }
 
-        private IEnumerable<string[]> run_cmd(string args)
+        private string Translate(string text)
         {
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            start.Arguments = string.Format("{0} \"{1}\"", SCRIPT_NAME, args);
+            start.Arguments = string.Format("translate.py \"{0}\"", text);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             string last = "";
-            DateTime dt = DateTime.Now;
             using (Process process = Process.Start(start))
             {
                 using (StreamReader reader = process.StandardOutput)
                 {
-                    string result = reader.ReadToEnd();
-                    last = result;
+                    last = reader.ReadToEnd();
                 }
             }
 
-            last = last.Substring(2, last.Length-5);
-            DateTime end = DateTime.Now;
-            string[] splitted = last.Split("*");
-            string all = "";
-            for (int i = 0; i < splitted.Length; i++)
+            //last = last.Substring(2, last.Length - 5);
+            //DateTime end = DateTime.Now;
+            //string[] splitted = last.Split("*");
+            //string all = "";
+            //for (int i = 0; i < splitted.Length; i++)
+            //{
+            //    all += (char)int.Parse(splitted[i]);
+            //}
+
+            //var res = all.Split("&").Select(qa => qa.Split("|"));
+            return last;
+        }
+
+        private async Task<IEnumerable<OpenQuestionViewModel>> GenQuestions(string prompt, int count)
+        {
+            var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
+            var chat = api.Chat.CreateConversation();
+
+            string translatedText = Translate(prompt);
+
+            TikToken tikToken = TikToken.EncodingForModel("gpt-3.5-turbo");
+            var encoded = tikToken.Encode(translatedText);
+            int[] encodedSentenceEnds = new[]
             {
-                all += (char)int.Parse(splitted[i]);
+                13, 382, 497,662,627,1131,2564,3343,4527,6058,6389,7609,
+            };
+
+            int i = 0;
+            List<OpenQuestionViewModel> questions = new List<OpenQuestionViewModel>();
+            while (i < encoded.Count)
+            {
+                var part = encoded.Skip(i).Take(2000).ToArray();
+                i += part.Length;
+                //Not last piece
+                if (part.Length == 2000)
+                {
+                    while (!encodedSentenceEnds.Contains(part[i - 1]))
+                    {
+                        i--;
+                    }
+                }
+                string text = "Generate questions and answers only on the text only in bulgarian. " + tikToken.Decode(part.Take(i).ToList());
+                chat.AppendUserInput(text);
+
+                Console.WriteLine(tikToken.Encode(text).Count + 2);
+                List<Tuple<string, string>> final = new List<Tuple<string, string>>();
+                var res = "";
+                string question = "";
+                await foreach (var response in chat.StreamResponseEnumerableFromChatbotAsync())
+                {
+                    res += response;
+                    if (res.Contains("\n"))
+                    {
+                        if (res.Length<5)
+                        {
+                            res = res.Replace("\n", "");
+                        }
+                        else if (question == "")
+                        {
+                            question = res;
+                            res = "";
+                        }
+                        else
+                        {
+                            AddQuestion(new OpenQuestionViewModel()
+                            {
+                                Order = count,
+                                Text = question,
+                                Answer = res
+                            });
+                            count++;
+                            res = "";
+                        }
+                    }
+                }
+                var lines = res.Replace("\r", "").Split("\n");
+                for (int j = 2; j < lines.Length; j+=2)
+                {
+                    questions.Add(new OpenQuestionViewModel()
+                    {
+                        Order = count,
+                        Text = lines[j-2],
+                        Answer = lines[j-1]
+                    });
+                    count++;
+                }
             }
-            
-            var res = all.Split("&").Select(qa => qa.Split("|"));
-            return res;
+
+            return questions;
         }
     }
 }

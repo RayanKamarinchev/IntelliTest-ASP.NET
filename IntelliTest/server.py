@@ -409,7 +409,7 @@ class QGen:
     def paraphrase(self, payload):
         inp = {
             "input_text": payload.get("input_text"),
-            "max_questions": payload.get("max_questions", 3)
+            "max_questions": payload.get("max_questions", 30)
         }
 
         text = inp['input_text']

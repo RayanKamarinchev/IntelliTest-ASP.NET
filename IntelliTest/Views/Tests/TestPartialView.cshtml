@@ -7,7 +7,7 @@
 @inject ITeacherService teacherService
 <div class="card card-margin">
     <div class="card-header no-border">
-        <h5 class="card-title">@Model.Title - @Model.Grade</h5>
+        <h6 class="card-title">@Model.Title - @Model.Grade</h6>
     </div>
     <div class="card-body pt-0">
         <div class="widget-49">
@@ -40,7 +40,7 @@
                         if (isOwner)
                         {
                             <a asp-action="Statistics" asp-route-testId="@Model.Id"
-                               class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
+                               class="btn btn-sm btn-primary back-col left-btn">
                                 Статистика
                             </a>
                         }
@@ -56,13 +56,13 @@
                         if (await testService.IsTestTakenByStudentId(Model.Id, student))
                         {
                             <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@Model.Id"
-                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                               class="btn btn-sm btn-secondary back-col left-btn">
                                 Резултати
                             </a>
                             @if (Model.MultiSubmit)
                             {
                                 <a onClick="warn('@Model.Id', @Model.Time, '@Model.Title')"
-                                   class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                                       class="btn btn-sm btn-secondary back-col left-btn">
                                     Направи
                                 </a>
                             }
@@ -70,7 +70,7 @@
                         else
                         {
                             <a onClick="warn('@Model.Id', @Model.Time, '@Model.Title')"
-                               class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
+                                   class="btn btn-sm btn-secondary back-col left-btn">
                                 Направи
                             </a>
                         }

@@ -4,31 +4,33 @@
 <form method="get" asp-action="Index">
                 <div class="row">
                 <div class="col-lg-4 mb-3 mb-sm-0">
-                    <div class="dropdown form-control form-control-lg bg-white" style="width: 100%; height: 100%;">
+                    <div class="dropdown form-control form-control-lg bg-white filter-dropdown">
                         <label asp-for="Sorting"></label>
                         <select class="form-control form-control-lg bg-white" style="font-size: 1.3rem"
                                 data-toggle="select" tabindex="-98" asp-for="Sorting">
-                            <option value="0"> Харесвания </option>
-                            <option value="4"> Читатели </option>
-                            <option value="5"> Време за четене </option>
+                            <div style="height: 100px">
+                                <option value="0"> Харесвания </option>
+                                <option value="4"> Читатели </option>
+                                <option value="5"> Време за четене </option>
+                            </div>
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="dropdown form-control form-control-lg bg-white" style="width: 100%; height: 100%;">
+                    <div class="dropdown form-control form-control-lg bg-white filter-dropdown">
                         <label asp-for="Subject" style="font-size: 1.3rem"></label>
                         <select class="form-control form-control-lg bg-white"
                                 data-toggle="select" tabindex="-98" asp-for="Subject">
-                    @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
-                    {
-                        string name = Enum.GetName(typeof(Subject), subjectValue);
-                                        <option value="@subjectValue">@name</option>
-                    }
+                                @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
+                                {
+                                    string name = Enum.GetName(typeof(Subject), subjectValue);
+                                    <option value="@subjectValue">@name</option>
+                                }
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="dropdown bootstrap-select form-control form-control-lg bg-white" style="width: 100%; height: 100%;">
+                    <div class="dropdown bootstrap-select form-control form-control-lg bg-white filter-dropdown">
                         <label asp-for="Grade" style="font-size: 1.3rem"></label>
                         <select class="form-control form-control-lg bg-white"
                                 data-toggle="select" tabindex="-98" asp-for="Grade">

@@ -123,6 +123,7 @@ a { text-decoration: none; }
     background-size: calc(100% + 10px);
     background-position: -0.4em 0em;
     transition: 0.5s;
+    z-index: 2;
 }
 
 .questBox h3 {
@@ -329,6 +330,7 @@ textarea {
 textarea { border-radius: 5px; }
 
 .timer {
+    z-index: 3;
     position: fixed;
     top: 70px;
     right: 50px;
@@ -496,4 +498,9 @@ textarea { border-radius: 5px; }
 }
 .test-trash:focus {
     box-shadow: none;
+}
+
+.filter-dropdown {
+    width: 95%;
+    height: 100%;
 }
