@@ -13,6 +13,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="OpenAI" Version="1.7.2" />
+    <PackageReference Include="TiktokenSharp" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>

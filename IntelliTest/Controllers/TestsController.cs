@@ -1,36 +1,18 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Security.Claims;
 using System.Text.Json;
-using AngleSharp;
-using Google.Apis.Auth.OAuth2;
-using GoogleTranslateFreeApi;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
-using IntelliTest.Core.Models.Lessons;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
-using IntelliTest.Core.Services;
-using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
-using NuGet.Packaging;
-using TiktokenSharp;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
-using Language = GoogleTranslateFreeApi.Language;
 
 namespace IntelliTest.Controllers
 {
-    public enum EditType
-    {
-        OpenQuestionAdd, ClosedQuestionAdd, AiGenerate, Delete
-    }
-
     [Authorize]
     public class TestsController : Controller
     {
@@ -40,20 +22,16 @@ namespace IntelliTest.Controllers
         private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly ITeacherService teacherService;
-        private readonly ILessonService lessonService;
         private readonly IClassService classService;
-        private readonly IConfiguration config;
 
         public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
-                               ITeacherService _teacherService, ILessonService _lessonService, IClassService _classService, IConfiguration _config)
+                               ITeacherService _teacherService, IClassService _classService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             teacherService = _teacherService;
-            lessonService = _lessonService;
             classService = _classService;
-            config = _config;
         }
 
         [HttpGet]
@@ -70,13 +48,6 @@ namespace IntelliTest.Controllers
             }
             else
             {
-                //ProcessStartInfo start = new ProcessStartInfo();
-                //start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-                //start.Arguments = string.Format("{0}", "server.py");
-                //start.UseShellExecute = false;
-                //start.RedirectStandardOutput = true;
-                //Process process = Process.Start(start);
-                //process.Start();
                 if (currentPage==0)
                 {
                     currentPage = 1;
@@ -101,9 +72,10 @@ namespace IntelliTest.Controllers
             model = await testService.GetMy(teacherId, query);
             return View("Index", model);
         }
+        
 
         [Route("Tests/Edit/{id}")]
-        public async Task<IActionResult> Edit(Guid id, EditType type, TestEditViewModel viewModel, [FromForm] string text,string url, int questionOrder, bool isText)
+        public async Task<IActionResult> Edit(Guid id, TestEditViewModel viewModel, [FromForm] string text,string url, int questionOrder, bool isText)
         {
             if (viewModel.PublicityLevel!=PublicityLevel.Link && viewModel.PublicityLevel != PublicityLevel.Public)
             {
@@ -150,198 +122,31 @@ namespace IntelliTest.Controllers
                     }
                 }
             }
-            if (id!= new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
+            if (!await testService.ExistsbyId(id))
             {
-                if (!await testService.ExistsbyId(id))
-                {
-                    return BadRequest();
-                }
-                var model = await testService.GetById(id);
-                var testEdit = testService.ToEdit(model);
-                TempData["PublicityLevel"] = testEdit.PublicityLevel;
-                TempData["editModel"] = JsonSerializer.Serialize(testEdit);
-                TempData["testId"] = id;
-                ModelState["Title"].Errors.Clear();
-                return View("Edit", testEdit);
+                return BadRequest();
             }
-            else
-            {
-                var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
-
-                model.Description = viewModel.Description;
-                model.Time = viewModel.Time;
-                model.Grade = viewModel.Grade;
-                model.PublicityLevel = (PublicityLevel)Math.Max((int)viewModel.PublicityLevel, (int)TempData.Peek("PublicityLevel"));
-                model.Title = viewModel.Title;
-                if (viewModel.OpenQuestions != null)
-                {
-                    for (int i = 0; i < viewModel.OpenQuestions.Count; i++)
-                    {
-                        model.OpenQuestions[i].Answer = viewModel.OpenQuestions[i].Answer;
-                        model.OpenQuestions[i].Order = viewModel.OpenQuestions[i].Order;
-                        model.OpenQuestions[i].Text = viewModel.OpenQuestions[i].Text;
-                        model.OpenQuestions[i].MaxScore = viewModel.OpenQuestions[i].MaxScore;
-                    }
-                }
-
-                if (viewModel.ClosedQuestions != null)
-                {
-                    for (int i = 0; i < viewModel.ClosedQuestions.Count; i++)
-                    {
-                        model.ClosedQuestions[i].Answers = viewModel.ClosedQuestions[i].Answers;
-                        model.ClosedQuestions[i].AnswerIndexes = viewModel.ClosedQuestions[i].AnswerIndexes;
-                        model.ClosedQuestions[i].Order = viewModel.ClosedQuestions[i].Order;
-                        model.ClosedQuestions[i].Text = viewModel.ClosedQuestions[i].Text;
-                        model.ClosedQuestions[i].MaxScore = viewModel.ClosedQuestions[i].MaxScore;
-                    }
-                }
-
-                if (type == EditType.OpenQuestionAdd)
-                {
-                    var q = new OpenQuestionViewModel()
-                    {
-                        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
-                    };
-                    model.OpenQuestions.Add(q);
-                }
-                else if (type == EditType.ClosedQuestionAdd)
-                {
-                    var q = new ClosedQuestionViewModel()
-                    {
-                        Answers = Enumerable.Repeat("", 6).ToArray(),
-                        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count
-                    };
-                    model.ClosedQuestions.Add(q);
-                }
-                else if (type == EditType.AiGenerate)
-                {
-                    if (!isText)
-                    {
-                        string guidString = url.Split('/').Last();
-                        Guid guidResult;
-                        bool isValid = Guid.TryParse(guidString, out guidResult);
-                        if (isValid)
-                        {
-                            var lesson = await lessonService.GetById(guidResult);
-                            if (lesson.IsPrivate)
-                            {
-                                ModelState.AddModelError("Title", "Урокът не е открит.");
-                                TempData["editModel"] = JsonSerializer.Serialize(model);
-                                return View("Edit", model);
-                            }
-                            text = lesson.Content;
-                        }
-                        else
-                        {
-                            var lesson = await lessonService.GetByName(url)!;
-                            if (lesson==null)
-                            {
-                                ModelState.AddModelError("Title", "Урокът не е открит.");
-                                TempData["editModel"] = JsonSerializer.Serialize(model);
-                                return View("Edit", model);
-                            }
-
-                            text = lesson.Content;
-                        }
-                    }
-                    //var res = run_cmd(text);
-                    //foreach (var se in res)
-                    //{
-                    //    var q = new OpenQuestionViewModel()
-                    //    {
-                    //        Order = model.ClosedQuestions.Count + model.OpenQuestions.Count,
-                    //        Text = se[0],
-                    //        Answer = se[1]
-                    //    };
-                    //    model.OpenQuestions.Add(q);
-                    //}
-                    var generatedQuestions =
-                        await GenQuestions(text, model.ClosedQuestions.Count + model.OpenQuestions.Count);
-                    model.OpenQuestions.AddRange(generatedQuestions);
-                }
-                else if (type == EditType.Delete)
-                {
-                    var closedQuestion = model.ClosedQuestions.FirstOrDefault(q => q.Order == questionOrder);
-                    int order; 
-                    if (closedQuestion == null)
-                    {
-                        var openQuestion = model.OpenQuestions.FirstOrDefault(q => q.Order == questionOrder);
-                        order = openQuestion.Order;
-                        model.OpenQuestions.Remove(openQuestion);
-                    }
-                    else
-                    {
-                        order = closedQuestion.Order;
-                        model.ClosedQuestions.Remove(closedQuestion);
-                    }
-
-                    for (int i = 0; i < model.OpenQuestions.Count; i++)
-                    {
-                        if (model.OpenQuestions[i].Order >= order)
-                        {
-                            model.OpenQuestions[i].Order--;
-                        }
-                    }
-                    for (int i = 0; i < model.ClosedQuestions.Count; i++)
-                    {
-                        if (model.ClosedQuestions[i].Order >= order)
-                        {
-                            model.ClosedQuestions[i].Order--;
-                        }
-                    }
-                }
-
-                TempData["editModel"] = JsonSerializer.Serialize(model);
-                return View("Edit", model);
-            }
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Teacher")]
-        public IActionResult AddQuestion(OpenQuestionViewModel question)
-        {
-            var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
-            model.OpenQuestions.Add(question);
-            TempData["editModel"] = JsonSerializer.Serialize(model);
-            return View("Edit", model);
+            var model = await testService.GetById(id);
+            var testEdit = testService.ToEdit(model);
+            testEdit.Id = id;
+            TempData["PublicityLevel"] = testEdit.PublicityLevel;
+            return View("Edit", testEdit);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Teacher")]
-        public async Task<IActionResult> EditSubmit(Guid id, TestEditViewModel model)
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Edit([FromBody]TestEditViewModel model)
         {
-            if (model.ClosedQuestions == null)
+            if (model.Id is null)
             {
-                model.ClosedQuestions = new List<ClosedQuestionViewModel>();
+                return View("Edit", model);
             }
-            if (model.OpenQuestions == null)
-            {
-                model.OpenQuestions = new List<OpenQuestionViewModel>();
-            }
-
-            for (int i = 0; i < model.ClosedQuestions.Count; i++)
-            {
-                List<string> answers = new List<string>();
-                List<bool> answersIndexes = new List<bool>();
-                for (int j = 0; j < model.ClosedQuestions[i].Answers.Length; j++)
-                {
-                    if (model.ClosedQuestions[i].Answers[j]!=null)
-                    {
-                        answers.Add(model.ClosedQuestions[i].Answers[j]);
-                        answersIndexes.Add(model.ClosedQuestions[i].AnswerIndexes[j]);
-                    }
-                }
-
-                model.ClosedQuestions[i].Answers = answers.ToArray();
-                model.ClosedQuestions[i].AnswerIndexes = answersIndexes.ToArray();
-            }
-
-            if (!await testService.ExistsbyId(id))
+            if (!await testService.ExistsbyId(model.Id.Value))
             {
                 return NotFound();
             }
 
-            if (!model.ClosedQuestions.All(c=>c.AnswerIndexes.Any(ai=>ai)))
+            if (!model.ClosedQuestions.All(c => c.AnswerIndexes.Any(ai => ai)))
             {
                 return View("Edit", model);
             }
@@ -350,11 +155,11 @@ namespace IntelliTest.Controllers
                 return View("Edit", model);
             }
 
+            model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
             Guid teacherId = await teacherService.GetTeacherId(User.Id());
-            await testService.Edit(id, model, teacherId);
+            await testService.Edit(model.Id.Value, model, teacherId);
             TempData["message"] = "Успешно редактира тест!";
-            TempData.Remove("editModel");
-            return RedirectToAction("Index");
+            return Content("redirect");
         }
 
         [HttpGet]
@@ -470,111 +275,14 @@ namespace IntelliTest.Controllers
             return RedirectToAction("ViewProfile", "User");
         }
 
-        private string Translate(string text)
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        public IActionResult AddQuestion(OpenQuestionViewModel question)
         {
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            start.Arguments = string.Format("translate.py \"{0}\"", text);
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
-            string last = "";
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    last = reader.ReadToEnd();
-                }
-            }
-
-            //last = last.Substring(2, last.Length - 5);
-            //DateTime end = DateTime.Now;
-            //string[] splitted = last.Split("*");
-            //string all = "";
-            //for (int i = 0; i < splitted.Length; i++)
-            //{
-            //    all += (char)int.Parse(splitted[i]);
-            //}
-
-            //var res = all.Split("&").Select(qa => qa.Split("|"));
-            return last;
-        }
-
-        private async Task<IEnumerable<OpenQuestionViewModel>> GenQuestions(string prompt, int count)
-        {
-            var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
-            var chat = api.Chat.CreateConversation();
-
-            string translatedText = Translate(prompt);
-
-            TikToken tikToken = TikToken.EncodingForModel("gpt-3.5-turbo");
-            var encoded = tikToken.Encode(translatedText);
-            int[] encodedSentenceEnds = new[]
-            {
-                13, 382, 497,662,627,1131,2564,3343,4527,6058,6389,7609,
-            };
-
-            int i = 0;
-            List<OpenQuestionViewModel> questions = new List<OpenQuestionViewModel>();
-            while (i < encoded.Count)
-            {
-                var part = encoded.Skip(i).Take(2000).ToArray();
-                i += part.Length;
-                //Not last piece
-                if (part.Length == 2000)
-                {
-                    while (!encodedSentenceEnds.Contains(part[i - 1]))
-                    {
-                        i--;
-                    }
-                }
-                string text = "Generate questions and answers only on the text only in bulgarian. " + tikToken.Decode(part.Take(i).ToList());
-                chat.AppendUserInput(text);
-
-                Console.WriteLine(tikToken.Encode(text).Count + 2);
-                List<Tuple<string, string>> final = new List<Tuple<string, string>>();
-                var res = "";
-                string question = "";
-                await foreach (var response in chat.StreamResponseEnumerableFromChatbotAsync())
-                {
-                    res += response;
-                    if (res.Contains("\n"))
-                    {
-                        if (res.Length<5)
-                        {
-                            res = res.Replace("\n", "");
-                        }
-                        else if (question == "")
-                        {
-                            question = res;
-                            res = "";
-                        }
-                        else
-                        {
-                            AddQuestion(new OpenQuestionViewModel()
-                            {
-                                Order = count,
-                                Text = question,
-                                Answer = res
-                            });
-                            count++;
-                            res = "";
-                        }
-                    }
-                }
-                var lines = res.Replace("\r", "").Split("\n");
-                for (int j = 2; j < lines.Length; j+=2)
-                {
-                    questions.Add(new OpenQuestionViewModel()
-                    {
-                        Order = count,
-                        Text = lines[j-2],
-                        Answer = lines[j-1]
-                    });
-                    count++;
-                }
-            }
-
-            return questions;
+            var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
+            model.OpenQuestions.Add(question);
+            TempData["editModel"] = JsonSerializer.Serialize(model);
+            return View("Edit", model);
         }
     }
 }

@@ -13,27 +13,27 @@
 }
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%">
-        <form method="post">
+        <form>
             <div class="customRow" style="margin-top: 50px">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
                     <div class="d-flex">
                         <label asp-for="Title"></label>
                         <div style="flex-grow: 1">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Title" asp-for="Title"/>
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="title" type="text" value="@Model.Title"/>
                         </div>
                     </div>
                     <div class="widthMax">
                         <label asp-for="Description" style="display: flex"></label>
-                        <textarea type="text" value="@Model.Description" asp-for="Description"></textarea>
+                        <textarea type="text" value="@Model.Description" id="desc"></textarea>
                     </div>
                     <div class="d-flex">
                         <label asp-for="Grade"></label>
                         <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Grade" asp-for="Grade"  style="text-align: center"/>
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="grade" type="text" value="@Model.Grade" style="text-align: center"/>
                         </div>
                         <label asp-for="Time"></label>
                         <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Time" asp-for="Time" style="text-align: center"/>
+                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="time" type="text" value="@Model.Time" style="text-align: center"/>
                         </div>
                     </div>
                 </div>
@@ -42,53 +42,50 @@
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
                     <div class="widthMax">
                         <label style="display: flex">Текст</label>
-                        <textarea name="text"></textarea>
+                        <textarea name="text" id="prompt"></textarea>
                     </div>
-                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-isText="true" class="btn btn-secondary">Генерирай</button>
+                    <button type="button" class="btn btn-secondary" id="gen">Генерирай</button>
                     <br/>
                     <div class="widthMax">
                         <label style="display: flex">От линк(URL) или заглавие</label>
-                        <input class="input-field widthMax" name="url" class="widthMax" style="color: black">
-                        <span class="text-danger" asp-validation-for="Title"></span>
+                        <input id="lessonName" class="input-field widthMax" name="url" class="widthMax" style="color: black">
                     </div>
+                    <span class="text-danger" id="lessonError"></span>
                     <br/>
-                    <button type="submit" asp-action="Edit" asp-route-type="AiGenerate" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-isText="false" class="btn btn-secondary">Генерирай</button>
+                    <button type="button" class="btn btn-secondary" id="genLesson" class="btn btn-secondary">Генерирай</button>
                 </div>
             </div>
-            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
-            {
-                if (Model.ClosedQuestions.Any(q => q.Order == i))
+            <div id="questions">
+                @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
                 {
-                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                    int indx = Model.ClosedQuestions.IndexOf(question);
-                            <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                    if (Model.ClosedQuestions.Any(q => q.Order == i))
+                    {
+                        var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+                        int indx = Model.ClosedQuestions.IndexOf(question);
+                        <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                    }
+                    else
+                    {
+                        var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
+                        <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                    }
                 }
-                else
-                {
-                    var q = Model.OpenQuestions.FindIndex(j=>j.Order == i);
-                            <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[q]"/>
-                }
-            }
-            <button asp-action="Edit" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" class="btn btn-secondary">Добави отворен въпрос</button>
-            <button asp-action="Edit" asp-route-id="@(new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))" asp-route-type="ClosedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
+            </div>
+            <button type="button" id="openQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
+            <button type="button" id="closedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
             <hr/>
-            @{
-                Guid id = new Guid(TempData.Peek("testId").ToString());
-            }
-            <button class="btn blue btn-primary" asp-action="EditSubmit" asp-route-id="@id" type="submit">Готово</button>
+            <button class="btn blue btn-primary" type="submit">Готово</button>
         </form>
     </div>
 </div>
 
 @section Scripts
 {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script>
         btns = document.getElementsByTagName("button");
         input = Array.prototype.slice.call(btns);
         function save(ev){
-            if(ev.currentTarget.type=="submit"){
-                console.log("lol")
-            }
                 var top  = window.pageYOffset || document.documentElement.scrollTop;
                 localStorage.setItem("scroll", top);
         }
@@ -100,6 +97,223 @@
         function onFocusOut(e){
             e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
         }
+    </script>
+    <script>
+        function openQuestionPartialView(question, answer, order, maxScore){return `
+                    <div class="questBox">
+                    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
+                        <span>Points:</span>
+                            <input type="text" value="${maxScore}" name="OpenQuestions${order}Score" style="width: 20px; margin-right: 30px;"/>
+                            <button class="circle delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <input style="display: none" value="${order}" asp-for="Order"/>
+                    <div class="customRow">
+                        <div class="questTextBox" style="width: calc(100% - 250px);">
+                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions${order}Question"/>
+                            <span class="underline"></span>
+                        </div>
+                    </div>
+                    <div class="questTextBox questAnswer">
+                        <div>
+                                <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="${answer}" name="OpenQuestions${order}Answer"/>
+                            <span class="underline"></span>
+                        </div>
+                    </div>
+                </div>
+        `}
+            function answerPartialView(answer, order, questionOrder){return `
+                        <div class="questTextBox option">
+                            <div>
+                                    <input type="checkbox" name="${questionOrder}AnswerIndexes${order}"/>
+                            </div>
+                            <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция ${order + 1}" type="text" name="${questionOrder}Answers${order}"/>
+                                <span class="underline"></span>
+                        </div>
+            `}
+
+            function closedQuestionPartialView(question, answers, order, maxScore){console.log(answers); return `
+                <div class="questBox" name="ClosedQuestions${order}">
+                    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
+                        <span>Points:</span>
+                                <input type="text" value="${maxScore}" name="ClosedQuestions${order}Score" style="width: 20px;margin-right: 30px"/>
+                        <button class="circle delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="customRow">
+                        <div class="questTextBox" style="width: calc(100% - 250px);">
+                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="ClosedQuestions${order}Question"/>
+                            <span class="underline"></span>
+                        </div>
+                    </div>
+                    <input type="text" value${order}" asp-for="Order" class="d-none"/>
+                    <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">`
+                            + answers.map(a=>answerPartialView(a.answer, a.order, order)).join('') +
+                    `
+                    </div>
+                </div>
+            `}
+
+        function createElementFromHTML(htmlString) {
+          var div = document.createElement('div');
+          div.innerHTML = htmlString.trim();
+          
+          return div.firstChild;
+        }
+        let emptyAnswers = [
+            {
+                answer: "",
+                order: 0
+            },
+            {
+                answer: "",
+                order: 1
+            },
+            {
+                answer: "",
+                order: 2
+            },
+            {
+                answer: "",
+                order: 3
+            },
+        ]
+        let count = @(Model.ClosedQuestions.Count() + Model.OpenQuestions.Count())
+        let lessonError = document.getElementById("lessonError");
+        let openQuestionAddBtn = document.getElementById("openQuestionAdd");
+        let closedQuestionAddBtn = document.getElementById("closedQuestionAdd");
+        let generateBtn = document.getElementById("gen");genLesson
+        let questions = document.getElementById("questions");
+        let lessonNameInput = document.getElementById("lessonName")
+        let promptInput = document.getElementById("prompt")
+        //Delete
+        questions.querySelectorAll(".delete").forEach(item => {
+          item.addEventListener('click', e => {
+                    e.parentNode.parentNode.remove();
+                    count--;
+          })
+        })
+        //Generate
+        generateBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+                connection.invoke("AddQuestion", promptInput.textContent)
+        })
+        //Add
+        openQuestionAddBtn.addEventListener("click", ()=>{
+            let el = createElementFromHTML(openQuestionPartialView("", "", count, 0));
+            el.querySelector(".delete").addEventListener('click', e => {
+                e.parentNode.parentNode.remove();
+                count--;
+            })
+            questions.appendChild(el)  
+            count++;
+        })
+        closedQuestionAddBtn.addEventListener("click", ()=>{
+            let el = createElementFromHTML(closedQuestionPartialView("", emptyAnswers, count, 0));
+                el.querySelector(".delete").addEventListener('click', e => {
+                e.parentNode.parentNode.remove();
+                count--;
+            })
+            questions.appendChild(el)  
+            count++;
+        })
+        function getByKey(allowed, value){
+            return Object.keys(value)
+              .filter(key => key.includes(allowed))
+              .reduce((obj, key) => {
+                obj[key] = value[key];
+                return obj;
+              }, {});
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            const data = new FormData(event.target);
+
+            let value = Object.fromEntries(data.entries());
+
+           value.topics = data.getAll("topics");
+           
+            let res = {
+                    OpenQuestions: [],
+                    ClosedQuestions: []
+            };
+            let i = 0;
+            while(true)
+            {
+                debugger;
+                question = getByKey("OpenQuestions" + i, value);
+                if (Object.keys(question).length === 0){
+                     question = getByKey("ClosedQuestions" + i, value);
+                }else{
+                    res["OpenQuestions"].push({
+                            text: Object.values(getByKey("OpenQuestions" + i + "Question", question))[0],
+                            answer: Object.values(getByKey("OpenQuestions" + i + "Answer", question))[0],
+                            order: i,
+                                maxScore: parseInt(Object.values(getByKey("OpenQuestions" + i + "Score", question))[0])
+                    })
+                    i++;
+                    continue;
+                }
+                if (Object.keys(question).length === 0){
+                    break;   
+                }
+                else{
+                    res["ClosedQuestions"].push({
+                            text: Object.values(getByKey("ClosedQuestions" + i + "Question", question))[0],
+                            answers: Object.values(getByKey(i + "Answers", value)),
+                            answerIndexes: Object.values(getByKey(i + "AnswerIndexes", value))
+                            .map(v=>v=="on"),
+                            order: i,
+                            maxScore: parseInt(Object.values(getByKey("ClosedQuestions" + i + "Score", question))[0])
+                    })
+                }
+                i++;
+            }
+            res["id"] = "@Model.Id";
+            res["title"] = document.getElementById("title").value;
+            res["description"] = document.getElementById("desc").value;
+            res["time"] = document.getElementById("time").value;
+            res["grade"] = document.getElementById("grade").value;
+            console.log(JSON.stringify(res))
+            $.ajax({
+                url: "/Tests/Edit",
+                method: 'POST',
+                data: JSON.stringify(res),
+                    contentType:'application/json',
+                    success: function(response) {
+                        if(response === "redirect"){
+                            window.location.href = "/Tests";
+                        }
+                        $(body).html(response);
+                    }
+            });
+        }
+
+      const form = document.querySelector("form");
+      form.addEventListener("submit", handleSubmit);
     
+        let connection = null;
+        setupConnection = () => {
+            connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/testEditHub")
+                .build();
+            connection.on("Add", (question, answer, order) => {
+                questions.appendChild(createElementFromHTML(openQuestionPartialView(question, answer, order, 0)))
+            });
+            connection.on("WrongLesson", () => {
+                    lessonError.textCotnent = "Урокът не е намерен"
+            });
+            connection.on("Finished", function () {
+                //connection.stop();
+            });
+            connection.start()
+                .catch(err => console.error(err, toString()));
+        }
+
+        setupConnection();
     </script>
 }

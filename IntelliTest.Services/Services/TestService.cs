@@ -1,4 +1,5 @@
-﻿using IntelliTest.Data;
+﻿using System.Text.Json;
+using IntelliTest.Data;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
@@ -6,6 +7,7 @@ using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
+using Org.BouncyCastle.Ocsp;
 
 namespace IntelliTest.Core.Services
 {
@@ -16,7 +18,7 @@ namespace IntelliTest.Core.Services
         public TestService(IntelliTestDbContext _context)
         {
             context = _context;
-        }
+    }
 
         public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query)
         {
