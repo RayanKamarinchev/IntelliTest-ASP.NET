@@ -33,14 +33,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
        .AddEntityFrameworkStores<IntelliTestDbContext>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("all", opt =>
-    {
-        opt.AllowAnyOrigin();
-        opt.AllowAnyMethod();
-    });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("all", opt =>
+//    {
+//        opt.AllowAnyOrigin();
+//        opt.AllowAnyMethod();
+//    });
+//});
 
 
 //External logins
@@ -145,8 +145,6 @@ app.MapHub<ChatHub>("/chatHub");
 app.MapHub<TestEditHub>("/testEditHub");
 
 app.Run();
-//Use different way to store connection string in production
-
 //TODO:Check ofr quotes in questions
 
 ///anti XSS cross site scripting

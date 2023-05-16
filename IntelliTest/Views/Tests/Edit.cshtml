@@ -1,5 +1,4 @@
-﻿@using System.Text.Json
-@model TestEditViewModel
+﻿@model TestEditViewModel
 @{
     ViewBag.Title = "Edit Test";
     if (Model.ClosedQuestions == null)
@@ -56,18 +55,34 @@
                 </div>
             </div>
             <div id="questions">
-                @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
-                {
-                    if (Model.ClosedQuestions.Any(q => q.Order == i))
+                @{
+                    int closedQuestionCount = Model.OpenQuestions.Count;
+                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(){Order=-1}, Model.OpenQuestions.Count));
+                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(){Order=-1}, closedQuestionCount));
+                    var closedQuestionsDummy = new List<ClosedQuestionViewModel>();
+                    var openQuestionsDummy = new List<OpenQuestionViewModel>();
+                    foreach (var question in Model.ClosedQuestions)
                     {
-                        var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                        int indx = Model.ClosedQuestions.IndexOf(question);
-                        <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[indx]"/>
+                        closedQuestionsDummy.Add(question);
                     }
-                    else
+                    foreach (var question in Model.OpenQuestions)
                     {
-                        var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                        <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[q]"/>
+                        openQuestionsDummy.Add(question);
+                    }
+                    for (int i = 0; i < closedQuestionsDummy.Count; i++)
+                    {
+                        if (Model.ClosedQuestions.Any(q => q.Order == i))
+                        {
+                            var question = closedQuestionsDummy.FirstOrDefault(q => q.Order == i);
+                            Model.ClosedQuestions[i] = question;
+                                <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
+                        }
+                        else
+                        {
+                            var q = openQuestionsDummy.FirstOrDefault(j => j.Order == i);
+                            Model.OpenQuestions[i] = q;
+                                <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
+                        }
                     }
                 }
             </div>
@@ -99,221 +114,8 @@
         }
     </script>
     <script>
-        function openQuestionPartialView(question, answer, order, maxScore){return `
-                    <div class="questBox">
-                    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
-                        <span>Points:</span>
-                            <input type="text" value="${maxScore}" name="OpenQuestions${order}Score" style="width: 20px; margin-right: 30px;"/>
-                            <button class="circle delete">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                    <input style="display: none" value="${order}" asp-for="Order"/>
-                    <div class="customRow">
-                        <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions${order}Question"/>
-                            <span class="underline"></span>
-                        </div>
-                    </div>
-                    <div class="questTextBox questAnswer">
-                        <div>
-                                <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="${answer}" name="OpenQuestions${order}Answer"/>
-                            <span class="underline"></span>
-                        </div>
-                    </div>
-                </div>
-        `}
-            function answerPartialView(answer, order, questionOrder){return `
-                        <div class="questTextBox option">
-                            <div>
-                                    <input type="checkbox" name="${questionOrder}AnswerIndexes${order}"/>
-                            </div>
-                            <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция ${order + 1}" type="text" name="${questionOrder}Answers${order}"/>
-                                <span class="underline"></span>
-                        </div>
-            `}
-
-            function closedQuestionPartialView(question, answers, order, maxScore){console.log(answers); return `
-                <div class="questBox" name="ClosedQuestions${order}">
-                    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
-                        <span>Points:</span>
-                                <input type="text" value="${maxScore}" name="ClosedQuestions${order}Score" style="width: 20px;margin-right: 30px"/>
-                        <button class="circle delete">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                    <div class="customRow">
-                        <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="ClosedQuestions${order}Question"/>
-                            <span class="underline"></span>
-                        </div>
-                    </div>
-                    <input type="text" value${order}" asp-for="Order" class="d-none"/>
-                    <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">`
-                            + answers.map(a=>answerPartialView(a.answer, a.order, order)).join('') +
-                    `
-                    </div>
-                </div>
-            `}
-
-        function createElementFromHTML(htmlString) {
-          var div = document.createElement('div');
-          div.innerHTML = htmlString.trim();
-          
-          return div.firstChild;
-        }
-        let emptyAnswers = [
-            {
-                answer: "",
-                order: 0
-            },
-            {
-                answer: "",
-                order: 1
-            },
-            {
-                answer: "",
-                order: 2
-            },
-            {
-                answer: "",
-                order: 3
-            },
-        ]
-        let count = @(Model.ClosedQuestions.Count() + Model.OpenQuestions.Count())
-        let lessonError = document.getElementById("lessonError");
-        let openQuestionAddBtn = document.getElementById("openQuestionAdd");
-        let closedQuestionAddBtn = document.getElementById("closedQuestionAdd");
-        let generateBtn = document.getElementById("gen");genLesson
-        let questions = document.getElementById("questions");
-        let lessonNameInput = document.getElementById("lessonName")
-        let promptInput = document.getElementById("prompt")
-        //Delete
-        questions.querySelectorAll(".delete").forEach(item => {
-          item.addEventListener('click', e => {
-                    e.parentNode.parentNode.remove();
-                    count--;
-          })
-        })
-        //Generate
-        generateBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-                connection.invoke("AddQuestion", promptInput.textContent)
-        })
-        //Add
-        openQuestionAddBtn.addEventListener("click", ()=>{
-            let el = createElementFromHTML(openQuestionPartialView("", "", count, 0));
-            el.querySelector(".delete").addEventListener('click', e => {
-                e.parentNode.parentNode.remove();
-                count--;
-            })
-            questions.appendChild(el)  
-            count++;
-        })
-        closedQuestionAddBtn.addEventListener("click", ()=>{
-            let el = createElementFromHTML(closedQuestionPartialView("", emptyAnswers, count, 0));
-                el.querySelector(".delete").addEventListener('click', e => {
-                e.parentNode.parentNode.remove();
-                count--;
-            })
-            questions.appendChild(el)  
-            count++;
-        })
-        function getByKey(allowed, value){
-            return Object.keys(value)
-              .filter(key => key.includes(allowed))
-              .reduce((obj, key) => {
-                obj[key] = value[key];
-                return obj;
-              }, {});
-        }
-
-        function handleSubmit(event) {
-            event.preventDefault();
-
-            const data = new FormData(event.target);
-
-            let value = Object.fromEntries(data.entries());
-
-           value.topics = data.getAll("topics");
-           
-            let res = {
-                    OpenQuestions: [],
-                    ClosedQuestions: []
-            };
-            let i = 0;
-            while(true)
-            {
-                debugger;
-                question = getByKey("OpenQuestions" + i, value);
-                if (Object.keys(question).length === 0){
-                     question = getByKey("ClosedQuestions" + i, value);
-                }else{
-                    res["OpenQuestions"].push({
-                            text: Object.values(getByKey("OpenQuestions" + i + "Question", question))[0],
-                            answer: Object.values(getByKey("OpenQuestions" + i + "Answer", question))[0],
-                            order: i,
-                                maxScore: parseInt(Object.values(getByKey("OpenQuestions" + i + "Score", question))[0])
-                    })
-                    i++;
-                    continue;
-                }
-                if (Object.keys(question).length === 0){
-                    break;   
-                }
-                else{
-                    res["ClosedQuestions"].push({
-                            text: Object.values(getByKey("ClosedQuestions" + i + "Question", question))[0],
-                            answers: Object.values(getByKey(i + "Answers", value)),
-                            answerIndexes: Object.values(getByKey(i + "AnswerIndexes", value))
-                            .map(v=>v=="on"),
-                            order: i,
-                            maxScore: parseInt(Object.values(getByKey("ClosedQuestions" + i + "Score", question))[0])
-                    })
-                }
-                i++;
-            }
-            res["id"] = "@Model.Id";
-            res["title"] = document.getElementById("title").value;
-            res["description"] = document.getElementById("desc").value;
-            res["time"] = document.getElementById("time").value;
-            res["grade"] = document.getElementById("grade").value;
-            console.log(JSON.stringify(res))
-            $.ajax({
-                url: "/Tests/Edit",
-                method: 'POST',
-                data: JSON.stringify(res),
-                    contentType:'application/json',
-                    success: function(response) {
-                        if(response === "redirect"){
-                            window.location.href = "/Tests";
-                        }
-                        $(body).html(response);
-                    }
-            });
-        }
-
-      const form = document.querySelector("form");
-      form.addEventListener("submit", handleSubmit);
-    
-        let connection = null;
-        setupConnection = () => {
-            connection = new signalR.HubConnectionBuilder()
-                    .withUrl("/testEditHub")
-                .build();
-            connection.on("Add", (question, answer, order) => {
-                questions.appendChild(createElementFromHTML(openQuestionPartialView(question, answer, order, 0)))
-            });
-            connection.on("WrongLesson", () => {
-                    lessonError.textCotnent = "Урокът не е намерен"
-            });
-            connection.on("Finished", function () {
-                //connection.stop();
-            });
-            connection.start()
-                .catch(err => console.error(err, toString()));
-        }
-
-        setupConnection();
+        var count = @Model.ClosedQuestions.Count();
+        var id = "@Model.Id";
     </script>
+    <script src="~/js/testEdit.js"></script>
 }
