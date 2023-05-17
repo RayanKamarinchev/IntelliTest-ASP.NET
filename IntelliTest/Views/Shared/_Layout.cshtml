@@ -1,5 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@inject IUrlHelper UrlHelper
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,12 +116,19 @@
         &copy; @DateTime.Now.Year - IntelliTest
     </div>
 </footer>
+    @if (ViewContext.RouteData.Values["Action"].ToString() != "Take")
+{
+    <script>
+        let isTakingTest = localStorage.getItem("takingTest")
+                localStorage.removeItem("takingTest")
+        if (isTakingTest) {
+            window.location.href = isTakingTest;
+        }
+    </script>
+}
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
-<script>
-    localStorage.setItem("scroll", 0)
-</script>
 </html>

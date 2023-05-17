@@ -1,11 +1,27 @@
 ﻿@model TestSubmitViewModel
 @{
     ViewBag.Title = "Taking Test";
+
+    int mins = Model.Time;
+    int sec = 0;
+    if (TempData.ContainsKey("TestStart"))
+    {
+        var span = DateTime.Now - (DateTime)TempData.Peek("TestStart");
+        mins -= (int)Math.Ceiling(Math.Ceiling(span.TotalSeconds)/60);
+        if (span.Seconds!=0)
+        {
+            sec += 60 - span.Seconds;
+        }
+    }
+    else
+    {
+        TempData["TestStart"] = DateTime.Now;
+    }
 }
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
         <div class="timer">
-            <h1 id="timer" style="margin: 0">@Model.Time:00</h1>    
+            <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>    
         </div>
         <form method="post" name="test">
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
@@ -40,8 +56,8 @@
             var timer = document.getElementById("timer");
             var interval = 1000; 
             var expected = Date.now() + interval;
-            var min = @Model.Time;
-            var sec = 0;
+            var min = @mins;
+            var sec = @sec;
             setTimeout(step, interval);
             function step() {
                 var dt = Date.now() - expected;
@@ -62,5 +78,7 @@
                     document.forms["test"].submit();
                 }
             });
+                localStorage.setItem("takingTest", window.location.href);
         </script>
+    <script src="~/js/testTake.js"></script>
     }

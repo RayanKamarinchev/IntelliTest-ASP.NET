@@ -221,6 +221,8 @@ namespace IntelliTest.Controllers
             Guid studentId = await studentService.GetStudentId(User.Id());
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             TempData["message"] = "Успешно предаде теста!";
+            TempData["TakingTest"] = false;
+            TempData.Remove("TestStart");
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 
