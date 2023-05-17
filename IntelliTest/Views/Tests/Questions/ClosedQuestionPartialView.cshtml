@@ -25,8 +25,8 @@
                 <div>
                     <input type="checkbox" asp-for="@Model.AnswerIndexes[i]"/>
                 </div>
-                <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция @(i + 1)" type="text" asp-for="Answers[i]"/>
-                    <span class="underline"></span>
+                        <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" value="@Model.Text" placeholder="Опция @(i + 1)" type="text" asp-for="Answers[i]"></textarea>
+                <span class="underline"></span>
             </div>
         }
     </div>

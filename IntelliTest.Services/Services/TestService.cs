@@ -211,7 +211,7 @@ namespace IntelliTest.Core.Services
                                                                                               .Select((val, indx) => new { val, indx })
                                                                                               .Where(q => q.val)
                                                                                               .Select(q => q.indx)),
-                                                            Answers = string.Join("&", q.Answers),
+                                                            Answers = string.Join("&", q.Answers.Where(a=>!string.IsNullOrEmpty(a))),
                                                             Order = q.Order,
                                                             MaxScore = q.MaxScore
                                                         }).ToList();

@@ -35,13 +35,13 @@
                     <input style="display: none" value="${order}" asp-for="Order"/>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions[${order}].Text"/>
+                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions[${order}].Text"></textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
                     <div class="questTextBox questAnswer">
                         <div>
-                                <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="${answer}" name="OpenQuestions[${order}].Answer"/>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="${answer}" name="OpenQuestions[${order}].Answer"></textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
@@ -52,6 +52,7 @@
                             <div>
                                     <input type="checkbox" name="ClosedQuestions[${questionOrder}].AnswerIndexes[${order}]"/>
                             </div>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Опция ${order + 1}" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]"></textarea>
                                 <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция ${order + 1}" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]"/>
                                 <span class="underline"></span>
                         </div>
@@ -68,7 +69,7 @@
                     </div>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="ClosedQuestions[${order}].Text"/>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="ClosedQuestions[${order}].Text"></textarea>
                             <span class="underline"></span>
                         </div>
                     </div>

@@ -8,7 +8,7 @@
     </div>
     <div class="questTextBox questAnswer">
         <div>
-            <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="@Model.Answer" asp-for="Answer"/>
+            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
             <span class="underline"></span>
         </div>
     </div>

@@ -13,7 +13,7 @@
         {
             <div class="questTextBox option">
                 <div>
-                    <input type="checkbox" asp-for="@Model.Answers[i]"/>
+                        <input type="checkbox" onfocus="onFocus(this)" onblur=onFocusOut(this) asp-for="@Model.Answers[i]"/>
                 </div>
                 <p>@Model.PossibleAnswers[i]</p>
             </div>

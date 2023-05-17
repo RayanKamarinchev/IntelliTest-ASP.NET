@@ -10,13 +10,13 @@
     <input style="display: none" value="@Model.Order" asp-for="Order"/>
     <div class="customRow">
         <div class="questTextBox" style="width: calc(100% - 250px);">
-            <input onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"/>
+            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"></textarea>
             <span class="underline"></span>
         </div>
     </div>
     <div class="questTextBox questAnswer">
         <div>
-            <input onFocus="onfocus(this)" placeholder="Отговор" onblur="onFocusOut(this)" type="text" value="@Model.Answer" asp-for="Answer"/>
+            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
             <span class="underline"></span>
         </div>
     </div>
