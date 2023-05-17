@@ -27,7 +27,7 @@
                     <div class="questBox">
                     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
                         <span>Points:</span>
-                            <input type="text" value="${maxScore}" name="OpenQuestions[${order}].MaxScore" style="width: 20px; margin-right: 30px;"/>
+                            <input type="text" value="${maxScore}" name="OpenQuestions[${order}].MaxScore" class="body_size" style="width: 20px; margin-right: 30px;"/>
                                 <button class="circle delete" type="button">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -35,7 +35,7 @@
                     <input style="display: none" value="${order}" asp-for="Order"/>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions[${order}].Text"></textarea>
+                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this)  placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions[${order}].Text"></textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                 <div class="questBox" name="ClosedQuestions${order}">
                     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
                         <span>Points:</span>
-                                <input type="text" value="${maxScore}" name="ClosedQuestions[${order}].MaxScore" style="width: 20px;margin-right: 30px"/>
+                                <input type="text" value="${maxScore}" class="body_size" name="ClosedQuestions[${order}].MaxScore" style="width: 20px;margin-right: 30px"/>
                         <button class="circle delete" type="button">
                             <i class="fa-solid fa-trash"></i>
                         </button>

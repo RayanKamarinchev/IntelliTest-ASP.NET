@@ -199,7 +199,7 @@ namespace IntelliTest.Controllers
             }
             if (await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
             {
-                return BadRequest();
+                return RedirectToAction("ReviewAnswers");
             }
 
             if (User.IsTeacher())
@@ -218,6 +218,18 @@ namespace IntelliTest.Controllers
         [Route("Take/{testId}")]
         public async Task<IActionResult> Take(TestSubmitViewModel model, Guid testId)
         {
+            if (!User.IsStudent())
+            {
+                return Unauthorized();
+            }
+            if (!await testService.ExistsbyId(testId))
+            {
+                return NotFound();
+            }
+            if (await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
+            {
+                return RedirectToAction("ReviewAnswers");
+            }
             Guid studentId = await studentService.GetStudentId(User.Id());
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             TempData["message"] = "Успешно предаде теста!";
@@ -227,7 +239,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Review/{testId}-{studentId}")]
+        [Route("Review/{testId}/{studentId}")]
         public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
             if (!User.IsStudent())
@@ -243,6 +255,10 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
+            if (!await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
+            {
+                return NotFound();
+            }
 
             var test = await testService.TestResults(testId, studentId);
             return View(test);
@@ -253,6 +269,10 @@ namespace IntelliTest.Controllers
         public async Task<IActionResult> Statistics(Guid testId)
         {
             if (!await teacherService.IsTestCreator(testId, await teacherService.GetTeacherId(User.Id())))
+            {
+                return NotFound();
+            }
+            if (!await testService.IsTestTakenByStudentId(testId, await studentService.GetStudent(await studentService.GetStudentId(User.Id()))))
             {
                 return NotFound();
             }

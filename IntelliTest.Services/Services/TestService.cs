@@ -195,35 +195,77 @@ namespace IntelliTest.Core.Services
                                     .Include(t=>t.OpenQuestions)
                                     .Include(t=>t.ClosedQuestions)
                                     .FirstOrDefaultAsync(t=>t.Id==id);
-            List<OpenQuestion> openQuestions = model.OpenQuestions
-                                                    .Select(q => new OpenQuestion()
-                                                    {
-                                                        Text = q.Text,
-                                                        Answer = q.Answer,
-                                                        Order = q.Order,
-                                                        MaxScore = q.MaxScore
-                                                    }).ToList();
-            List<ClosedQuestion> closedQuestions = model.ClosedQuestions
-                                                        .Select(q => new ClosedQuestion()
-                                                        {
-                                                            Text = q.Text,
-                                                            AnswerIndexes = string.Join("&", q.AnswerIndexes
-                                                                                              .Select((val, indx) => new { val, indx })
-                                                                                              .Where(q => q.val)
-                                                                                              .Select(q => q.indx)),
-                                                            Answers = string.Join("&", q.Answers.Where(a=>!string.IsNullOrEmpty(a))),
-                                                            Order = q.Order,
-                                                            MaxScore = q.MaxScore
-                                                        }).ToList();
+            
+            test.OpenQuestions = test.OpenQuestions.Select(x =>
+            {
+                var modelQuestion = model.OpenQuestions.FirstOrDefault(q => q.Answer == x.Answer || q.Text == x.Text);
+                if (modelQuestion is null)
+                {
+                    return new OpenQuestion();
+                }
+                model.OpenQuestions.Remove(modelQuestion);
+                x.Text = modelQuestion.Text;
+                x.Answer = modelQuestion.Answer;
+                x.Order = modelQuestion.Order;
+                x.MaxScore = modelQuestion.MaxScore;
+                return x;
+            })
+                                     .Where(q=>q.Text!="")
+                                     .Union(model.OpenQuestions
+                                                 .Select(q => new OpenQuestion()
+                                                 {
+                                                     Text = q.Text,
+                                                     Answer = q.Answer,
+                                                     Order = q.Order,
+                                                     MaxScore = q.MaxScore
+                                                 }))
+                                     .ToList();
+
+            test.ClosedQuestions = test.ClosedQuestions.Select(x =>
+                                     {
+                                         var modelQuestion = model.ClosedQuestions
+                                                                  .FirstOrDefault(q =>
+                                                                                      string.Join("&", q.Answers.Where(a => !string.IsNullOrEmpty(a)))
+                                                                                   == x.Answers || q.Text == x.Text);
+                                         if (modelQuestion is null)
+                                         {
+                                             return new ClosedQuestion();
+                                         }
+                                         model.ClosedQuestions.Remove(modelQuestion);
+                                         x.Text = modelQuestion.Text;
+                                         x.Answers = string.Join(
+                                             "&", modelQuestion.Answers.Where(a => !string.IsNullOrEmpty(a)));
+                                         x.Order = modelQuestion.Order;
+                                         x.AnswerIndexes = string.Join("&", modelQuestion.AnswerIndexes
+                                                                                         .Select((val, indx) =>
+                                                                                                     new { val, indx })
+                                                                                         .Where(q => q.val)
+                                                                                         .Select(q => q.indx));
+                                         x.MaxScore = modelQuestion.MaxScore;
+                                         return x;
+                                     })
+                                     .Where(q => q.Text != "")
+                                     .Union(model.ClosedQuestions
+                                                 .Select(q => new ClosedQuestion()
+                                                 {
+                                                     Text = q.Text,
+                                                     AnswerIndexes = string.Join("&", q.AnswerIndexes
+                                                                                       .Select((val, indx) => new { val, indx })
+                                                                                       .Where(q => q.val)
+                                                                                       .Select(q => q.indx)),
+                                                     Answers = string.Join("&", q.Answers.Where(a => !string.IsNullOrEmpty(a))),
+                                                     Order = q.Order,
+                                                     MaxScore = q.MaxScore
+                                                 }))
+                                     .ToList();
+
             if (test.CreatorId==teacherId)
             {
                 test.Title = model.Title;
                 test.Description = model.Description;
                 test.Grade = model.Grade;
                 test.Time = model.Time;
-                test.ClosedQuestions = closedQuestions;
-                test.OpenQuestions = openQuestions;
-                context.Update(test);
+                //context.Update(test);
             }
             else
             {
@@ -233,8 +275,8 @@ namespace IntelliTest.Core.Services
                     Description = model.Description,
                     Grade = model.Grade,
                     Time = model.Time,
-                    ClosedQuestions = closedQuestions,
-                    OpenQuestions = openQuestions,
+                    ClosedQuestions = test.ClosedQuestions,
+                    OpenQuestions = test.OpenQuestions,
                     CreatedOn = DateTime.Now,
                     CreatorId = teacherId
                 };
