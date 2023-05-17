@@ -26,9 +26,10 @@ namespace IntelliTest.Core.Contracts
         Task<Guid> Create(TestViewModel model, Guid teacherId, string[] classNames);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount);
 
-        decimal CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
+        Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
         public Task<bool> StudentHasAccess(Guid testId, Guid studentId);
         public Task DeleteTest(Guid id);
         public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
+        string Translate(string text);
     }
 }

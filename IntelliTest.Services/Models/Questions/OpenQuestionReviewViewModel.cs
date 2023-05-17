@@ -10,5 +10,6 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string RightAnswer { get; set; }
         public decimal Score { get; set; }
+        public string Explanation { get; set; }
     }
 }

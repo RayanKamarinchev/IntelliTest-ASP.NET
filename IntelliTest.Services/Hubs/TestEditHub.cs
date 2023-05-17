@@ -41,17 +41,6 @@ namespace IntelliTest.Core.Hubs
                     last = reader.ReadToEnd();
                 }
             }
-
-            //last = last.Substring(2, last.Length - 5);
-            //DateTime end = DateTime.Now;
-            //string[] splitted = last.Split("*");
-            //string all = "";
-            //for (int i = 0; i < splitted.Length; i++)
-            //{
-            //    all += (char)int.Parse(splitted[i]);
-            //}
-
-            //var res = all.Split("&").Select(qa => qa.Split("|"));
             return last;
         }
 
@@ -115,8 +104,7 @@ namespace IntelliTest.Core.Hubs
                 }
                 string text = "Generate questions \"Q\" and answers \"A\" only on the text only in bulgarian. " + tikToken.Decode(part.Take(i).ToList());
                 chat.AppendUserInput(text);
-
-                Console.WriteLine(tikToken.Encode(text).Count + 2);
+                
                 List<Tuple<string, string>> final = new List<Tuple<string, string>>();
                 var res = "";
                 string question = "";

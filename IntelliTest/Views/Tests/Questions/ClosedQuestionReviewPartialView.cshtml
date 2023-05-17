@@ -1,7 +1,7 @@
 ﻿@model ClosedQuestionReviewViewModel
 
 <div class="questBox">
-    <p class="questionScore">@Model.Score/@Model.MaxScore</p>
+    <p class="questionScore">@($"{Model.Score:f2}")/@Model.MaxScore</p>
     <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">
