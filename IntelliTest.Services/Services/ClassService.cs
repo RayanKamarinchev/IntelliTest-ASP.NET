@@ -45,7 +45,8 @@ namespace IntelliTest.Core.Services
                 {
                     FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
                     Id = c.TeacherId,
-                    School = c.Teacher.School
+                    School = c.Teacher.School,
+                    ImageUrl = c.Teacher.User.PhotoPath
                 },
                 ImageUrl = c.ImageUrl,
                 Subject = c.Subject
@@ -67,7 +68,8 @@ namespace IntelliTest.Core.Services
                 {
                     FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
                     Id = c.TeacherId,
-                    School = c.Teacher.School
+                    School = c.Teacher.School,
+                    ImageUrl = c.Teacher.User.PhotoPath
                 },
                 ImageUrl = c.ImageUrl,
                 Subject = c.Subject

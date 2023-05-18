@@ -39,6 +39,7 @@ namespace IntelliTest.Data.Entities
         public Guid CreatorId { get; set; }
         public List<ClassTest> ClassesWithAccess { get; set; }
         public PublicityLevel PublicyLevel { get; set; }
+        public string PhotoPath { get; set; }
 
         public IEnumerable<TestLike> TestLikes { get; set; }
         public IEnumerable<TestResult> TestResults { get; set; }

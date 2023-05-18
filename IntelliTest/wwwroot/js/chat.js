@@ -153,11 +153,13 @@
             connection.invoke("GetUsers", self.joinedRoom()?.name()).then(function (result) {
                 self.chatUsers.removeAll();
                 for (var i = 0; i < result.length; i++) {
+                    console.log(result[i])
                     self.chatUsers.push(new ChatUser(result[i].userName,
                         result[i].fullName,
                         result[i].avatar,
                         result[i].currentRoom,
                         result[i].device))
+                    console.log("comp")
                 }
             });
         }
@@ -313,7 +315,7 @@
 
         var { dateOnly, timeOnly } = formatDate(date);
         if (diff == 0)
-            self.timestampRelative = `Today`;
+            self.timestampRelative = timestamp;
         else if (diff == -1)
             self.timestampRelative = `Yestrday`;
         else

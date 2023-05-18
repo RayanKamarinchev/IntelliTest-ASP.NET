@@ -335,6 +335,11 @@ namespace IntelliTest.Core.Services
             return last;
         }
 
+        public async Task SaveChanges()
+        {
+            await context.SaveChangesAsync();
+        }
+
         public async Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore)
         {
             if (Regex.Matches(RightAnswer, @"\w+")

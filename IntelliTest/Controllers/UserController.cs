@@ -7,6 +7,7 @@ using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace IntelliTest.Controllers
         private readonly ILessonService lessonService;
         private readonly IEmailService emailService;
         private readonly ITestService testService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager,
@@ -31,7 +33,8 @@ namespace IntelliTest.Controllers
                               IStudentService _studentService,
                               ILessonService _lessonService,
                               IEmailService email_service,
-                              ITestService testService)
+                              ITestService testService,
+                              IWebHostEnvironment webHostEnvironment)
         {
             userManager = _userManager;
             signInManager = _signInManager;
@@ -41,6 +44,7 @@ namespace IntelliTest.Controllers
             this.emailService = email_service;
             roleManager = _roleManager;
             this.testService = testService;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         private string GetEmailTemplate(string link)
@@ -231,8 +235,10 @@ namespace IntelliTest.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                IsTeacher = User.IsTeacher()
+                IsTeacher = User.IsTeacher(),
+                ImageUrl = user.PhotoPath
             };
+            TempData["imagePath"] = user.PhotoPath;
             return View(model);
         }
 
@@ -242,6 +248,22 @@ namespace IntelliTest.Controllers
             var user = await userManager.GetUserAsync(User);
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
+            if (model.Image != null && model.Image.ContentType.StartsWith("image"))
+            {
+                string folder = "imgs/";
+                if (string.IsNullOrEmpty((string)TempData.Peek("imagePath")))
+                {
+                    folder += Guid.NewGuid() + "_" + model.Image.FileName;
+                    model.ImageUrl = folder;
+                }
+                else
+                {
+                    folder = (string)TempData["imagePath"];
+                }
+                string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
+                await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                user.PhotoPath = folder;
+            }
             if (model.Password!=null && await userManager.CheckPasswordAsync(user, model.Password))
             {
                 user.Email = model.Email;
@@ -265,8 +287,11 @@ namespace IntelliTest.Controllers
                     }, User.Id());
                 }
 
+                model.ImageUrl = (string)TempData.Peek("imagePath");
                 return await Logout();
             }
+
+            await testService.SaveChanges();
             return View(model);
         }
 
@@ -310,21 +335,6 @@ namespace IntelliTest.Controllers
                     };
                     return PartialView("Panels/UserInfoPartialView", model);
             }
-        }
-
-        [HttpGet]
-        public async Task<string> ImageUpload(FileUpload file)
-        {
-            var user = await userManager.GetUserAsync(User);
-            using (var ms = new MemoryStream())
-            {
-                await file.file.CopyToAsync(ms);
-                var fileBytes = ms.ToArray();
-                user.Photo = fileBytes;
-                //save this
-            }
-
-            return "Ok";
         }
 
         [HttpGet]

@@ -31,5 +31,6 @@ namespace IntelliTest.Core.Contracts
         public Task DeleteTest(Guid id);
         public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
         string Translate(string text);
+        Task SaveChanges();
     }
 }

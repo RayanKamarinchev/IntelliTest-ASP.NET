@@ -1,13 +1,17 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Data.Entities
-@using IntelliTest.Core.Contracts
-@using System.Security.Claims
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
 @{
     var user = await UserManager.GetUserAsync(User);
+    ViewBag.Title = "User Profile";
+    string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
+    if (user.PhotoPath != "")
+    {
+        src = "/" + user.PhotoPath;
+    }
 }
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
@@ -19,7 +23,7 @@
         <li class="nav-item">
 
             <a asp-action="ViewProfile" asp-controller="User" class="nav-link text-dark">
-                <img asp-action="Login" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png" alt="" style="max-width: 40px; height: 40px; margin-left: 10px; border-radius: 100%;">
+                <img src="@src" alt="" style="width: 40px; height: 40px; margin-left: 10px; border-radius: 100%;">
             </a>
         </li>
         <li class="nav-item">

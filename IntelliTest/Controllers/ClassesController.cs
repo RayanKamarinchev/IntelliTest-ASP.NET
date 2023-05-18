@@ -80,7 +80,7 @@ namespace IntelliTest.Controllers
             if (model.Image != null && model.Image.ContentType.StartsWith("image"))
             {
                 string folder = "imgs/";
-                folder += Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                folder += Guid.NewGuid() + "_" + model.Image.FileName;
                 model.ImageUrl = folder;
                 string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
                 await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));

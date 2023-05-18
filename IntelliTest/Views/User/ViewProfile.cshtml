@@ -3,6 +3,11 @@
 @model EditUser
 @{
     ViewBag.Title = "User Profile";
+    string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
+    if (Model.ImageUrl != "")
+    {
+        src = "/" + Model.ImageUrl;
+    }
 }
 <div class="e-profile">
     <div class="row">
@@ -10,7 +15,7 @@
             <div class="mx-auto" style="width: 140px;">
                 <div class="d-flex justify-content-center align-items-center rounded"
                      style="height: 140px; background-color: rgb(233, 236, 239);">
-                    <span style="color: rgb(166, 168, 170); font: bold 8pt Arial;">140x140</span>
+                    <img src="@src" height="140" width="140"/>
                 </div>
             </div>
         </div>
@@ -18,10 +23,14 @@
             <div class="text-center text-sm-left mb-2 mb-sm-0">
                 <h5 class="pt-sm-2 pb-1 mb-0 text-nowrap">@Model.FirstName @Model.LastName</h5>
                 <div class="mt-2">
-                    <button class="btn btn-primary" type="button">
-                        <i class="fa fa-fw fa-camera"></i>
-                        <span>Change Photo</span>
-                    </button>
+                    <form method="post" name="img">
+                        <label for="file-upload" class="btn btn-primary">
+                            <i class="fa fa-fw fa-camera"></i>
+                            <span>Change Photo</span>
+                        </label>
+                        <input style="display: none" id="file-upload" type="file" accept="image/*"
+                               onchange="document.forms['img'].submit(); " asp-for="Image"/>
+                    </form>
                 </div>
             </div>
         </div>

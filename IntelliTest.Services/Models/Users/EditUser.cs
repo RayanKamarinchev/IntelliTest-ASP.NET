@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace IntelliTest.Core.Models.Users
 {
@@ -14,5 +15,7 @@ namespace IntelliTest.Core.Models.Users
         public string Password { get; set; }
         public bool IsTeacher { get; set; }
         public UserPanel UserPanel { get; set; }
+        public IFormFile? Image { get; set; }
+        public string ImageUrl { get; set; } = "";
     }
 }
