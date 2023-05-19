@@ -37,7 +37,7 @@ namespace IntelliTest.Core.Services
 
                 lessonQuery = lessonQuery
                     .Where(l => EF.Functions.Like(l.Title.ToLower(), query.Filters.SearchTerm) ||
-                                EF.Functions.Like(l.School.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(l.Creator.School.ToLower(), query.Filters.SearchTerm) ||
                                 EF.Functions.Like(l.Content.ToLower(), query.Filters.SearchTerm));
             }
 
@@ -78,7 +78,7 @@ namespace IntelliTest.Core.Services
                     Likes = c,
                     Readers = l.Reads.Count(),
                     Title = l.Title,
-                    School = l.School,
+                    School = l.Creator.School,
                     Subject = l.Subject,
                     CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
                     HtmlContent = l.HtmlCotnent,
@@ -131,7 +131,7 @@ namespace IntelliTest.Core.Services
                 Likes = l.LessonLikes?.Count() ?? 0,
                 Readers = l.Reads.Count(),
                 Title = l.Title,
-                School = l.School,
+                School = l.Creator.School,
                 Subject = l.Subject,
                 CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
                 HtmlContent = l.HtmlCotnent
@@ -164,7 +164,7 @@ namespace IntelliTest.Core.Services
                 Likes = l.LessonLikes?.Count() ?? 0,
                 Readers = l.Reads.Count(),
                 Title = l.Title,
-                School = l.School,
+                School = l.Creator.School,
                 Subject = l.Subject,
                 CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
                 HtmlContent = l.HtmlCotnent
@@ -198,7 +198,6 @@ namespace IntelliTest.Core.Services
                 CreatedOn = DateTime.Now,
                 CreatorId = teacherId,
                 Grade = model.Grade,
-                School = model.School,
                 Subject = model.Subject,
                 Title = model.Title,
             };
@@ -283,7 +282,7 @@ namespace IntelliTest.Core.Services
                     Likes = c,
                     Readers = l.Reads.Count(),
                     Title = l.Title,
-                    School = l.School,
+                    School = l.Creator.School,
                     Subject = l.Subject,
                     CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
                 });
@@ -327,7 +326,7 @@ namespace IntelliTest.Core.Services
                     Likes = c,
                     Readers = l.Reads.Count(),
                     Title = l.Title,
-                    School = l.School,
+                    School = l.Creator.School,
                     Subject = l.Subject,
                     CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
                 });
@@ -347,7 +346,6 @@ namespace IntelliTest.Core.Services
             lesson.Grade = model.Grade;
             lesson.OpenQuestions = model.OpenQuestions;
             lesson.ClosedQuestions = model.ClosedQuestions;
-            lesson.School = model.School;
             lesson.Content = model.Content;
             lesson.Title = model.Title;
             lesson.HtmlCotnent = model.HtmlContent;

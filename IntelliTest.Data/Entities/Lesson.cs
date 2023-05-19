@@ -28,7 +28,6 @@ namespace IntelliTest.Data.Entities
         public List<LessonLike>? LessonLikes { get; set; }
         public int Grade { get; set; }
         public Subject Subject { get; set; }
-        public string School { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsDeleted { get; set; }
         public IEnumerable<OpenQuestion>? OpenQuestions { get; set; }

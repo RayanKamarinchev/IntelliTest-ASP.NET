@@ -19,8 +19,6 @@ namespace IntelliTest.Data.Entities
         [Required]
         [StringLength(1000)]
         public string Description { get; set; }
-        [StringLength(50)]
-        public string School { get; set; }
         [Required]
         public int Time { get; set; }
         [Required]

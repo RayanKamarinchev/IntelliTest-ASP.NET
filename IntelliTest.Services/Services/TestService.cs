@@ -43,7 +43,7 @@ namespace IntelliTest.Core.Services
 
                 testQuery = testQuery
                     .Where(t => EF.Functions.Like(t.Title.ToLower(), query.Filters.SearchTerm) ||
-                                EF.Functions.Like(t.School.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(t.Creator.School.ToLower(), query.Filters.SearchTerm) ||
                                 EF.Functions.Like(t.Description.ToLower(), query.Filters.SearchTerm));
             }
             if (query.Filters.Sorting == Sorting.Likes)
@@ -624,7 +624,6 @@ namespace IntelliTest.Core.Services
                 Subject = model.Subject,
                 Time = model.Time,
                 Grade = model.Grade,
-                School = model.School,
                 CreatedOn = DateTime.Now,
                 CreatorId = teacherId,
                 OpenQuestions = new List<OpenQuestion>(),

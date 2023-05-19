@@ -4,18 +4,16 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-@{
-    var user = await UserManager.GetUserAsync(User);
-    ViewBag.Title = "User Profile";
-    string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
-    if (user.PhotoPath != "")
-    {
-        src = "/" + user.PhotoPath;
-    }
-}
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
+        var user = await UserManager.GetUserAsync(User);
+        ViewBag.Title = "User Profile";
+        string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
+        if (user.PhotoPath != "")
+        {
+            src = "/" + user.PhotoPath;
+        }
         <li style="display: flex;
                                     align-items: center;">
                 <a style="font-weight: 500;">@(user.FirstName +" "+ user.LastName[0]+".")</a>

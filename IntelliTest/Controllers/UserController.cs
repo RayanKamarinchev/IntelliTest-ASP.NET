@@ -246,8 +246,7 @@ namespace IntelliTest.Controllers
         public async Task<IActionResult> ViewProfile(EditUser model)
         {
             var user = await userManager.GetUserAsync(User);
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
+            model.ImageUrl = (string)TempData.Peek("imagePath");
             if (model.Image != null && model.Image.ContentType.StartsWith("image"))
             {
                 string folder = "imgs/";
@@ -262,33 +261,43 @@ namespace IntelliTest.Controllers
                 }
                 string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
                 await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                model.FirstName = user.FirstName;
+                model.LastName = user.LastName;
                 user.PhotoPath = folder;
             }
-            if (model.Password!=null && await userManager.CheckPasswordAsync(user, model.Password))
+            else
             {
-                user.Email = model.Email;
-            }
-
-            if (!User.IsTeacher() && !User.IsStudent())
-            {
-                if (model.IsTeacher)
+                if (!ModelState.IsValid)
                 {
-                    await GiveRole(user, "Teacher");
-                    await teacherService.AddTeacher(User.Id());
+                    return View(model);
                 }
-                else
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                if (model.Password != null && await userManager.CheckPasswordAsync(user, model.Password))
                 {
-                    await GiveRole(user, "Student");
-                    await studentService.AddStudent(new UserType()
+                    user.Email = model.Email;
+                }
+
+                if (!User.IsTeacher() && !User.IsStudent())
+                {
+                    if (model.IsTeacher)
                     {
-                        Grade = 0,
-                        IsStudent = true,
-                        School = ""
-                    }, User.Id());
-                }
+                        await GiveRole(user, "Teacher");
+                        await teacherService.AddTeacher(User.Id());
+                    }
+                    else
+                    {
+                        await GiveRole(user, "Student");
+                        await studentService.AddStudent(new UserType()
+                        {
+                            Grade = 0,
+                            IsStudent = true,
+                            School = ""
+                        }, User.Id());
+                    }
 
-                model.ImageUrl = (string)TempData.Peek("imagePath");
-                return await Logout();
+                    return await Logout();
+                }
             }
 
             await testService.SaveChanges();

@@ -10,6 +10,7 @@
                     <label>Име</label>
                     <input class="form-control" type="text"
                            asp-for="FirstName" value="@Model.FirstName">
+                    <span class="text-danger" asp-validation-for="FirstName"></span>
                 </div>
             </div>
             <div class="col">
@@ -17,6 +18,7 @@
                     <label>Фамилия</label>
                     <input class="form-control" type="text"
                            asp-for="LastName" value="@Model.LastName">
+                    <span class="text-danger" asp-validation-for="LastName"></span>
                 </div>
             </div>
             <div class="col">
@@ -50,6 +52,7 @@
                 <div class="form-group">
                     <label>Current Password</label>
                     <input class="form-control" type="password" asp-for="Password">
+
                 </div>
             </div>
             <div class="col">
@@ -57,6 +60,7 @@
                     <label>Email</label>
                     <input class="form-control" type="text"
                            asp-for="Email" value="@Model.Email">
+                    <span class="text-danger" asp-validation-for="Email"></span>
                 </div>
             </div>
         </div>
