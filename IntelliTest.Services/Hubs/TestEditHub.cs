@@ -102,7 +102,7 @@ namespace IntelliTest.Core.Hubs
                         i--;
                     }
                 }
-                string text = "Generate questions \"Q\" and answers \"A\" only on the text only in bulgarian. " + tikToken.Decode(part.Take(i).ToList());
+                string text = "Generate questions \"Q\" in bulgarian and answers \"A\" only on the text and only in bulgarian . " + tikToken.Decode(part.Take(i).ToList());
                 chat.AppendUserInput(text);
                 
                 List<Tuple<string, string>> final = new List<Tuple<string, string>>();

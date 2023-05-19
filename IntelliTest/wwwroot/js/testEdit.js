@@ -7,7 +7,9 @@
                     .withUrl("/testEditHub")
                     .build();
             connection.on("Add", (question, answer) => {
-                questions.prepend(createElementFromHTML(openQuestionPartialView(question, answer, count, 0)))
+                let el = createElementFromHTML(openQuestionPartialView(question, answer, count, 0));
+                textAreaAdjust(el);
+                questions.prepend(el)
                 count++;
             });
             connection.on("WrongLesson", () => {
@@ -35,13 +37,13 @@
                     <input style="display: none" value="${order}" asp-for="Order"/>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this)  placeholder="Въпрос" type="text" value="${question}" name="OpenQuestions[${order}].Text"></textarea>
+                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this)  placeholder="Въпрос" type="text" name="OpenQuestions[${order}].Text">${question}</textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
                     <div class="questTextBox questAnswer">
                         <div>
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="${answer}" name="OpenQuestions[${order}].Answer"></textarea>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" name="OpenQuestions[${order}].Answer">${answer}</textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
@@ -52,8 +54,8 @@
                             <div>
                                     <input type="checkbox" name="ClosedQuestions[${questionOrder}].AnswerIndexes[${order}]"/>
                             </div>
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Опция ${order + 1}" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]"></textarea>
-                                <input onFocus="onFocus(this)" onBlur="onFocusOut(this)" placeholder="Опция ${order + 1}" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]"/>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Опция ${order + 1}" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]">${answer}</textarea>
+
                                 <span class="underline"></span>
                         </div>
             `}
@@ -69,7 +71,7 @@
                     </div>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="${question}" name="ClosedQuestions[${order}].Text"></textarea>
+<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" name="ClosedQuestions[${order}].Text">${question}</textarea>
                             <span class="underline"></span>
                         </div>
                     </div>
