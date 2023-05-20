@@ -22,6 +22,6 @@ namespace IntelliTest.Data.Entities
         public Guid StudentId { get; set; }
 
         public decimal Points { get; set; }
-        public string Explanation { get; set; }
+        public string? Explanation { get; set; }
     }
 }

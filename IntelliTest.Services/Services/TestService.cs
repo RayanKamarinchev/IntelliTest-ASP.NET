@@ -78,11 +78,74 @@ namespace IntelliTest.Core.Services
                                     OpenQuestions = t.OpenQuestions,
                                     Time = t.Time,
                                     Title = t.Title,
-                                    MultiSubmit = t.MultiSubmission
+                                    MultiSubmit = t.MultiSubmission,
+                                    PublicityLevel = t.PublicyLevel
                                 });
             var tests =await test.ToListAsync();
             query.Items = tests;
             query.TotalItemsCount = tests.Count;
+            return query;
+        }
+
+        public async Task<QueryModel<TestViewModel>> FilterMine(IEnumerable<Test> testQuery, QueryModel<TestViewModel> query)
+        {
+            if (query.Filters.Subject != Subject.Няма)
+            {
+                testQuery = testQuery.Where(t => t.Subject == query.Filters.Subject);
+            }
+            if (query.Filters.Grade >= 1 && query.Filters.Grade <= 12)
+            {
+                testQuery = testQuery.Where(t => t.Grade == query.Filters.Grade);
+            }
+
+            if (string.IsNullOrEmpty(query.Filters.SearchTerm) == false)
+            {
+                query.Filters.SearchTerm = $"%{query.Filters.SearchTerm.ToLower()}%";
+
+                testQuery = testQuery
+                    .Where(t => EF.Functions.Like(t.Title.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(t.Creator.School.ToLower(), query.Filters.SearchTerm) ||
+                                EF.Functions.Like(t.Description.ToLower(), query.Filters.SearchTerm));
+            }
+            if (query.Filters.Sorting == Sorting.Likes)
+            {
+                testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
+
+            }
+            else if (query.Filters.Sorting == Sorting.Examiners)
+            {
+                testQuery = testQuery.OrderBy(t => t.TestResults.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Questions)
+            {
+                testQuery = testQuery.OrderBy(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+            }
+            else if (query.Filters.Sorting == Sorting.Score)
+            {
+                testQuery = testQuery.OrderBy(t => t.TestResults.Average(r => r.Score));
+            }
+
+            var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
+                                .Take(query.ItemsPerPage)
+                                .Select(t => new TestViewModel()
+                                {
+                                    AverageScore = Math.Round(t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score), 2),
+                                    ClosedQuestions = t.ClosedQuestions,
+                                    CreatedOn = t.CreatedOn,
+                                    Description = t.Description,
+                                    Grade = t.Grade,
+                                    Id = t.Id,
+                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
+                                               t.OpenQuestions.Sum(q => q.MaxScore),
+                                    OpenQuestions = t.OpenQuestions,
+                                    Time = t.Time,
+                                    Title = t.Title,
+                                    MultiSubmit = t.MultiSubmission,
+                                    PublicityLevel = t.PublicyLevel
+                                });
+            var mock = test.ToList();
+            query.Items = test.ToList();
+            query.TotalItemsCount = test.Count();
             return query;
         }
 
@@ -99,6 +162,7 @@ namespace IntelliTest.Core.Services
         {
             var testQuery = context.Tests
                                    .Include(t => t.TestResults)
+                                   .Include(t=>t.TestLikes)
                                    .Where(t => !t.IsDeleted
                                                   && t.CreatorId == teacherId);
             return await Filter(testQuery, query);
@@ -110,6 +174,7 @@ namespace IntelliTest.Core.Services
                                  .Include(t=>t.OpenQuestions)
                                  .Include(t=>t.ClosedQuestions)
                                  .Include(t=>t.TestResults)
+                                 .Include(t => t.TestLikes)
                                  .FirstOrDefaultAsync(t=>t.Id == id);
             return new TestViewModel()
             {
@@ -123,7 +188,8 @@ namespace IntelliTest.Core.Services
                 OpenQuestions = t.OpenQuestions,
                 Time = t.Time,
                 Title = t.Title,
-                MultiSubmit = t.MultiSubmission
+                MultiSubmit = t.MultiSubmission,
+                PublicityLevel = t.PublicyLevel
             };
         }
 
@@ -158,7 +224,8 @@ namespace IntelliTest.Core.Services
                 Description = model.Description,
                 Grade = model.Grade,
                 Title = model.Title,
-                
+                Id = model.Id,
+                PublicityLevel = model.PublicityLevel
             };
             return t;
         }
@@ -271,6 +338,7 @@ namespace IntelliTest.Core.Services
                 test.Description = model.Description;
                 test.Grade = model.Grade;
                 test.Time = model.Time;
+                test.PublicyLevel = model.PublicityLevel;
                 //context.Update(test);
             }
             else
@@ -284,17 +352,18 @@ namespace IntelliTest.Core.Services
                     ClosedQuestions = test.ClosedQuestions,
                     OpenQuestions = test.OpenQuestions,
                     CreatedOn = DateTime.Now,
-                    CreatorId = teacherId
+                    CreatorId = teacherId,
+                    PublicyLevel = model.PublicityLevel
                 };
                 context.Tests.Add(newTest);
             }
             await context.SaveChangesAsync();
         }
 
-        public decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore, int answersCount)
+        public decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore)
         {
             decimal score = 0;
-            for (int i = 0; i < answersCount; i++)
+            for (int i = 0; i < Answers.Length; i++)
             {
                 if (Answers[i])
                 {
@@ -428,8 +497,7 @@ namespace IntelliTest.Core.Services
                 };
                 closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.Answers,
                      closedQuestionModel.RightAnswers,
-                     closedQuestionModel.MaxScore,
-                     closedQuestionModel.PossibleAnswers.Length);
+                     closedQuestionModel.MaxScore);
                 closedQuestions.Add(closedQuestionModel);
             }
 
@@ -483,8 +551,8 @@ namespace IntelliTest.Core.Services
             });
 
         }
-
-        public static bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
+        //
+        public bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
         {
             var list = Enumerable.Repeat(false, answers.Length).ToArray();
             if (answerIndexes=="")
@@ -601,18 +669,33 @@ namespace IntelliTest.Core.Services
                                        .Include(s=>s.ClosedAnswers)
                                        .ThenInclude(a=>a.Question)
                                        .ThenInclude(q=>q.Test)
+                                       .ThenInclude(t=>t.TestResults)
+                                       
+
+                                       .Include(s => s.ClosedAnswers)
+                                       .ThenInclude(a => a.Question)
+                                       .ThenInclude(q => q.Test)
+                                       .ThenInclude(t=>t.TestLikes)
+
                                        .Include(s=>s.OpenAnswers)
                                        .ThenInclude(a => a.Question)
                                        .ThenInclude(q => q.Test)
+                                       .ThenInclude(t=>t.TestResults)
+
+                                       .Include(s => s.OpenAnswers)
+                                       .ThenInclude(a => a.Question)
+                                       .ThenInclude(q => q.Test)
+                                       .ThenInclude(t=>t.TestLikes)
+
                                        .FirstOrDefaultAsync(s=>s.Id == studentId);
-            var closedIds = student?.ClosedAnswers
+            var closedQuestionTests = student?.ClosedAnswers
                                  ?.Select(a => a.Question.Test)
                                  ?.Distinct() ?? new List<Test>();
-            var openIds = student?.OpenAnswers
+            var openQuestionTests = student?.OpenAnswers
                                   ?.Select(a => a.Question.Test)
                                   ?.Distinct() ?? new List<Test>();
-            var testsQuery = closedIds.Union(openIds).AsQueryable();
-            return await Filter(testsQuery, query);
+            var testsQuery = closedQuestionTests.Union(openQuestionTests);
+            return await FilterMine(testsQuery, query);
         }
 
         public async Task<Guid> Create(TestViewModel model, Guid teacherId, string[] classNames)

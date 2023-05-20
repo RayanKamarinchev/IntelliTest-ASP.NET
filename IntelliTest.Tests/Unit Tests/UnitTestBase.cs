@@ -7,6 +7,7 @@ using IntelliTest.Data;
 using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 using IntelliTest.Tests.Mocks;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace IntelliTest.Tests.Unit_Tests
@@ -14,12 +15,21 @@ namespace IntelliTest.Tests.Unit_Tests
     public class UnitTestBase
     {
         protected IntelliTestDbContext data;
+        protected IConfiguration configuration;
 
         [OneTimeSetUp]
         public void SetUpBase()
         {
             data = DbMock.Instance;
             SeedDatabase();
+            var inMemorySettings = new Dictionary<string, string> {
+                {"TopLevelKey", "TopLevelValue"},
+                {"SectionName:SomeKey", "SectionValue"}
+            };
+
+            configuration = new ConfigurationBuilder()
+                                           .AddInMemoryCollection(inMemorySettings)
+                                           .Build();
         }
 
         [OneTimeTearDown]
@@ -30,31 +40,39 @@ namespace IntelliTest.Tests.Unit_Tests
 
         private void SeedDatabase()
         {
+            Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
+            Guid id2 = Guid.Parse("fcda0a94-d7f6-4836-a093-f69066f177c7");
             var userTeacher = new User()
             {
                 Email = "teacher@gmail.com",
                 FirstName = "Antonio",
-                LastName = "Vivaldi"
+                LastName = "Vivaldi",
+                Id = "TeacherUser",
+                PhotoPath = ""
             };
             data.Users.Add(userTeacher);
             var userStudent = new User()
             {
                 Email = "student@gmail.com",
                 FirstName = "Pesho",
-                LastName = "Peshov"
+                LastName = "Peshov",
+                Id = "StudentUser",
+                PhotoPath = ""
             };
             data.Users.Add(userStudent);
             var teacher = new Teacher()
             {
                 User = userStudent,
-                School = "PMG Sliven"
+                School = "PMG Sliven",
+                Id = id
             };
             data.Teachers.Add(teacher);
             var student = new Student()
             {
                 Grade = 8,
                 School = "PMG Sliven",
-                User = userStudent
+                User = userStudent,
+                Id = id
                 //Grades
             };
             data.Students.Add(student);
@@ -64,7 +82,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 ImageUrl = "imgs/263578a3-3347-4965-a1cf-08be0d5f29dc_test-img-removebg-preview.png",
                 Name = "Math class",
                 Subject = Subject.Математика,
-                Teacher = teacher
+                Teacher = teacher,
+                Id = id
             };
             data.Classes.Add(clas);
             var studentClass = new StudentClass()
@@ -81,7 +100,9 @@ namespace IntelliTest.Tests.Unit_Tests
                 Grade = 8,
                 Time = 10,
                 Title = "The test",
-                PublicyLevel = PublicityLevel.ClassOnly
+                PublicyLevel = PublicityLevel.TeachersOnly,
+                Id = id,
+                PhotoPath = ""
             };
             data.Tests.Add(test);
             var closedQuestions = new List<ClosedQuestion>()
@@ -93,7 +114,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     MaxScore = 2,
                     Order = 0,
                     Test = test,
-                    Text = "Избери"
+                    Text = "Избери",
+                    Id = id
                 }
             };
             data.ClosedQuestions.AddRange(closedQuestions);
@@ -105,7 +127,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Its me, Mario",
                     Test = test,
                     MaxScore = 3,
-                    Order = 1
+                    Order = 1,
+                    Id = id
                 },
                 new OpenQuestion()
                 {
@@ -113,7 +136,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Fine",
                     Test = test,
                     MaxScore = 1,
-                    Order = 2
+                    Order = 2,
+                    Id = id2
                 },
             };
             data.OpenQuestions.AddRange(openQuestionjs);
@@ -129,7 +153,9 @@ namespace IntelliTest.Tests.Unit_Tests
                 {
                     AnswerIndexes = "2",
                     Student = student,
-                    Question = closedQuestions[0]
+                    Question = closedQuestions[0],
+                    Id = id,
+                    Explanation = "None"
                 }
             };
             data.ClosedQuestionAnswers.AddRange(closedQuestionAnswers);
@@ -139,13 +165,17 @@ namespace IntelliTest.Tests.Unit_Tests
                 {
                     Answer = "its me mario",
                     Student = student,
-                    Question = openQuestionjs[0]
+                    Question = openQuestionjs[0],
+                    Id = id,
+                    Explanation = "None"
                 },
                 new OpenQuestionAnswer()
                 {
                     Answer = "Bad",
                     Student = student,
-                    Question = openQuestionjs[1]
+                    Question = openQuestionjs[1],
+                    Id = id2,
+                    Explanation = "None"
                 }
             };
             data.OpenQuestionAnswers.AddRange(openQuestionAnswers);
@@ -156,7 +186,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 Creator = teacher,
                 Grade = 8,
                 HtmlCotnent = "Example nonsense text",
-                Title = "Math lesson"
+                Title = "Math lesson",
+                Id = id
             };
             data.Lessons.Add(lesson);
             var reads = new List<Read>()
@@ -169,6 +200,7 @@ namespace IntelliTest.Tests.Unit_Tests
             };
             data.Reads.AddRange(reads);
             //Test result
+            data.SaveChanges();
         }
     }
 }
