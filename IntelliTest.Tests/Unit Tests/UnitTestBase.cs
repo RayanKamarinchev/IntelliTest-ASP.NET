@@ -187,18 +187,10 @@ namespace IntelliTest.Tests.Unit_Tests
                 Grade = 8,
                 HtmlCotnent = "Example nonsense text",
                 Title = "Math lesson",
-                Id = id
+                Id = id,
+                Subject = Subject.Математика
             };
             data.Lessons.Add(lesson);
-            var reads = new List<Read>()
-            {
-                new Read()
-                {
-                    Lesson = lesson,
-                    User = userStudent
-                }
-            };
-            data.Reads.AddRange(reads);
             //Test result
             data.SaveChanges();
         }

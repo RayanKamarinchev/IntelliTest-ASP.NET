@@ -41,5 +41,6 @@ namespace IntelliTest.Core.Models.Tests
         public IList<ClosedQuestion>? ClosedQuestions { get; set; }
         public IList<bool> Selected { get; set; }
         public bool MultiSubmit { get; set; }
+        public string PhotoPath { get; set; }
     }
 }

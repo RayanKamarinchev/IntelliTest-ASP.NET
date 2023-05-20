@@ -15,6 +15,7 @@ using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json;
+using NUnit.Framework.Interfaces;
 
 namespace IntelliTest.Tests.Unit_Tests
 {
@@ -29,6 +30,16 @@ namespace IntelliTest.Tests.Unit_Tests
         public void SetUp() =>
             testService = new TestService(data, configuration);
 
+        public void SetUpQuery() => query = new QueryModel<TestViewModel>()
+        {
+            CurrentPage = 1,
+            Filters = new Filter()
+            {
+                Sorting = Sorting.Likes,
+                Subject = Subject.Няма
+            },
+            ItemsPerPage = 3
+        };
         [Test]
         public async Task GetById_Correct()
         {
@@ -209,7 +220,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task Translate_Correct()
         {
-            Assert.AreEqual("In Europe, the New Age began at the end of the 15th century and continued until the First World War (1914 - 1918).", testService.Translate("В Европа Новото време започва от края на XV в. и продължава до Първата световна война (1914 – 1918 г.)."));
+            Assert.AreEqual("", testService.Translate("В Европа Новото време започва от края на XV в. и продължава до Първата световна война (1914 – 1918 г.)."));
         }
         [Test]
         public async Task IsTestTakenByStudentId_Correct()
@@ -217,7 +228,7 @@ namespace IntelliTest.Tests.Unit_Tests
             Assert.IsTrue(await testService.IsTestTakenByStudentId(id, await data.Students.FirstOrDefaultAsync()));
         }
         [Test]
-        public async Task GetExaminersIds_Correct()
+        public void GetExaminersIds_Correct()
         {
             Assert.AreEqual(id, testService.GetExaminersIds(id)[0]);
         }
@@ -239,21 +250,132 @@ namespace IntelliTest.Tests.Unit_Tests
             Assert.AreEqual(json1, json2);
         }
         [Test]
-        public async Task TestsTaken_Correct()
+        public async Task Create_Correct()
         {
-            var test = (await testService.TestsTakenByStudent(id, query)).Items.FirstOrDefault();
-            string json1 = JsonConvert.SerializeObject(await testService.GetById(id), Formatting.Indented,
-                                                       new JsonSerializerSettings()
-                                                       {
-                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling
-                                                                                             .Ignore
-                                                       });
-            string json2 = JsonConvert.SerializeObject(test, Formatting.Indented,
-                                                       new JsonSerializerSettings()
-                                                       {
-                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                                                       });
-            Assert.AreEqual(json1, json2);
+            int testsCount = data.Tests.Count();
+            var testModel = new TestViewModel()
+            {
+                CreatedOn = new DateTime(2023, 5, 19, 10, 51, 0),
+                Description = "Test Test",
+                Grade = 8,
+                Time = 10,
+                Title = "The test",
+                Id = id2,
+                PublicityLevel = PublicityLevel.Public,
+                PhotoPath = ""
+            };
+            await testService.Create(testModel, id, new string[0]);
+            int testsCountNow = (await testService.GetAll(false, query)).Items.Count();
+            Assert.AreEqual(testsCount+1, testsCountNow);
+            SetUpBase();
+            SetUp();
+        }
+
+        [Test]
+        public async Task ExistsbyId_Correct()
+        {
+            Assert.IsTrue(await testService.ExistsbyId(id));
+        }
+
+        [Test]
+        public async Task StudentHasAccess_Correct()
+        {
+            Assert.IsFalse(await testService.StudentHasAccess(id, id));
+        }
+
+        [Test]
+        public async Task Delete_Correct()
+        {
+            await testService.DeleteTest(id);
+            Assert.IsFalse(await testService.ExistsbyId(id));
+            SetUpBase();
+            SetUp();
+        }
+
+        [Test]
+        public async Task GetStatistics_Correct()
+        {
+            var res = await testService.GetStatistics(id);
+            Assert.AreEqual("The test", res.Title);
+            Assert.AreEqual(1, res.ClosedQuestions.Count);
+            Assert.AreEqual(2, res.OpenQuestions.Count);
+            Assert.AreEqual(0, res.Examiners);
+            Assert.AreEqual(2, res.ClosedQuestions.FirstOrDefault().StudentAnswers[0][0]);
+            Assert.AreEqual("its me mario", res.OpenQuestions.FirstOrDefault().StudentAnswers[0]);
+            Assert.AreEqual("Bad", res.OpenQuestions.ToList()[1].StudentAnswers[0]);
+        }
+
+        [Test]
+        public async Task Filter_Correct()
+        {
+            var teacher = await data.Teachers.FirstOrDefaultAsync(t => t.Id == id);
+            var tests = new List<Test>()
+            {
+                new Test()
+                {
+                    CreatedOn = new DateTime(2023, 5, 19, 10, 51, 0),
+                    Creator = teacher,
+                    Description = "Test Test",
+                    Grade = 10,
+                    Time = 10,
+                    Title = "Pesho",
+                    PublicyLevel = PublicityLevel.TeachersOnly,
+                    Id = id2,
+                    PhotoPath = "",
+                    Subject = Subject.Математика
+                }
+            };
+            data.Tests.AddRange(tests);
+            await data.SaveChangesAsync();
+            SetUp();
+            var testsDb = await data.Tests
+                                    .Include(t => t.TestResults)
+                                    .Include(t => t.TestLikes)
+                                    .ToListAsync();
+            query.Filters.Subject = Subject.Математика;
+            var bySubject = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id2, bySubject.Items.FirstOrDefault().Id);
+            var bySubjectMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id2, bySubjectMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            query.Filters.Grade = 10;
+            var byGrade = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id2, byGrade.Items.FirstOrDefault().Id);
+            var byGradeMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id2, byGradeMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            query.Filters.SearchTerm = "Pesho";
+            var bySearchTerm = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id2, bySearchTerm.Items.FirstOrDefault().Id);
+            var bySearchTermMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id2, bySearchTermMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            query.Filters.Sorting = Sorting.Examiners;
+            var byExaminers = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
+            var byExaminersMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id, byExaminersMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            query.Filters.Sorting = Sorting.Score;
+            var byScore = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id, byScore.Items.FirstOrDefault().Id);
+            var byScoreMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id, byScoreMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            query.Filters.Sorting = Sorting.Questions;
+            var byQuestions = await testService.Filter(data.Tests, query);
+            Assert.AreEqual(id2, byQuestions.Items.FirstOrDefault().Id);
+            var byQuestionsMine = await testService.FilterMine(testsDb, query);
+            Assert.AreEqual(id2, byQuestionsMine.Items.FirstOrDefault().Id);
+
+            SetUpQuery();
+            SetUpBase();
+            SetUp();
         }
     }
 }

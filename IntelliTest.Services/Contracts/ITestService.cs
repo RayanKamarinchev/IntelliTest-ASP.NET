@@ -33,5 +33,7 @@ namespace IntelliTest.Core.Contracts
         string Translate(string text);
         Task SaveChanges();
         bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes);
+        public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query);
+        public Task<QueryModel<TestViewModel>> FilterMine(IEnumerable<Test> testQuery, QueryModel<TestViewModel> query);
     }
 }

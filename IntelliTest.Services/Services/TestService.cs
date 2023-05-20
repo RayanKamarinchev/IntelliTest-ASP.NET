@@ -60,7 +60,7 @@ namespace IntelliTest.Core.Services
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Average(r=>r.Score));
+                testQuery = testQuery.OrderBy(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r=>r.Score));
             }
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
@@ -100,12 +100,11 @@ namespace IntelliTest.Core.Services
 
             if (string.IsNullOrEmpty(query.Filters.SearchTerm) == false)
             {
-                query.Filters.SearchTerm = $"%{query.Filters.SearchTerm.ToLower()}%";
-
+                query.Filters.SearchTerm = query.Filters.SearchTerm.Replace("%", "");
                 testQuery = testQuery
-                    .Where(t => EF.Functions.Like(t.Title.ToLower(), query.Filters.SearchTerm) ||
-                                EF.Functions.Like(t.Creator.School.ToLower(), query.Filters.SearchTerm) ||
-                                EF.Functions.Like(t.Description.ToLower(), query.Filters.SearchTerm));
+                    .Where(t => t.Title.ToLower().Contains(query.Filters.SearchTerm) ||
+                                t.Creator.School.ToLower().Contains(query.Filters.SearchTerm) ||
+                                t.Description.ToLower().Contains(query.Filters.SearchTerm));
             }
             if (query.Filters.Sorting == Sorting.Likes)
             {
@@ -122,7 +121,7 @@ namespace IntelliTest.Core.Services
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Average(r => r.Score));
+                testQuery = testQuery.OrderBy(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score));
             }
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
@@ -143,7 +142,6 @@ namespace IntelliTest.Core.Services
                                     MultiSubmit = t.MultiSubmission,
                                     PublicityLevel = t.PublicyLevel
                                 });
-            var mock = test.ToList();
             query.Items = test.ToList();
             query.TotalItemsCount = test.Count();
             return query;
@@ -151,7 +149,9 @@ namespace IntelliTest.Core.Services
 
         public async Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query)
         {
-            var testQuery = context.Tests.Include(t=>t.TestResults)
+            var testQuery = context.Tests
+                                   .Include(t=>t.TestResults)
+                                   .Include(t => t.TestLikes)
                                    .Where(t => !t.IsDeleted
                                                   && (t.PublicyLevel == PublicityLevel.Public ||
                                                       (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)));
@@ -168,14 +168,19 @@ namespace IntelliTest.Core.Services
             return await Filter(testQuery, query);
         }
 
-        public async Task<TestViewModel> GetById(Guid id)
+        public async Task<TestViewModel?> GetById(Guid id)
         {
             var t = await context.Tests
+                                 .Where(t=>!t.IsDeleted)
                                  .Include(t=>t.OpenQuestions)
                                  .Include(t=>t.ClosedQuestions)
                                  .Include(t=>t.TestResults)
                                  .Include(t => t.TestLikes)
                                  .FirstOrDefaultAsync(t=>t.Id == id);
+            if (t is null)
+            {
+                return null;
+            }
             return new TestViewModel()
             {
                 AverageScore = Math.Round(t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score), 2),
@@ -710,7 +715,8 @@ namespace IntelliTest.Core.Services
                 CreatedOn = DateTime.Now,
                 CreatorId = teacherId,
                 OpenQuestions = new List<OpenQuestion>(),
-                ClosedQuestions = new List<ClosedQuestion>()
+                ClosedQuestions = new List<ClosedQuestion>(),
+                PhotoPath = model.PhotoPath
             };
             var classes = await context.Classes.Where(c => classNames.Contains(c.Name)).ToListAsync();
             var e = await context.Tests.AddAsync(test);
@@ -725,16 +731,18 @@ namespace IntelliTest.Core.Services
 
         public async Task<bool> ExistsbyId(Guid id)
         {
-            return await context.Tests.AnyAsync(t=>t.Id == id);
+            return await context.Tests
+                                .Where(c => !c.IsDeleted)
+                                .AnyAsync(t=>t.Id == id);
         }
 
         public async Task<bool> StudentHasAccess(Guid testId, Guid studentId)
         {
             Test? test = await context.Tests
+                                      .Where(t=>!t.IsDeleted)
                                       .Include(t=>t.ClassesWithAccess)
                                       .ThenInclude(ct=>ct.Class)
                                       .ThenInclude(c=>c.Students)
-                                      .ThenInclude(cs=>cs.StudentId)
                                       .FirstOrDefaultAsync(t => t.Id == testId);
             if (test == null)
             {
