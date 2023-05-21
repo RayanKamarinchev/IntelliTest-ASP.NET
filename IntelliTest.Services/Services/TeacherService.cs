@@ -29,28 +29,15 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsTestCreator(Guid testId, Guid teacherId)
-        {
-            var teacher = await context.Teachers
-                                       .Include(t => t.Tests)
-                                       .FirstOrDefaultAsync(t => t.Id == teacherId);
-            return teacher.Tests.Any(t => t.Id == testId);
-
-        }
-
-        public async Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId)
-        {
-            var teacher = await context.Teachers
-                                       .Include(t => t.Lessons)
-                                       .FirstOrDefaultAsync(t => t.Id == teacherId);
-            return teacher.Lessons.Any(t => t.Id == lessonId);
-        }
-
-        public async Task<Guid> GetTeacherId(string userId)
+        public async Task<Guid?> GetTeacherId(string userId)
         {
             var teacher = await context.Teachers
                                        .Include(t => t.Tests)
                                        .FirstOrDefaultAsync(t => t.UserId == userId);
+            if (teacher is null)
+            {
+                return null;
+            }
             return teacher.Id;
         }
     }

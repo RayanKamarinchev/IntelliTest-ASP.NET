@@ -42,5 +42,7 @@ namespace IntelliTest.Core.Models.Tests
         public IList<bool> Selected { get; set; }
         public bool MultiSubmit { get; set; }
         public string PhotoPath { get; set; }
+        public bool IsOwner { get; set; }
+        public bool IsTestTaken { get; set; }
     }
 }

@@ -19,13 +19,11 @@ namespace IntelliTest.Controllers
         private readonly ILessonService lessonService;
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
-        private readonly ITeacherService teacherService;
 
         public LessonsController(ILessonService _lessonService, IMemoryCache _cache, ITeacherService _teacherService)
         {
             lessonService = _lessonService;
             cache = _cache;
-            teacherService = _teacherService;
         }
 
         [HttpGet]
@@ -41,7 +39,8 @@ namespace IntelliTest.Controllers
                     currentPage = 1;
                 }
                 QueryModel<LessonViewModel> query = new QueryModel<LessonViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
-                model = await lessonService.GetAll(query);
+                var teacherId = (Guid)TempData.Peek("TeacherId");
+                model = await lessonService.GetAll(teacherId, query);
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -55,7 +54,7 @@ namespace IntelliTest.Controllers
         [Route("Read/{id}")]
         public async Task<IActionResult> Read(Guid id)
         {
-            if (!await lessonService.ExistsById(id))
+            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 return BadRequest();
             }
@@ -87,9 +86,7 @@ namespace IntelliTest.Controllers
 
             if (model == null)
             {
-                Guid teacherId = await teacherService.GetTeacherId(User.Id());
-
-                if (!await teacherService.IsLessonCreator(id, teacherId))
+                if (!await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
                 {
                     return RedirectToAction("Read", new { id = id });
                 }
@@ -125,15 +122,13 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
-            if (!await lessonService.ExistsById(id))
+            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
-                await lessonService.Create(model, await teacherService.GetTeacherId(User.Id()));
+                await lessonService.Create(model, (Guid)TempData.Peek("TeacherId"));
                 return RedirectToAction("Index");
             }
 
-            Guid teacherId = await teacherService.GetTeacherId(User.Id());
-
-            if (!await teacherService.IsLessonCreator(id, teacherId))
+            if (!await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
             {
                 return NotFound();
             }
@@ -145,12 +140,20 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Like(Guid lessonId, string userId)
         {
+            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
+            {
+                return NotFound();
+            }
             await lessonService.LikeLesson(lessonId, userId);
             return NoContent();
         }
         [HttpGet]
         public async Task<IActionResult> Unlike(Guid lessonId, string userId)
         {
+            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
+            {
+                return NotFound();
+            }
             await lessonService.UnlikeLesson(lessonId, userId);
             return NoContent();
         }

@@ -7,15 +7,15 @@ namespace IntelliTest.Core.Contracts
 {
     public interface ITestService
     {
-        Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query);
-        Task<QueryModel<TestViewModel>> GetMy(Guid teacherId, QueryModel<TestViewModel> query);
+        Task<QueryModel<TestViewModel>> GetAll(Guid? teacherId, Guid? studentId, QueryModel<TestViewModel> query);
+        Task<QueryModel<TestViewModel>> GetMy(Guid? teacherId, Guid? studentId, QueryModel<TestViewModel> query);
         Task<TestViewModel> GetById(Guid id);
         Task<bool> ExistsbyId(Guid id);
         TestEditViewModel ToEdit(TestViewModel model);
         Task Edit(Guid id, TestEditViewModel model, Guid teacherId);
         TestSubmitViewModel ToSubmit(TestViewModel model);
         Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId);
-        Task<bool> IsTestTakenByStudentId(Guid testId, Student student);
+        Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId);
         Task<TestStatsViewModel> GetStatistics(Guid testId);
         Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
                            List<ClosedQuestionAnswerViewModel> closedQuestions,
@@ -33,7 +33,8 @@ namespace IntelliTest.Core.Contracts
         string Translate(string text);
         Task SaveChanges();
         bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes);
-        public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query);
+        public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId);
         public Task<QueryModel<TestViewModel>> FilterMine(IEnumerable<Test> testQuery, QueryModel<TestViewModel> query);
+        public Task<bool> IsTestCreator(Guid testId, Guid teacherId);
     }
 }

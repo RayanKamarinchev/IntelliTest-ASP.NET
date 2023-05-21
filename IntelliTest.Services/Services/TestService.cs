@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using IntelliTest.Data;
+﻿using IntelliTest.Data;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
@@ -7,7 +6,6 @@ using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
-using Org.BouncyCastle.Ocsp;
 using System.Diagnostics;
 using TiktokenSharp;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +24,7 @@ namespace IntelliTest.Core.Services
             config = _config;
         }
 
-        public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query)
+        public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId)
         {
             if (query.Filters.Subject!=Subject.Няма)
             {
@@ -82,6 +80,20 @@ namespace IntelliTest.Core.Services
                                     PublicityLevel = t.PublicyLevel
                                 });
             var tests =await test.ToListAsync();
+            tests.Select(async t =>
+            {
+                t.IsOwner = false;
+                if (teacherId is not null)
+                {
+                    t.IsOwner = await IsTestCreator(t.Id, teacherId.Value);
+                }
+
+                t.IsTestTaken = false;
+                if (studentId is not null)
+                {
+                    t.IsTestTaken = await IsTestTakenByStudentId(t.Id, studentId.Value);
+                }
+            });
             query.Items = tests;
             query.TotalItemsCount = tests.Count;
             return query;
@@ -140,32 +152,34 @@ namespace IntelliTest.Core.Services
                                     Time = t.Time,
                                     Title = t.Title,
                                     MultiSubmit = t.MultiSubmission,
-                                    PublicityLevel = t.PublicyLevel
+                                    PublicityLevel = t.PublicyLevel,
+                                    IsOwner = false,
+                                    IsTestTaken = true
                                 });
             query.Items = test.ToList();
             query.TotalItemsCount = test.Count();
             return query;
         }
 
-        public async Task<QueryModel<TestViewModel>> GetAll(bool isTeacher, QueryModel<TestViewModel> query)
+        public async Task<QueryModel<TestViewModel>> GetAll(Guid? teacherId, Guid? studentId, QueryModel<TestViewModel> query)
         {
             var testQuery = context.Tests
                                    .Include(t=>t.TestResults)
                                    .Include(t => t.TestLikes)
                                    .Where(t => !t.IsDeleted
                                                   && (t.PublicyLevel == PublicityLevel.Public ||
-                                                      (isTeacher && t.PublicyLevel == PublicityLevel.TeachersOnly)));
-            return await Filter(testQuery, query);
+                                                      (teacherId.ToString()!="" && t.PublicyLevel == PublicityLevel.TeachersOnly)));
+            return await Filter(testQuery, query, teacherId, studentId);
         }
 
-        public async Task<QueryModel<TestViewModel>> GetMy(Guid teacherId, QueryModel<TestViewModel> query)
+        public async Task<QueryModel<TestViewModel>> GetMy(Guid? teacherId, Guid? studentId, QueryModel<TestViewModel> query)
         {
             var testQuery = context.Tests
                                    .Include(t => t.TestResults)
                                    .Include(t=>t.TestLikes)
                                    .Where(t => !t.IsDeleted
                                                   && t.CreatorId == teacherId);
-            return await Filter(testQuery, query);
+            return await Filter(testQuery, query, teacherId, studentId);
         }
 
         public async Task<TestViewModel?> GetById(Guid id)
@@ -576,8 +590,9 @@ namespace IntelliTest.Core.Services
             return list;
         }
 
-        public async Task<bool> IsTestTakenByStudentId(Guid testId, Student student)
+        public async Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId)
         {
+            var student = await context.Students.FirstOrDefaultAsync(s => s.Id == studentId);
             bool closed = (student?.ClosedAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
             bool open = (student?.OpenAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
             return closed || open;
@@ -792,6 +807,19 @@ namespace IntelliTest.Core.Services
             }
 
             return model;
+        }
+
+        public async Task<bool> IsTestCreator(Guid testId, Guid teacherId)
+        {
+            var teacher = await context.Teachers
+                                       .Include(t => t.Tests)
+                                       .FirstOrDefaultAsync(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return false;
+            }
+            return teacher.Tests.Any(t => t.Id == testId);
+
         }
     }
 }

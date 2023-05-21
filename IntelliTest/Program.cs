@@ -72,11 +72,11 @@ builder.Services.AddControllers()
 builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddTransient<IRoomService, RoomService>();
 builder.Services.AddTransient<ITestService, TestService>();
-builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IClassService, ClassService>();
+builder.Services.AddTransient<IStudentService, StudentService>();
 
 builder.Services.AddSignalR();
 
@@ -151,3 +151,4 @@ app.Run();
 //var sanitizer = new HtmlSanitizer();
 //sanitizer.Sanitize("");
 //Test Image editing
+//TODO: TestController 175 test image add

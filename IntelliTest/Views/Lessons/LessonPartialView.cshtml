@@ -41,8 +41,7 @@
             {
                 return;
             }
-            Guid teacherId = await teacherService.GetTeacherId(User.Id());
-            if (Model.CreatorId == teacherId)
+            if (Model.CreatorId == (Guid)TempData.Peek("TeacherId"))
             {
                 <a asp-action="Edit" style="color: white !important;position: absolute;right: 10px;bottom: 10px;" class="text-black body_size btn btn-primary">Редактирай</a>
             }

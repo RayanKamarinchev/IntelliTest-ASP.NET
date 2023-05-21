@@ -310,8 +310,7 @@ namespace IntelliTest.Controllers
             switch (type)
             {
                 case "results":
-                    Guid studentId = await studentService.GetStudentId(User.Id());
-                    var results = await studentService.GetAllResults(studentId);
+                    var results = await studentService.GetAllResults((Guid)TempData.Peek("StudentId"));
                     return PartialView("Panels/UserTestResultsPartialView", results);
                 case "read":
                     var read = await lessonService.ReadLessons(User.Id());
@@ -323,12 +322,11 @@ namespace IntelliTest.Controllers
                     QueryModel<TestViewModel> myTests = new QueryModel<TestViewModel>();
                     if (User.IsTeacher())
                     {
-                        Guid teacherId = await teacherService.GetTeacherId(User.Id());
-                        myTests = await testService.GetMy(teacherId, new QueryModel<TestViewModel>());
+                        myTests = await testService.GetMy((Guid)TempData.Peek("TeacherId"), null, new QueryModel<TestViewModel>());
                     }
                     else if (User.IsStudent())
                     {
-                        Guid studentOwnerId = await studentService.GetStudentId(User.Id());
+                        Guid studentOwnerId = (Guid)TempData.Peek("StudentId");
                         myTests = await testService.TestsTakenByStudent(studentOwnerId, new QueryModel<TestViewModel>());
                     }
 

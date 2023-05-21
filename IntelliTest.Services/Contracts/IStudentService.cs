@@ -8,7 +8,7 @@ namespace IntelliTest.Core.Contracts
     public interface IStudentService
     {
         Task AddStudent(UserType model, string userId);
-        Task<Guid> GetStudentId(string userId);
+        Task<Guid?> GetStudentId(string userId);
 
         Task<Student> GetStudent(Guid studentId);
         Task<IEnumerable<TestResultsViewModel>> GetAllResults(Guid studentId);

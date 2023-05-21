@@ -60,7 +60,7 @@ namespace IntelliTest.Controllers
             model.Name = "";
             model.Teacher = new TeacherViewModel()
             {
-                Id = await teacherService.GetTeacherId(User.Id())
+                Id = (Guid)TempData.Peek("TeacherId")
             };
             return View("Create", model);
         }
@@ -88,7 +88,7 @@ namespace IntelliTest.Controllers
 
             model.Teacher = new TeacherViewModel()
             {
-                Id = await teacherService.GetTeacherId(User.Id())
+                Id = (Guid)TempData.Peek("TeacherId")
             };
             await classService.Create(model);
             TempData["message"] = "Успешно създаден клас";
@@ -245,9 +245,8 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
-
-            Guid studentId = await studentService.GetStudentId(User.Id());
-            bool success = await classService.AddStudent(studentId, model.Id);
+            
+            bool success = await classService.AddStudent((Guid)TempData.Peek("StudentId"), model.Id);
             if (!success)
             {
                 ModelState.AddModelError("Id", "Курсът не е намерен");

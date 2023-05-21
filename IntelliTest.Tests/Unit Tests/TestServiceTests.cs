@@ -51,7 +51,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task GetMy_Correct()
         {
-            var test = await testService.GetMy(id, new QueryModel<TestViewModel>());
+            var test = await testService.GetMy(null, id, new QueryModel<TestViewModel>());
             var real = await data.Tests.FirstOrDefaultAsync(t => t.Id == id);
             Assert.AreEqual(test.Items.First().Id, real.Id);
         }
@@ -70,14 +70,14 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task GetAll_CorrectStudent()
         {
-            var test = await testService.GetAll(false, query);
+            var test = await testService.GetAll(null, id, query);
             var real = await data.Tests.FirstOrDefaultAsync(t => t.Id == id);
             Assert.AreEqual(0, test.Items.Count());
         }
         [Test]
         public async Task GetAll_CorrectTeacher()
         {
-            var test = await testService.GetAll(true, query);
+            var test = await testService.GetAll(id, null, query);
             var real = await data.Tests.FirstOrDefaultAsync(t => t.Id == id);
             Assert.AreEqual(test.Items.First().Id, real.Id);
         }
@@ -225,7 +225,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task IsTestTakenByStudentId_Correct()
         {
-            Assert.IsTrue(await testService.IsTestTakenByStudentId(id, await data.Students.FirstOrDefaultAsync()));
+            Assert.IsTrue(await testService.IsTestTakenByStudentId(id, id));
         }
         [Test]
         public void GetExaminersIds_Correct()
@@ -265,7 +265,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 PhotoPath = ""
             };
             await testService.Create(testModel, id, new string[0]);
-            int testsCountNow = (await testService.GetAll(false, query)).Items.Count();
+            int testsCountNow = (await testService.GetAll(null, id, query)).Items.Count();
             Assert.AreEqual(testsCount+1, testsCountNow);
             SetUpBase();
             SetUp();
@@ -333,42 +333,42 @@ namespace IntelliTest.Tests.Unit_Tests
                                     .Include(t => t.TestLikes)
                                     .ToListAsync();
             query.Filters.Subject = Subject.Математика;
-            var bySubject = await testService.Filter(data.Tests, query);
+            var bySubject = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id2, bySubject.Items.FirstOrDefault().Id);
             var bySubjectMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id2, bySubjectMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Grade = 10;
-            var byGrade = await testService.Filter(data.Tests, query);
+            var byGrade = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id2, byGrade.Items.FirstOrDefault().Id);
             var byGradeMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id2, byGradeMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.SearchTerm = "Pesho";
-            var bySearchTerm = await testService.Filter(data.Tests, query);
+            var bySearchTerm = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id2, bySearchTerm.Items.FirstOrDefault().Id);
             var bySearchTermMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id2, bySearchTermMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Examiners;
-            var byExaminers = await testService.Filter(data.Tests, query);
+            var byExaminers = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
             var byExaminersMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id, byExaminersMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Score;
-            var byScore = await testService.Filter(data.Tests, query);
+            var byScore = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id, byScore.Items.FirstOrDefault().Id);
             var byScoreMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id, byScoreMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Questions;
-            var byQuestions = await testService.Filter(data.Tests, query);
+            var byQuestions = await testService.Filter(data.Tests, query, null, null);
             Assert.AreEqual(id2, byQuestions.Items.FirstOrDefault().Id);
             var byQuestionsMine = await testService.FilterMine(testsDb, query);
             Assert.AreEqual(id2, byQuestionsMine.Items.FirstOrDefault().Id);

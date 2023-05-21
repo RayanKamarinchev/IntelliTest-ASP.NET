@@ -2,9 +2,6 @@
 @using IntelliTest.Core.Contracts
 @using IntelliTest.Infrastructure
 @model TestViewModel
-@inject ITestService testService
-@inject IStudentService studentService
-@inject ITeacherService teacherService
 <div class="card card-margin">
     <div class="card-header no-border">
         <h5 class="card-title">@Model.Title - @Model.Grade</h5>
@@ -39,8 +36,7 @@
                 @{
                     if (User.IsTeacher())
                     {
-                        bool isOwner = await teacherService.IsTestCreator(Model.Id, await teacherService.GetTeacherId(User.Id()));
-                        if (isOwner)
+                        if (Model.IsOwner)
                         {
                             <a asp-action="Statistics" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
@@ -54,11 +50,9 @@
                     }
                     else
                     {
-                        Guid studentId = await studentService.GetStudentId(User.Id());
-                        var student = await studentService.GetStudent(studentId);
-                        if (await testService.IsTestTakenByStudentId(Model.Id, student))
+                        if (Model.IsTestTaken)
                         {
-                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@Model.Id"
+                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@TempData.Peek("StudentId")" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                                 Резултати
                             </a>

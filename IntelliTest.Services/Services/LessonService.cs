@@ -91,10 +91,10 @@ namespace IntelliTest.Core.Services
             return query;
         }
 
-        public async Task<QueryModel<LessonViewModel>> GetAll(QueryModel<LessonViewModel> query)
+        public async Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query)
         {
-            List<LessonViewModel> model = new List<LessonViewModel>();
             var lessonsQuery = context.Lessons
+                                      .Where(l => !l.IsDeleted && (!l.IsPrivate || l.CreatorId == teacherId))
                                       .Include(l => l.LessonLikes)
                                       .Include(l => l.ClosedQuestions)
                                       .Include(l => l.OpenQuestions)
@@ -108,11 +108,13 @@ namespace IntelliTest.Core.Services
         public async Task<LessonViewModel?>? GetById(Guid lessonId)
         {
             var l = await context.Lessons
-                                 .Include(l => l.OpenQuestions)
+                                 .Where(l => !l.IsDeleted)
+                                 .Include(l => l.LessonLikes)
                                  .Include(l => l.ClosedQuestions)
+                                 .Include(l => l.OpenQuestions)
                                  .Include(l => l.Reads)
                                  .Include(l => l.Creator)
-                                 .ThenInclude(t => t.User)
+                                 .ThenInclude(c => c.User)
                                  .FirstOrDefaultAsync(l => l.Id == lessonId);
             if (l == null)
             {
@@ -141,6 +143,7 @@ namespace IntelliTest.Core.Services
         public async Task<LessonViewModel?>? GetByName(string name)
         {
             var l = await context.Lessons
+                                 .Where(l => !l.IsDeleted)
                                  .Include(l => l.OpenQuestions)
                                  .Include(l => l.ClosedQuestions)
                                  .Include(l => l.Reads)
@@ -208,6 +211,7 @@ namespace IntelliTest.Core.Services
         public async Task LikeLesson(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
+                                      .Where(l => !l.IsDeleted)
                                       .Include(l => l.LessonLikes)
                                       .FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.LessonLikes.Add(new LessonLike()
@@ -220,6 +224,7 @@ namespace IntelliTest.Core.Services
         public async Task UnlikeLesson(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
+                                      .Where(l=>!l.IsDeleted)
                                       .Include(l => l.LessonLikes)
                                       .FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.LessonLikes.Remove(lesson.LessonLikes.Single(l => l.UserId == userId));
@@ -229,6 +234,7 @@ namespace IntelliTest.Core.Services
         public async Task<bool> IsLiked(Guid lessonId, string userId)
         {
             var lesson = await context.Lessons
+                                      .Where(l=>!l.IsDeleted)
                                       .Include(l => l.LessonLikes)
                                       .FirstOrDefaultAsync(l => l.Id == lessonId);
             return lesson.LessonLikes.Any(l => l.UserId == userId);
@@ -251,9 +257,8 @@ namespace IntelliTest.Core.Services
         public async Task<IEnumerable<LessonViewModel>> ReadLessons(string userId)
         {
             List<LessonViewModel> model = new List<LessonViewModel>();
-            var mock = await context.Lessons.ToListAsync();
             var lessons = await context.Lessons
-                                       .Where(l => l.Reads.Any(r => r.UserId == userId))
+                                       .Where(l => l.Reads.Any(r => r.UserId == userId) && !l.IsDeleted)
                                        .Include(l => l.LessonLikes)
                                        .Include(l => l.ClosedQuestions)
                                        .Include(l => l.OpenQuestions)
@@ -284,7 +289,8 @@ namespace IntelliTest.Core.Services
                     Title = l.Title,
                     School = l.Creator.School,
                     Subject = l.Subject,
-                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
+                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
+                    HtmlContent = l.HtmlCotnent
                 });
             }
 
@@ -297,6 +303,7 @@ namespace IntelliTest.Core.Services
             var lessons = await context.Lessons
                                        .Where(l => l.LessonLikes != null)
                                        .Where(l => l.LessonLikes.Any(l => l.UserId == userId))
+                                       .Where(l=>!l.IsDeleted)
                                        .Include(l => l.LessonLikes)
                                        .Include(l => l.ClosedQuestions)
                                        .Include(l => l.OpenQuestions)
@@ -335,14 +342,18 @@ namespace IntelliTest.Core.Services
             return model;
         }
 
-        public Task<bool> ExistsById(Guid lessonId)
+        public Task<bool> ExistsById(Guid teacherId,Guid lessonId)
         {
-            return context.Lessons.AnyAsync(l => l.Id == lessonId);
+            return context.Lessons
+                          .Where(l => !l.IsDeleted && (!l.IsPrivate || l.CreatorId == teacherId))
+                          .AnyAsync(l => l.Id == lessonId);
         }
 
         public async Task Edit(Guid lessonId, EditLessonViewModel model)
         {
-            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == lessonId);
+            var lesson = await context.Lessons
+                                      .Where(l => !l.IsDeleted)
+                                      .FirstOrDefaultAsync(l => l.Id == lessonId);
             lesson.Grade = model.Grade;
             lesson.OpenQuestions = model.OpenQuestions;
             lesson.ClosedQuestions = model.ClosedQuestions;
@@ -351,6 +362,18 @@ namespace IntelliTest.Core.Services
             lesson.HtmlCotnent = model.HtmlContent;
             context.Update(lesson);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId)
+        {
+            var teacher = await context.Teachers
+                                       .Include(t => t.Lessons)
+                                       .FirstOrDefaultAsync(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return false;
+            }
+            return teacher.Lessons.Any(t => t.Id == lessonId);
         }
     }
 }
