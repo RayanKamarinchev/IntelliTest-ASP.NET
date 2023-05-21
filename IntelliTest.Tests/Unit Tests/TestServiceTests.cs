@@ -51,7 +51,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task GetMy_Correct()
         {
-            var test = await testService.GetMy(null, id, new QueryModel<TestViewModel>());
+            var test = await testService.GetMy(id, null, new QueryModel<TestViewModel>());
             var real = await data.Tests.FirstOrDefaultAsync(t => t.Id == id);
             Assert.AreEqual(test.Items.First().Id, real.Id);
         }
@@ -236,7 +236,9 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task TestsTakenByStudent_Correct()
         {
             var test = (await testService.TestsTakenByStudent(id, query)).Items.FirstOrDefault();
-            string json1 = JsonConvert.SerializeObject(await testService.GetById(id), Formatting.Indented,
+            var dbTest = await testService.GetById(id);
+            dbTest.IsTestTaken = true;
+            string json1 = JsonConvert.SerializeObject(dbTest, Formatting.Indented,
                                                        new JsonSerializerSettings()
                                                        {
                                                            ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling
@@ -265,7 +267,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 PhotoPath = ""
             };
             await testService.Create(testModel, id, new string[0]);
-            int testsCountNow = (await testService.GetAll(null, id, query)).Items.Count();
+            int testsCountNow = (await testService.GetAll(id, id, query)).Items.Count();
             Assert.AreEqual(testsCount+1, testsCountNow);
             SetUpBase();
             SetUp();

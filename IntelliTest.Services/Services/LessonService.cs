@@ -335,7 +335,8 @@ namespace IntelliTest.Core.Services
                     Title = l.Title,
                     School = l.Creator.School,
                     Subject = l.Subject,
-                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName
+                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
+                    HtmlContent = l.HtmlCotnent
                 });
             }
 

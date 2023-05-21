@@ -29,7 +29,7 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
         {
-            if (0 == 1 && cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model))
+            if (cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model))
             {
             }
             else

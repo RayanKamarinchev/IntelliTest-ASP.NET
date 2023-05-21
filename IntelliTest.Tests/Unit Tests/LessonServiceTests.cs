@@ -22,7 +22,7 @@ using OpenAI_API.Models;
 namespace IntelliTest.Tests.Unit_Tests
 {
     [TestFixture]
-    public class ClassServiceTests : UnitTestBase
+    public class LessonServiceTests : UnitTestBase
     {
         private ILessonService lessonService;
         private Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
@@ -98,7 +98,7 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpQuery();
             query.Filters.Sorting = Sorting.Readers;
             var byExaminers = await lessonService.Filter(lessonsDb, query);
-            Assert.AreEqual(id2, byExaminers.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.ReadingTime;
@@ -121,7 +121,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task GetAll_Correct()
         {
-            var lessonsCount = (await lessonService.GetAll(query)).Items.Count();
+            var lessonsCount = (await lessonService.GetAll(null, query)).Items.Count();
             var real = data.Lessons.Where(l=>!l.IsDeleted).Count();
             Assert.AreEqual(lessonsCount, real);
         }
