@@ -104,6 +104,7 @@ namespace IntelliTest.Core.Services
             c.Description = model.Description;
             c.Name = model.Name;
             c.Subject = model.Subject;
+            c.ImageUrl = model.ImageUrl;
             await context.SaveChangesAsync();
         }
 
@@ -120,6 +121,9 @@ namespace IntelliTest.Core.Services
                                       .Include(c => c.Students)
                                       .ThenInclude(s => s.Student)
                                       .ThenInclude(s => s.User)
+                                      .Include(s=>s.Students)
+                                      .ThenInclude(s=>s.Student)
+                                      .ThenInclude(s=>s.TestResults)
                                       .FirstOrDefaultAsync(c => c.Id == id);
             return clasDb.Students.Select(s => new StudentViewModel()
             {
@@ -128,7 +132,8 @@ namespace IntelliTest.Core.Services
                 TestResults = s.Student.TestResults
                                .Where(t=>clasDb.ClassTests.Any(ct=>ct.TestId == t.TestId))
                                .Select(t=>t.Score)
-                               .ToList()
+                               .ToList(),
+                Id = id
             }).ToList();
         }
 

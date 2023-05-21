@@ -60,9 +60,18 @@ namespace IntelliTest.Tests.Unit_Tests
                 PhotoPath = ""
             };
             data.Users.Add(userStudent);
+            var bonusUser = new User()
+            {
+                Email = "thebest@gmail.com",
+                FirstName = "Gosho",
+                LastName = "Jordanov",
+                Id = "BestUser",
+                PhotoPath = ""
+            };
+            data.Users.Add(userStudent);
             var teacher = new Teacher()
             {
-                User = userStudent,
+                User = userTeacher,
                 School = "PMG Sliven",
                 Id = id
             };
