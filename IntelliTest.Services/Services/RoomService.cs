@@ -19,13 +19,12 @@ namespace IntelliTest.Core.Services
     public class RoomService : IRoomService
     {
         private readonly IntelliTestDbContext context;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<ChatHub>? _hubContext;
 
-        public RoomService(IntelliTestDbContext _context,
-                           IHubContext<ChatHub> hubContext)
+        public RoomService(IntelliTestDbContext _context, IHubContext<ChatHub>? _hubContext)
         {
             context = _context;
-            _hubContext = hubContext;
+            this._hubContext = _hubContext;
         }
 
         public async Task<IEnumerable<RoomViewModel>> GetAll(string userId)
@@ -46,9 +45,11 @@ namespace IntelliTest.Core.Services
             return rooms;
         }
         
-        public async Task<RoomViewModel?> GetById(Guid id)
+        public async Task<RoomViewModel?> GetById(Guid id, string userId)
         {
-            var room = await context.Rooms.Where(r=> !r.IsDeleted).FirstOrDefaultAsync(r=>r.Id==id);
+            var room = await context.Rooms
+                                    .Where(r => !r.IsDeleted && r.Users.Any(u => u.UserId == userId))
+                                    .FirstOrDefaultAsync(r=>r.Id==id);
             if (room == null)
                 return null;
             return new RoomViewModel()
@@ -56,8 +57,8 @@ namespace IntelliTest.Core.Services
                 Admin = room.Admin.UserName,
                 Id = room.Id,
                 Name = room.Name,
-                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
-                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
+                LastMessage = room.Messages.MinBy(m => m.Timestamp) == null ? "" : room.Messages.MinBy(m => m.Timestamp).Content,
+                TimeStamp = room.Messages.MinBy(m => m.Timestamp) == null ? "" : room.Messages.MinBy(m => m.Timestamp).Timestamp.ToString("MM/dd/yyyy")
             };
         }
         
@@ -75,16 +76,18 @@ namespace IntelliTest.Core.Services
 
             await context.Rooms.AddAsync(room);
             await context.SaveChangesAsync();
-            var user = context.Users.Find(userId);
             var createdRoom = new RoomViewModel()
             {
-                Admin = room.Admin.UserName,
+                Admin = room.Admin.FirstName + " " + room.Admin.LastName,
                 Id = room.Id,
                 Name = room.Name,
-                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
-                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
+                LastMessage = "",
+                TimeStamp = ""
             };
-            await _hubContext.Clients.All.SendAsync("addChatRoom", createdRoom);
+            if (_hubContext is not null)
+            {
+                await _hubContext.Clients.All.SendAsync("addChatRoom", createdRoom);
+            }
 
             return createdRoom;
         }
@@ -92,11 +95,11 @@ namespace IntelliTest.Core.Services
         public async Task<HttpError> Edit(Guid id, RoomViewModel viewModel, string userId)
         {
             if (context.Rooms.Where(r=>!r.IsDeleted).Any(r => r.Name == viewModel.Name))
-                //return BadRequest("Invalid room name or room already exists");
-                return HttpError.BadRequest;
+                return HttpError.NotFound;
 
             var room = await context.Rooms
                 .Include(r => r.Admin)
+                .Include(r => r.Messages)
                 .Where(r => r.Id == id && r.AdminId == userId && !r.IsDeleted)
                 .FirstOrDefaultAsync();
 
@@ -108,13 +111,16 @@ namespace IntelliTest.Core.Services
 
             var updatedRoom = new RoomViewModel()
             {
-                Admin = room.Admin.UserName,
+                Admin = room.Admin.FirstName + " " + room.Admin.LastName,
                 Id = room.Id,
                 Name = room.Name,
-                LastMessage = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Content,
-                TimeStamp = room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault() == null ? "" : room.Messages.OrderBy(m => m.Timestamp).FirstOrDefault().Timestamp.ToString("MM/dd/yyyy")
+                LastMessage = room.Messages.MinBy(m => m.Timestamp) is null? "" : room.Messages.MinBy(m => m.Timestamp).Content,
+                TimeStamp = room.Messages.MinBy(m => m.Timestamp) is null ? "" : room.Messages.MinBy(m => m.Timestamp).Timestamp.ToString("MM/dd/yyyy")
             };
-            await _hubContext.Clients.All.SendAsync("updateChatRoom", updatedRoom);
+            if (_hubContext is not null)
+            {
+                await _hubContext.Clients.All.SendAsync("updateChatRoom", updatedRoom);
+            }
 
             return HttpError.Ok;
         }
@@ -132,8 +138,11 @@ namespace IntelliTest.Core.Services
             room.IsDeleted = true;
             await context.SaveChangesAsync();
 
-            await _hubContext.Clients.All.SendAsync("removeChatRoom", room.Id);
-            await _hubContext.Clients.Group(room.Name).SendAsync("onRoomDeleted");
+            if (_hubContext is not null)
+            {
+                await _hubContext.Clients.All.SendAsync("removeChatRoom", room.Id);
+                await _hubContext.Clients.Group(room.Name).SendAsync("onRoomDeleted");
+            }
 
             return true;
         }

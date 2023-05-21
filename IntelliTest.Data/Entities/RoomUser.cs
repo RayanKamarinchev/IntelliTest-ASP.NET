@@ -12,7 +12,7 @@ namespace IntelliTest.Data.Entities
         public User User { get; set; }
         [ForeignKey(nameof(User))]
         public string UserId { get; set; }
-        public Room Rooim { get; set; }
+        public Room Room { get; set; }
         [ForeignKey(nameof(Room))]
         public Guid RoomId { get; set; }
     }

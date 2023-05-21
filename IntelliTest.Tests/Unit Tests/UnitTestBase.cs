@@ -200,6 +200,47 @@ namespace IntelliTest.Tests.Unit_Tests
                 Subject = Subject.Математика
             };
             data.Lessons.Add(lesson);
+            var room = new Room()
+            {
+               Name = "Class room",
+               AdminId = "TeacherUser",
+               Id = id
+            };
+            data.Rooms.Add(room);
+            var roomUsers = new List<RoomUser>()
+            {
+                new RoomUser()
+                {
+                    Room = room,
+                    UserId = "StudentUser"
+                },
+                new RoomUser()
+                {
+                    Room = room,
+                    UserId = "TeacherUser"
+                }
+            };
+            data.RoomUsers.AddRange(roomUsers);
+            var messages = new List<Message>()
+            {
+                new Message()
+                {
+                    Room = room,
+                    Content = "Hello",
+                    Sender = userStudent,
+                    Timestamp = new DateTime(2023, 5, 21, 2, 41, 0),
+                    Id = id
+                },
+                new Message()
+                {
+                    Room = room,
+                    Content = "Hello Student",
+                    Sender = userTeacher,
+                    Timestamp = new DateTime(2023, 5, 21, 2, 42, 0),
+                    Id = id2
+                }
+            };
+            data.Messages.AddRange(messages);
             //Test result
             data.SaveChanges();
         }

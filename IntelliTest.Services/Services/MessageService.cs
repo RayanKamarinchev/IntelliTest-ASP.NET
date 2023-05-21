@@ -19,10 +19,10 @@ namespace IntelliTest.Core.Services
     public class MessageService : IMessageService
     {
         private readonly IntelliTestDbContext context;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<ChatHub>? _hubContext;
 
         public MessageService(IntelliTestDbContext _context,
-                              IHubContext<ChatHub> hubContext)
+                              IHubContext<ChatHub>? hubContext)
         {
             context = _context;
             _hubContext = hubContext;
@@ -106,7 +106,10 @@ namespace IntelliTest.Core.Services
                 Timestamp = message.Timestamp,
                 Avatar = "fillUserAvatar"
             };
-            await _hubContext.Clients.Group(room.Name).SendAsync("newMessage", createdMessage);
+            if (_hubContext is not null)
+            {
+                await _hubContext.Clients.Group(room.Name).SendAsync("newMessage", createdMessage);
+            }
 
             return createdMessage;
         }
@@ -124,7 +127,10 @@ namespace IntelliTest.Core.Services
             message.IsDeleted = true;
             await context.SaveChangesAsync();
 
-            await _hubContext.Clients.All.SendAsync("removeChatMessage", message.Id);
+            if (_hubContext is not null)
+            {
+                await _hubContext.Clients.All.SendAsync("removeChatMessage", message.Id);
+            }
             return true;
         }
     }

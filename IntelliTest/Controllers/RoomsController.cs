@@ -30,7 +30,7 @@ namespace IntelliTest.Controllers
         [HttpGet("Get/{id}")]
         public async Task<ActionResult<Room>> Get(Guid id)
         {
-            var roomViewModel = await roomService.GetById(id);
+            var roomViewModel = await roomService.GetById(id, User.Id());
             if (roomViewModel == null)
             {
                 return NotFound();

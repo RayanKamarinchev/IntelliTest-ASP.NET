@@ -1,4 +1,5 @@
 ﻿using IntelliTest.Data.Entities;
+using IntelliTest.Data.Migrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,7 @@ namespace IntelliTest.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<ClassTest> ClassTests { get; set; }
+        public DbSet<RoomUser> RoomUsers { get; set; }
 
     }
 }
