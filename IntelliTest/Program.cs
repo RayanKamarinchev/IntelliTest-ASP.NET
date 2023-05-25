@@ -60,7 +60,8 @@ builder.Services.AddAuthentication()
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
-});
+}).AddJsonOptions(o => o.JsonSerializerOptions
+                        .ReferenceHandler = ReferenceHandler.Preserve);
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

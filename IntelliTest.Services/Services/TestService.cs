@@ -80,20 +80,16 @@ namespace IntelliTest.Core.Services
                                     PublicityLevel = t.PublicyLevel
                                 });
             var tests =await test.ToListAsync();
-            tests.Select(async t =>
-            {
-                t.IsOwner = false;
-                if (teacherId is not null)
-                {
-                    t.IsOwner = await IsTestCreator(t.Id, teacherId.Value);
-                }
+            foreach (var t in tests)
+             {
+                 t.IsOwner = false;
+                 if (teacherId is not null)
+                     t.IsOwner = await IsTestCreator(t.Id, teacherId.Value);
 
-                t.IsTestTaken = false;
-                if (studentId is not null)
-                {
-                    t.IsTestTaken = await IsTestTakenByStudentId(t.Id, studentId.Value);
-                }
-            });
+                 t.IsTestTaken = false;
+                 if (studentId is not null)
+                     t.IsTestTaken = await IsTestTakenByStudentId(t.Id, studentId.Value);
+             }
             query.Items = tests;
             query.TotalItemsCount = tests.Count;
             return query;
@@ -532,6 +528,10 @@ namespace IntelliTest.Core.Services
         public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
                                         List<ClosedQuestionAnswerViewModel> closedQuestions, Guid studentId, Guid testId)
         {
+            if (context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId))
+            {
+                return;
+            }
             var open = openQuestions?.Select(q => new OpenQuestionAnswer()
             {
                 Answer = q.Answer,
@@ -559,7 +559,6 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
             
             var review = await TestResults(testId, studentId);
-
             await context.TestResults.AddAsync(new TestResult()
             {
                 Mark = Mark.Unmarked,
@@ -568,7 +567,7 @@ namespace IntelliTest.Core.Services
                 TestId = testId,
                 TakenOn = DateTime.Now
             });
-
+            await context.SaveChangesAsync();
         }
         //
         public bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
@@ -592,10 +591,9 @@ namespace IntelliTest.Core.Services
 
         public async Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId)
         {
-            var student = await context.Students.FirstOrDefaultAsync(s => s.Id == studentId);
-            bool closed = (student?.ClosedAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
-            bool open = (student?.OpenAnswers?.Any(a => a?.Question?.Test?.Id == testId) ?? false);
-            return closed || open;
+            var student = await context.Students
+                                       .FirstOrDefaultAsync(s => s.Id == studentId);
+            return context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId);
         }
 
         public async Task<TestStatsViewModel> GetStatistics(Guid testId)

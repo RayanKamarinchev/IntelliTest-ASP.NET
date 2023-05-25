@@ -74,6 +74,7 @@
             }
             document.addEventListener("visibilitychange", () => {
                 if(document.hidden){
+                    console.log("here")
                     document.forms["test"].submit();
                 }
             });

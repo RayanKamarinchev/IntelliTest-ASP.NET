@@ -33,7 +33,7 @@ namespace IntelliTest.Infrastructure
         {
             SetAsync(cache, key, value, new MemoryCacheEntryOptions());
         }
-        public static void SetAsync<T> (this IMemoryCache cache, string key, T value, MemoryCacheEntryOptions options)
+        public static void SetAsync<T>(this IMemoryCache cache, string key, T value, MemoryCacheEntryOptions options)
         {
             var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value, GetJsonSerializerOptions()));
             cache.Set(key, bytes, options);
@@ -58,6 +58,7 @@ namespace IntelliTest.Infrastructure
                 WriteIndented = true,
                 AllowTrailingCommas = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             };
         }
     }

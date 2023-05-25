@@ -15,6 +15,10 @@
             else
             {
                 var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
+                if (q==-1)
+                {
+                    continue;
+                }
                 <partial name="Questions/OpenQuestionReviewPartialView" for="OpenQuestions[q]"/>
             }
         }
