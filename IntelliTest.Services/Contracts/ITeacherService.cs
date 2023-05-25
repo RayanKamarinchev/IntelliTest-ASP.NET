@@ -11,6 +11,6 @@ namespace IntelliTest.Core.Contracts
     public interface ITeacherService
     {
         Task AddTeacher(string userId);
-        Task<Guid?> GetTeacherId(string userId);
+        Guid? GetTeacherId(string userId);
     }
 }

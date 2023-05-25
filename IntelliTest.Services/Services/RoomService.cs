@@ -54,7 +54,7 @@ namespace IntelliTest.Core.Services
                 return null;
             return new RoomViewModel()
             {
-                Admin = room.Admin.UserName,
+                Admin = room.Admin.FirstName + " " + room.Admin.LastName,
                 Id = room.Id,
                 Name = room.Name,
                 LastMessage = room.Messages.MinBy(m => m.Timestamp) == null ? "" : room.Messages.MinBy(m => m.Timestamp).Content,

@@ -20,10 +20,18 @@ namespace IntelliTest.Controllers
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
 
-        public LessonsController(ILessonService _lessonService, IMemoryCache _cache, ITeacherService _teacherService)
+        public LessonsController(ILessonService _lessonService, IMemoryCache _cache, ITeacherService teacherService, IStudentService studentService)
         {
             lessonService = _lessonService;
             cache = _cache;
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
         }
 
         [HttpGet]
@@ -39,7 +47,7 @@ namespace IntelliTest.Controllers
                     currentPage = 1;
                 }
                 QueryModel<LessonViewModel> query = new QueryModel<LessonViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
-                var teacherId = (Guid)TempData.Peek("TeacherId");
+                var teacherId = (Guid?)TempData.Peek("TeacherId") ?? null;
                 model = await lessonService.GetAll(teacherId, query);
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));

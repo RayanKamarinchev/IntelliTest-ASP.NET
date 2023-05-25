@@ -16,6 +16,8 @@ using Google;
 using System;
 using System.Text.Json.Serialization;
 using IntelliTest.Core.Hubs;
+using Org.BouncyCastle.Ocsp;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];

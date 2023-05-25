@@ -19,6 +19,7 @@ namespace IntelliTest.Controllers
         public RoomsController(IRoomService _roomService)
         {
             roomService = _roomService;
+
         }
         [HttpGet("Get")]
         public async Task<ActionResult<IEnumerable<RoomViewModel>>> Get()

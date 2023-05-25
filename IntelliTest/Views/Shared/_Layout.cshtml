@@ -1,19 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using IntelliTest.Core.Services
-@using IntelliTest.Infrastructure
-@using IntelliTest.Core.Contracts
-@inject ITeacherService teacherService
-@inject IStudentService studentService
-@{
-    if (!TempData.Keys.Contains("TeacherId"))
-    {
-        TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
-    }
-    if (!TempData.Keys.Contains("StudentId"))
-    {
-        TempData["StudentId"] = studentService.GetStudentId(User.Id());
-    }
-}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,6 +14,8 @@
     <link rel="stylesheet" href="~/css/sideSearch.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/edit.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css"/>
+    <link rel="stylesheet" href="~/lib/mathquill/mathquill.min.css"/>
+    <script type="text/javascript" src="~/lib/mathquill/mathquill.min.js"></script>
     <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
     <script src="~/lib/font-awesome/js/all.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>

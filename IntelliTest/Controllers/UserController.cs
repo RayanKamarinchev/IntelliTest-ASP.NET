@@ -36,6 +36,14 @@ namespace IntelliTest.Controllers
                               ITestService testService,
                               IWebHostEnvironment webHostEnvironment)
         {
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
             userManager = _userManager;
             signInManager = _signInManager;
             studentService = _studentService;
@@ -63,12 +71,6 @@ namespace IntelliTest.Controllers
             {
                 await userManager.AddToRoleAsync(user, roleName);
             }
-        }
-
-    public void ClearCookies()
-        {
-            TempData.Remove("isStudent");
-            TempData.Remove("isTeacher");
         }
 
         [HttpGet]
@@ -108,8 +110,7 @@ namespace IntelliTest.Controllers
             {
                 ModelState.AddModelError("", error.Description);
             }
-
-            ClearCookies();
+            
             return View(model);
         }
 
@@ -147,14 +148,12 @@ namespace IntelliTest.Controllers
             }
 
             ModelState.AddModelError("", "Invalid Login");
-            ClearCookies();
             return RedirectToAction("Login");
         }
 
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            ClearCookies();
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]
@@ -359,7 +358,6 @@ namespace IntelliTest.Controllers
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "User");
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            ClearCookies();
             return new ChallengeResult(provider, properties);
         }
         [AllowAnonymous]

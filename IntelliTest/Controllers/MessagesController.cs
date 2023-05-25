@@ -17,8 +17,16 @@ namespace IntelliTest.Controllers
     {
         private readonly IMessageService messageService;
 
-        public MessagesController(IMessageService _messageService)
+        public MessagesController(IMessageService _messageService, ITeacherService teacherService, IStudentService studentService)
         {
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
             messageService = _messageService;
         }
         [HttpGet("Get/{id}")]

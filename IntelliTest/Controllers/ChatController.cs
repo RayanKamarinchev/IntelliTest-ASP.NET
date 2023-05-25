@@ -1,5 +1,7 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Chat;
+using IntelliTest.Core.Services;
+using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +10,16 @@ namespace IntelliTest.Controllers
     [Authorize]
     public class ChatController : Controller
     {
-        private readonly IMessageService messageService;
-        public ChatController(IMessageService _messageService)
+        public ChatController(ITeacherService teacherService, IStudentService studentService)
         {
-            messageService = _messageService;
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
         }
         [HttpGet("Index")]
         public IActionResult Index()

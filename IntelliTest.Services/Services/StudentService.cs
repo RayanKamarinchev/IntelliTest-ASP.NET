@@ -34,9 +34,9 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<Guid?> GetStudentId(string userId)
+        public Guid? GetStudentId(string userId)
         {
-            var student = await context.Students.FirstOrDefaultAsync(u => u.UserId == userId);
+            var student = context.Students.FirstOrDefault(u => u.UserId == userId);
             if (student == null)
             {
                 return null;

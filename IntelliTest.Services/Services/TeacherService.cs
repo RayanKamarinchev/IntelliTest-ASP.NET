@@ -29,11 +29,11 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<Guid?> GetTeacherId(string userId)
+        public Guid? GetTeacherId(string userId)
         {
-            var teacher = await context.Teachers
+            var teacher = context.Teachers
                                        .Include(t => t.Tests)
-                                       .FirstOrDefaultAsync(t => t.UserId == userId);
+                                       .FirstOrDefault(t => t.UserId == userId);
             if (teacher is null)
             {
                 return null;

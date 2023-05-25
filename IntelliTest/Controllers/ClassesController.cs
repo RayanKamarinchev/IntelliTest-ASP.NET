@@ -14,23 +14,27 @@ namespace IntelliTest.Controllers
     public class ClassesController : Controller
     {
         private readonly IClassService classService;
-        private readonly ITeacherService teacherService;
-        private readonly IStudentService studentService;
         private readonly ITestService testService;
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
         private readonly IWebHostEnvironment webHostEnvironment;
 
 
-        public ClassesController(IClassService _classService, IMemoryCache _cache, ITeacherService _teacherService,
-                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService, IStudentService _studentService)
+        public ClassesController(IClassService _classService, IMemoryCache _cache, ITeacherService teacherService,
+                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService, IStudentService studentService)
         {
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
             classService = _classService;
             cache = _cache;
-            teacherService = _teacherService;
             webHostEnvironment = _webHostEnvironment;
             testService = _testService;
-            studentService = _studentService;
         }
         public async Task<IActionResult> Index()
         {

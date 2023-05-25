@@ -16,19 +16,26 @@ namespace IntelliTest.Controllers
     [Authorize]
     public class TestsController : Controller
     {
-        const string SCRIPT_NAME = "script.py";
         private readonly ITestService testService;
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService, IClassService _classService)
+        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,ITeacherService teacherService, IClassService _classService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             classService = _classService;
+            if (!TempData.Keys.Contains("TeacherId"))
+            {
+                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+            }
+            if (!TempData.Keys.Contains("StudentId"))
+            {
+                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+            }
         }
 
         [HttpGet]

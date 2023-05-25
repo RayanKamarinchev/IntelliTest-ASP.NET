@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IntelliTest.Services\IntelliTest.Core.csproj" />
+    <ProjectReference Include="..\IntelliTest\IntelliTest.csproj" />
   </ItemGroup>
 
 </Project>

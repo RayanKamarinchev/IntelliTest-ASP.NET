@@ -44,6 +44,10 @@
         "knockout-latest.js",
         "knockout-latest.min.js"
       ]
+    },
+    {
+      "library": "mathquill@0.9.1",
+      "destination": "wwwroot/lib/mathquill/"
     }
   ]
 }

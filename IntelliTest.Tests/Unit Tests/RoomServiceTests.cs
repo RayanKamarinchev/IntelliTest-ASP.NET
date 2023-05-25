@@ -37,8 +37,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 Admin = "Antonio Vivaldi",
                 Id = id,
                 Name = "Class room",
-                LastMessage = "",
-                TimeStamp = ""
+                LastMessage = "Hello",
+                TimeStamp = "05/21/2023"
             };
             var received = await roomService.GetById(id, "TeacherUser");
             Assert.AreEqual(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(received));
