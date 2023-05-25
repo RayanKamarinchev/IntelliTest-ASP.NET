@@ -10,17 +10,6 @@ namespace IntelliTest.Controllers
     [Authorize]
     public class ChatController : Controller
     {
-        public ChatController(ITeacherService teacherService, IStudentService studentService)
-        {
-            if (!TempData.Keys.Contains("TeacherId"))
-            {
-                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
-            }
-            if (!TempData.Keys.Contains("StudentId"))
-            {
-                TempData["StudentId"] = studentService.GetStudentId(User.Id());
-            }
-        }
         [HttpGet("Index")]
         public IActionResult Index()
         {

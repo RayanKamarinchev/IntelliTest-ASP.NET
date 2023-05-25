@@ -20,17 +20,9 @@ namespace IntelliTest.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
 
 
-        public ClassesController(IClassService _classService, IMemoryCache _cache, ITeacherService teacherService,
-                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService, IStudentService studentService)
+        public ClassesController(IClassService _classService, IMemoryCache _cache,
+                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService)
         {
-            if (!TempData.Keys.Contains("TeacherId"))
-            {
-                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
-            }
-            if (!TempData.Keys.Contains("StudentId"))
-            {
-                TempData["StudentId"] = studentService.GetStudentId(User.Id());
-            }
             classService = _classService;
             cache = _cache;
             webHostEnvironment = _webHostEnvironment;

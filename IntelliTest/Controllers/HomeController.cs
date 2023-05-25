@@ -1,4 +1,5 @@
-﻿using IntelliTest.Core.Contracts;
+﻿using System.Security.Claims;
+using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Services;
 using IntelliTest.Infrastructure;
@@ -8,17 +9,6 @@ namespace IntelliTest.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(ITeacherService teacherService, IStudentService studentService)
-        {
-            if (!TempData.Keys.Contains("TeacherId"))
-            {
-                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
-            }
-            if (!TempData.Keys.Contains("StudentId"))
-            {
-                TempData["StudentId"] = studentService.GetStudentId(User.Id());
-            }
-        }
         public IActionResult Index()
         {
             return View();

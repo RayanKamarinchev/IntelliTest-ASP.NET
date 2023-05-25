@@ -22,20 +22,12 @@ namespace IntelliTest.Controllers
         private readonly IStudentService studentService;
         private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,ITeacherService teacherService, IClassService _classService)
+        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService, IClassService _classService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             classService = _classService;
-            if (!TempData.Keys.Contains("TeacherId"))
-            {
-                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
-            }
-            if (!TempData.Keys.Contains("StudentId"))
-            {
-                TempData["StudentId"] = studentService.GetStudentId(User.Id());
-            }
         }
 
         [HttpGet]
