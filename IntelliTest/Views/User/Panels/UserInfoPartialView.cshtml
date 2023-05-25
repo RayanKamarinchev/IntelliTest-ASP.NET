@@ -23,8 +23,16 @@
             </div>
             <div class="col">
                 <div class="form-group">
+                    <label>Училище</label>
+                    <input class="form-control" type="text"
+                           asp-for="School" value="@Model.School">
+                    <span class="text-danger" asp-validation-for="School"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
                     <div class="text-center mb-3" style="display: flex; flex-direction: column;">
-                        <label>Аз съм...</label>
+                        <label>Аз съм... (ще трябва да влезете отново в профила си)</label>
                         <div class="switch-button">
                             @{
                                 if (!User.IsStudent() && !User.IsTeacher())

@@ -10,7 +10,7 @@
         var user = await UserManager.GetUserAsync(User);
         ViewBag.Title = "User Profile";
         string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
-        if (user.PhotoPath != "")
+        if (!string.IsNullOrEmpty(user.PhotoPath))
         {
             src = "/" + user.PhotoPath;
         }

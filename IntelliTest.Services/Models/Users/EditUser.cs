@@ -17,5 +17,6 @@ namespace IntelliTest.Core.Models.Users
         public UserPanel UserPanel { get; set; }
         public IFormFile? Image { get; set; }
         public string ImageUrl { get; set; } = "";
+        public string School { get; set; } = "";
     }
 }

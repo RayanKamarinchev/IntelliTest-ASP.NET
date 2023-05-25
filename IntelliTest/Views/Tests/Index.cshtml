@@ -33,7 +33,7 @@
             </ul>
         </section>
             <nav aria-label="Page navigation example" style="position: absolute; bottom: 20px; width: 100%">
-                <ul class="pagination justify-content-center" style="font-size: 1.5rem">
+                <ul class="pagination justify-content-center" style="font-size: 1.5rem; position: relative; z-index: -1">
                     <li class="page-item disabled">
                         <a class="page-link @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
                            asp-action="Index"

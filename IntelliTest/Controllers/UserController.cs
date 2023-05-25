@@ -135,7 +135,7 @@ namespace IntelliTest.Controllers
                 var res = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                 if (res.Succeeded)
                 {
-                    AddRoleIdsToTempData();
+                    AddRoleIdsToTempData(user.Id);
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -275,7 +275,7 @@ namespace IntelliTest.Controllers
                     if (model.IsTeacher)
                     {
                         await GiveRole(user, "Teacher");
-                        await teacherService.AddTeacher(User.Id());
+                        await teacherService.AddTeacher(User.Id(), model.School);
                     }
                     else
                     {
@@ -372,7 +372,8 @@ namespace IntelliTest.Controllers
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                AddRoleIdsToTempData();
+                var user = await userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+                AddRoleIdsToTempData(user.Id);
                 return RedirectToAction("Index", "Home");
             }
             if (result.IsLockedOut)
@@ -400,22 +401,22 @@ namespace IntelliTest.Controllers
 
                     await userManager.AddLoginAsync(user, info);
                     await signInManager.SignInAsync(user, isPersistent: false);
-                    AddRoleIdsToTempData();
+                    AddRoleIdsToTempData(user.Id);
                     return RedirectToAction("Index", "Home");
                 }
                 return RedirectToAction("Register");
             }
         }
 
-        public void AddRoleIdsToTempData()
+        public void AddRoleIdsToTempData(string userId)
         {
             if (!TempData.Keys.Contains("TeacherId"))
             {
-                TempData["TeacherId"] = teacherService.GetTeacherId(User.Id());
+                TempData["TeacherId"] = teacherService.GetTeacherId(userId);
             }
             if (!TempData.Keys.Contains("StudentId"))
             {
-                TempData["StudentId"] = studentService.GetStudentId(User.Id());
+                TempData["StudentId"] = studentService.GetStudentId(userId);
             }
         }
     }

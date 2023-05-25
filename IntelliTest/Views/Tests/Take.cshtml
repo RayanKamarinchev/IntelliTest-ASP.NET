@@ -4,18 +4,16 @@
 
     int mins = Model.Time;
     int sec = 0;
-    if (TempData.ContainsKey("TestStart"))
+    if (TempData.ContainsKey("TestStarted"))
     {
-        var span = DateTime.Now - (DateTime)TempData.Peek("TestStart");
-        mins -= (int)Math.Ceiling(Math.Ceiling(span.TotalSeconds)/60);
-        if (span.Seconds!=0)
-        {
-            sec += 60 - span.Seconds;
-        }
+        TempData.Remove("TestStarted");
+        <script>
+                    document.forms["test"].submit(); 
+        </script>
     }
     else
     {
-        TempData["TestStart"] = DateTime.Now;
+        TempData["TestStarted"] = true;
     }
 }
 <div class="editMain">
@@ -56,8 +54,9 @@
             var timer = document.getElementById("timer");
             var interval = 1000; 
             var expected = Date.now() + interval;
-            var min = @mins;
+            let min = @mins;
             var sec = @sec;
+            //setTimeout(document.forms["test"].submit(), min*60+sec)
             setTimeout(step, interval);
             function step() {
                 var dt = Date.now() - expected;
@@ -66,8 +65,7 @@
                     sec+=60;
                     min--;
                 }
-                if(min<=0 || sec<=0){
-                            localStorage.removeItem("takingTest");
+                if(min<0 || sec<=0){
                     document.forms["test"].submit(); 
                 }
                 timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
@@ -76,11 +74,9 @@
             }
             document.addEventListener("visibilitychange", () => {
                 if(document.hidden){
-                        localStorage.removeItem("takingTest");
                     document.forms["test"].submit();
                 }
             });
-            localStorage.setItem("takingTest", window.location.href);
         </script>
     <script src="~/js/testTake.js"></script>
     }

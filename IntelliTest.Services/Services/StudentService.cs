@@ -51,6 +51,9 @@ namespace IntelliTest.Core.Services
                                 .ThenInclude(q => q.Question.Test)
                                 .Include(s=>s.OpenAnswers)
                                 .ThenInclude(q=>q.Question.Test)
+                                .Include(s=>s.Classes)
+                                .ThenInclude(c=>c.Class)
+                                .ThenInclude(c=>c.Teacher)
                                 .FirstOrDefaultAsync(s=>s.Id==studentId);
         }
 

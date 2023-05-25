@@ -10,7 +10,7 @@ namespace IntelliTest.Core.Contracts
 {
     public interface ITeacherService
     {
-        Task AddTeacher(string userId);
+        Task AddTeacher(string userId, string school);
         Guid? GetTeacherId(string userId);
     }
 }

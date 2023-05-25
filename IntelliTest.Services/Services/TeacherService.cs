@@ -19,11 +19,12 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        public async Task AddTeacher(string userId)
+        public async Task AddTeacher(string userId, string school)
         {
             Teacher teacher = new Teacher()
             {
-                UserId = userId
+                UserId = userId,
+                School = school
             };
             await context.Teachers.AddAsync(teacher);
             await context.SaveChangesAsync();

@@ -223,7 +223,7 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            if (TempData.Peek("StudentId") is null || studentId != (Guid)TempData.Peek("StudentId") || !isStudentsTeacher)
+            if (TempData.Peek("StudentId") is null || studentId != (Guid)TempData.Peek("StudentId"))
             {
                 return Unauthorized();
             }

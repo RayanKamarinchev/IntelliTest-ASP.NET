@@ -313,6 +313,7 @@ xfilter
   -moz-transition: -moz-transform 0.3s, box-shadow 0.3s;
   transition: transform 0.3s, box-shadow 0.3s;
 }
+
 .cd-filter::before {
   /* top colored bar */
   content: '';
@@ -366,6 +367,18 @@ xfilter
   .cd-filter form {
     padding: 70px 10%;
   }
+}
+@media only screen and (max-width: 425px) {
+    .cd-filter {
+        width: 50%;
+    }
+    .cd-gallery {
+        float: left;
+    }
+
+    .cd-filter form {
+        padding: 70px 10%;
+    }
 }
 
 .cd-filter-trigger {
@@ -426,7 +439,7 @@ xcustom form elements
   color: #9a9a9a;
   text-transform: uppercase;
   font-weight: 700;
-  /*font-size: 1.3rem;*/
+  font-size: 90%;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -522,7 +535,7 @@ xcustom form elements
 }
 .cd-filter-block select {
   cursor: pointer;
-  /*font-size: 1.4rem;*/
+  font-size: 80%;
 }
 .cd-filter-block select::-ms-expand {
   display: none;
