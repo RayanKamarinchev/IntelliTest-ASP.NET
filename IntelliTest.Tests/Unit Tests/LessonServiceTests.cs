@@ -121,7 +121,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task GetAll_Correct()
         {
-            var lessonsCount = (await lessonService.GetAll(null, query)).Items.Count();
+            var lessonsCount = (await lessonService.GetAll(null, query, "StudentUser")).Items.Count();
             var real = data.Lessons.Where(l=>!l.IsDeleted).Count();
             Assert.AreEqual(lessonsCount, real);
         }

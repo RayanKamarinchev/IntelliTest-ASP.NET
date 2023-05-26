@@ -18,7 +18,7 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
-        private Func<Lesson, int, LessonViewModel> ToViewModel = (l, c) => new LessonViewModel()
+        private Func<Lesson, int, string, LessonViewModel> ToViewModel = (l, c, userId) => new LessonViewModel()
         {
             ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
             OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
@@ -33,11 +33,13 @@ namespace IntelliTest.Core.Services
             School = l.Creator.School,
             Subject = l.Subject,
             CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-            HtmlContent = l.HtmlCotnent
+            HtmlContent = l.HtmlCotnent,
+            IsLiked = l.LessonLikes.Any(l => l.UserId == userId)
         };
 
         public async Task<QueryModel<LessonViewModel>> Filter(IQueryable<Lesson> lessonQuery,
-                                                              QueryModel<LessonViewModel> query)
+                                                              QueryModel<LessonViewModel> query,
+                                                              string userId)
         {
             if (query.Filters.Subject != Subject.Няма)
             {
@@ -78,6 +80,7 @@ namespace IntelliTest.Core.Services
                                        .Include(l=>l.Reads)
                                        .Include(l=>l.OpenQuestions)
                                        .Include(l=>l.ClosedQuestions)
+                                       .Include(l=>l.LessonLikes)
                                        .ToListAsync();
             var lessons = new List<LessonViewModel>();
             foreach (var l in lessonsDb)
@@ -89,7 +92,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                lessons.Add(ToViewModel(l,c));
+                lessons.Add(ToViewModel(l,c, userId));
             }
 
             query.Items = lessons;
@@ -97,7 +100,7 @@ namespace IntelliTest.Core.Services
             return query;
         }
 
-        public async Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query)
+        public async Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query, string userId)
         {
             var lessonsQuery = context.Lessons
                                       .Where(l => !l.IsDeleted && (!l.IsPrivate || l.CreatorId == teacherId))
@@ -108,7 +111,7 @@ namespace IntelliTest.Core.Services
                                       .Include(l => l.Creator)
                                       .ThenInclude(c => c.User)
                                       .Where(l => !l.IsPrivate);
-            return await Filter(lessonsQuery, query);
+            return await Filter(lessonsQuery, query, userId);
         }
 
         public async Task<LessonViewModel?>? GetById(Guid lessonId)
@@ -127,7 +130,7 @@ namespace IntelliTest.Core.Services
                 return null;
             }
 
-            return ToViewModel(l, l.LessonLikes?.Count() ?? 0);
+            return ToViewModel(l, l.LessonLikes?.Count() ?? 0, "");
         }
 
         public async Task<LessonViewModel?>? GetByName(string name)
@@ -145,7 +148,7 @@ namespace IntelliTest.Core.Services
                 return null;
             }
 
-            return ToViewModel(l, l.LessonLikes?.Count() ?? 0);
+            return ToViewModel(l, l.LessonLikes?.Count() ?? 0, "");
         }
 
         public EditLessonViewModel ToEdit(LessonViewModel model)
@@ -249,7 +252,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                model.Add(ToViewModel(l, c));
+                model.Add(ToViewModel(l, c, userId));
             }
 
             return model;
@@ -279,7 +282,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                model.Add(ToViewModel(l, c));
+                model.Add(ToViewModel(l, c, userId));
             }
 
             return model;

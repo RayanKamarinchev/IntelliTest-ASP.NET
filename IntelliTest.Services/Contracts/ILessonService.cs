@@ -11,7 +11,7 @@ namespace IntelliTest.Core.Contracts
 {
     public interface ILessonService
     {
-        Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query);
+        Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query, string userId);
         Task<LessonViewModel?>? GetById(Guid lessonId);
         Task<LessonViewModel?>? GetByName(string name);
         Task<bool> ExistsById(Guid teacherId, Guid lessonId);
@@ -26,7 +26,7 @@ namespace IntelliTest.Core.Contracts
         Task<IEnumerable<LessonViewModel>> LikedLessons(string userId);
 
         public Task<QueryModel<LessonViewModel>> Filter(IQueryable<Lesson> lessonQuery,
-                                                        QueryModel<LessonViewModel> query);
+                                                        QueryModel<LessonViewModel> query, string userId);
 
         public Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId);
     }

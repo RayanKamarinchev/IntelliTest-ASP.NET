@@ -27,5 +27,6 @@ namespace IntelliTest.Core.Models.Lessons
         public string CreatorName { get; set; }
         public IEnumerable<OpenQuestion> OpenQuestions { get; set; }
         public IEnumerable<ClosedQuestion> ClosedQuestions { get; set; }
+        public bool IsLiked { get; set; }
     }
 }

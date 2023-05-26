@@ -40,7 +40,7 @@ namespace IntelliTest.Controllers
                 }
                 QueryModel<LessonViewModel> query = new QueryModel<LessonViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
                 var teacherId = (Guid?)TempData.Peek("TeacherId") ?? null;
-                model = await lessonService.GetAll(teacherId, query);
+                model = await lessonService.GetAll(teacherId, query, User.Id());
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
