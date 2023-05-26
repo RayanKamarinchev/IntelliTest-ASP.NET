@@ -44,7 +44,7 @@ namespace IntelliTest.Controllers
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
                 cache.SetAsync("lessons", model, cacheEntryOptions);
             }
             return View(model);

@@ -24,6 +24,23 @@ namespace IntelliTest.Core.Services
             config = _config;
         }
 
+        private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
+        {
+            AverageScore = Math.Round(!t.TestResults.Any() ? 0 : t.TestResults.Average(r => r.Score), 2),
+            ClosedQuestions = t.ClosedQuestions,
+            CreatedOn = t.CreatedOn,
+            Description = t.Description,
+            Grade = t.Grade,
+            Id = t.Id,
+            MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
+                       t.OpenQuestions.Sum(q => q.MaxScore),
+            OpenQuestions = t.OpenQuestions,
+            Time = t.Time,
+            Title = t.Title,
+            MultiSubmit = t.MultiSubmission,
+            PublicityLevel = t.PublicyLevel
+        };
+
         public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId)
         {
             if (query.Filters.Subject!=Subject.Няма)
@@ -63,22 +80,10 @@ namespace IntelliTest.Core.Services
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
-                                .Select(t => new TestViewModel()
-                                {
-                                    AverageScore = Math.Round(t.TestResults.Count()==0 ? 0 : t.TestResults.Average(r => r.Score),2),
-                                    ClosedQuestions = t.ClosedQuestions,
-                                    CreatedOn = t.CreatedOn,
-                                    Description = t.Description,
-                                    Grade = t.Grade,
-                                    Id = t.Id,
-                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
-                                               t.OpenQuestions.Sum(q => q.MaxScore),
-                                    OpenQuestions = t.OpenQuestions,
-                                    Time = t.Time,
-                                    Title = t.Title,
-                                    MultiSubmit = t.MultiSubmission,
-                                    PublicityLevel = t.PublicyLevel
-                                });
+                                .Include(t=>t.ClosedQuestions)
+                                .Include(t=>t.OpenQuestions)
+                                .Include(t=>t.TestResults)
+                                .Select(x=>ToViewModel(x));
             var tests =await test.ToListAsync();
             foreach (var t in tests)
              {
@@ -134,24 +139,8 @@ namespace IntelliTest.Core.Services
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
-                                .Select(t => new TestViewModel()
-                                {
-                                    AverageScore = Math.Round(t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score), 2),
-                                    ClosedQuestions = t.ClosedQuestions,
-                                    CreatedOn = t.CreatedOn,
-                                    Description = t.Description,
-                                    Grade = t.Grade,
-                                    Id = t.Id,
-                                    MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
-                                               t.OpenQuestions.Sum(q => q.MaxScore),
-                                    OpenQuestions = t.OpenQuestions,
-                                    Time = t.Time,
-                                    Title = t.Title,
-                                    MultiSubmit = t.MultiSubmission,
-                                    PublicityLevel = t.PublicyLevel,
-                                    IsOwner = false,
-                                    IsTestTaken = true
-                                });
+                                .Select(x=>ToViewModel(x));
+            test.ToList().ForEach(t => t.IsTestTaken = true);
             query.Items = test.ToList();
             query.TotalItemsCount = test.Count();
             return query;
@@ -191,21 +180,8 @@ namespace IntelliTest.Core.Services
             {
                 return null;
             }
-            return new TestViewModel()
-            {
-                AverageScore = Math.Round(t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score), 2),
-                ClosedQuestions = t.ClosedQuestions,
-                CreatedOn = t.CreatedOn,
-                Description = t.Description,
-                Grade = t.Grade,
-                Id = t.Id,
-                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) + t.OpenQuestions.Sum(q => q.MaxScore),
-                OpenQuestions = t.OpenQuestions,
-                Time = t.Time,
-                Title = t.Title,
-                MultiSubmit = t.MultiSubmission,
-                PublicityLevel = t.PublicyLevel
-            };
+
+            return ToViewModel(t);
         }
 
         public TestEditViewModel ToEdit(TestViewModel model)

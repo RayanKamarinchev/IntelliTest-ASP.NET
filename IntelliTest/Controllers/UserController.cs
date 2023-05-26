@@ -147,6 +147,7 @@ namespace IntelliTest.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
+            TempData.Clear();
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]

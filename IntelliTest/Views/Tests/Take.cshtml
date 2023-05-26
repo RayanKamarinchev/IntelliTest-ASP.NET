@@ -4,22 +4,11 @@
 
     int mins = Model.Time;
     int sec = 0;
-    if (TempData.ContainsKey("TestStarted"))
-    {
-        TempData.Remove("TestStarted");
-        <script>
-                    document.forms["test"].submit(); 
-        </script>
-    }
-    else
-    {
-        TempData["TestStarted"] = true;
-    }
 }
 <div class="editMain">
-    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
+    <div id="addAddMoreDiv">
         <div class="timer">
-            <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>    
+            <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>
         </div>
         <form method="post" name="test">
             @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
@@ -28,12 +17,12 @@
                 {
                     var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                     int indx = Model.ClosedQuestions.IndexOf(question);
-                            <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
+                    <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
                 }
                 else
                 {
                     var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                            <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
+                    <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
                 }
             }
             <hr/>
@@ -45,39 +34,63 @@
 @section Scripts
 {
     <script>
-            function onFocus(e) {
-                e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
-            }
-            function onFocusOut(e){
-                e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
-            }
-            var timer = document.getElementById("timer");
-            var interval = 1000; 
-            var expected = Date.now() + interval;
-            let min = @mins;
-            var sec = @sec;
-            //setTimeout(document.forms["test"].submit(), min*60+sec)
-            setTimeout(step, interval);
-            function step() {
-                var dt = Date.now() - expected;
-                sec--;
-                if(sec < 0){
-                    sec+=60;
-                    min--;
+                function onFocus(e) {
+                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
                 }
-                if(min<0 || sec<=0){
-                    document.forms["test"].submit(); 
+                function onFocusOut(e){
+                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
                 }
-                timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
-                expected += interval;
-                setTimeout(step, Math.max(0, interval - dt));
-            }
-            document.addEventListener("visibilitychange", () => {
-                if(document.hidden){
-                    console.log("here")
-                    document.forms["test"].submit();
+                var timer = document.getElementById("timer");
+                var interval = 1000; 
+                var expected = Date.now() + interval;
+                let min = @mins;
+                var sec = @sec;
+                //setTimeout(document.forms["test"].submit(), min*60+sec)
+                setTimeout(step, interval);
+                function step() {
+                    var dt = Date.now() - expected;
+                    sec--;
+                    if(sec < 0){
+                        sec+=60;
+                        min--;
+                    }
+                    if(min<0 || sec<=0){
+                        document.forms["test"].submit(); 
+                    }
+                    timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
+                    expected += interval;
+                    setTimeout(step, Math.max(0, interval - dt));
                 }
-            });
-        </script>
+                document.addEventListener("visibilitychange", () => {
+                    if(document.hidden){
+                        console.log("here")
+                        document.forms["test"].submit();
+                    }
+                });
+            </script>
     <script src="~/js/testTake.js"></script>
+}
+@{
+    var id = Context.GetRouteData().Values["testId"];
+    if (TempData.ContainsKey("TestStarted"))
+    {
+        string sessionId = ((Guid)TempData.Peek("TestStarted")).ToString();
+        if (sessionId == (string)id)
+        {
+            TempData.Remove("TestStarted");
+            <script defer>
+                    document.forms["test"].submit(); 
+            </script>
+        }
+        else
+        {
+            <script>
+                    document.location.href = "/Take/@sessionId"
+            </script>
+        }
     }
+    else
+    {
+        TempData["TestStarted"] = id;
+    }
+}

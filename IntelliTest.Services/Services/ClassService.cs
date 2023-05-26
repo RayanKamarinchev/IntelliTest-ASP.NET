@@ -20,6 +20,23 @@ namespace IntelliTest.Core.Services
         {
             context = _context;
         }
+
+        private Func<Class, ClassViewModel> ToViewModel = c => new ClassViewModel()
+        {
+            Description = c.Description,
+            Name = c.Name,
+            Id = c.Id,
+            Teacher = new TeacherViewModel()
+            {
+                FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
+                Id = c.TeacherId,
+                School = c.Teacher.School,
+                ImageUrl = c.Teacher.User.PhotoPath
+            },
+            ImageUrl = c.ImageUrl,
+            Subject = c.Subject
+        };
+
         public async Task<IEnumerable<ClassViewModel>> GetAll(string userId, bool isStudent, bool isTeacher)
         {
             var query = context.Classes
@@ -36,21 +53,7 @@ namespace IntelliTest.Core.Services
                 query = query.Where(c => c.Teacher.UserId == userId);
             }
 
-            return await query.Select(c => new ClassViewModel()
-            {
-                Description = c.Description,
-                Name = c.Name,
-                Id = c.Id,
-                Teacher = new TeacherViewModel()
-                {
-                    FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
-                    Id = c.TeacherId,
-                    School = c.Teacher.School,
-                    ImageUrl = c.Teacher.User.PhotoPath
-                },
-                ImageUrl = c.ImageUrl,
-                Subject = c.Subject
-            }).ToListAsync();
+            return await query.Select(x => ToViewModel(x)).ToListAsync();
         }
 
         public async Task<ClassViewModel?> GetById(Guid id)
@@ -59,21 +62,7 @@ namespace IntelliTest.Core.Services
                                  .Include(c=>c.Teacher)
                                  .ThenInclude(t=>t.User)
                                  .FirstOrDefaultAsync(c=>c.Id == id);
-            return new ClassViewModel()
-            {
-                Description = c.Description,
-                Name = c.Name,
-                Id = c.Id,
-                Teacher = new TeacherViewModel()
-                {
-                    FullName = c.Teacher.User.FirstName + " " + c.Teacher.User.LastName,
-                    Id = c.TeacherId,
-                    School = c.Teacher.School,
-                    ImageUrl = c.Teacher.User.PhotoPath
-                },
-                ImageUrl = c.ImageUrl,
-                Subject = c.Subject
-            };
+            return ToViewModel(c);
         }
 
         public async Task<bool> IsClassOwner(Guid id, string userId)

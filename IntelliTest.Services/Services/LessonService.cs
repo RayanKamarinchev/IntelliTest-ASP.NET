@@ -18,6 +18,24 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
+        private Func<Lesson, int, LessonViewModel> ToViewModel = (l, c) => new LessonViewModel()
+        {
+            ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
+            OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
+            Content = l.Content,
+            CreatedOn = l.CreatedOn,
+            CreatorId = l.CreatorId,
+            Grade = l.Grade,
+            Id = l.Id,
+            Likes = c,
+            Readers = l.Reads.Count(),
+            Title = l.Title,
+            School = l.Creator.School,
+            Subject = l.Subject,
+            CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
+            HtmlContent = l.HtmlCotnent
+        };
+
         public async Task<QueryModel<LessonViewModel>> Filter(IQueryable<Lesson> lessonQuery,
                                                               QueryModel<LessonViewModel> query)
         {
@@ -55,7 +73,12 @@ namespace IntelliTest.Core.Services
             }
 
             var lessonsDb = await lessonQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
-                                       .Take(query.ItemsPerPage).ToListAsync();
+                                       .Take(query.ItemsPerPage)
+                                       .Include(l=>l.Creator)
+                                       .Include(l=>l.Reads)
+                                       .Include(l=>l.OpenQuestions)
+                                       .Include(l=>l.ClosedQuestions)
+                                       .ToListAsync();
             var lessons = new List<LessonViewModel>();
             foreach (var l in lessonsDb)
             {
@@ -66,24 +89,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                lessons.Add(new LessonViewModel()
-                {
-                    ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
-                    OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
-                    Content = l.Content,
-                    CreatedOn = l.CreatedOn,
-                    CreatorId = l.CreatorId,
-                    Grade = l.Grade,
-                    Id = l.Id,
-                    Likes = c,
-                    Readers = l.Reads.Count(),
-                    Title = l.Title,
-                    School = l.Creator.School,
-                    Subject = l.Subject,
-                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-                    HtmlContent = l.HtmlCotnent,
-                    IsPrivate = false
-                });
+                lessons.Add(ToViewModel(l,c));
             }
 
             query.Items = lessons;
@@ -121,23 +127,7 @@ namespace IntelliTest.Core.Services
                 return null;
             }
 
-            return new LessonViewModel()
-            {
-                ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
-                OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
-                Content = l.Content,
-                CreatedOn = l.CreatedOn,
-                CreatorId = l.CreatorId,
-                Grade = l.Grade,
-                Id = l.Id,
-                Likes = l.LessonLikes?.Count() ?? 0,
-                Readers = l.Reads.Count(),
-                Title = l.Title,
-                School = l.Creator.School,
-                Subject = l.Subject,
-                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-                HtmlContent = l.HtmlCotnent
-            };
+            return ToViewModel(l, l.LessonLikes?.Count() ?? 0);
         }
 
         public async Task<LessonViewModel?>? GetByName(string name)
@@ -155,23 +145,7 @@ namespace IntelliTest.Core.Services
                 return null;
             }
 
-            return new LessonViewModel()
-            {
-                ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
-                OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
-                Content = l.Content,
-                CreatedOn = l.CreatedOn,
-                CreatorId = l.CreatorId,
-                Grade = l.Grade,
-                Id = l.Id,
-                Likes = l.LessonLikes?.Count() ?? 0,
-                Readers = l.Reads.Count(),
-                Title = l.Title,
-                School = l.Creator.School,
-                Subject = l.Subject,
-                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-                HtmlContent = l.HtmlCotnent
-            };
+            return ToViewModel(l, l.LessonLikes?.Count() ?? 0);
         }
 
         public EditLessonViewModel ToEdit(LessonViewModel model)
@@ -275,23 +249,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                model.Add(new LessonViewModel()
-                {
-                    ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
-                    OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
-                    Content = l.Content,
-                    CreatedOn = l.CreatedOn,
-                    CreatorId = l.CreatorId,
-                    Grade = l.Grade,
-                    Id = l.Id,
-                    Likes = c,
-                    Readers = l.Reads.Count(),
-                    Title = l.Title,
-                    School = l.Creator.School,
-                    Subject = l.Subject,
-                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-                    HtmlContent = l.HtmlCotnent
-                });
+                model.Add(ToViewModel(l, c));
             }
 
             return model;
@@ -321,23 +279,7 @@ namespace IntelliTest.Core.Services
                     c = n.Count();
                 }
 
-                model.Add(new LessonViewModel()
-                {
-                    ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
-                    OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
-                    Content = l.Content,
-                    CreatedOn = l.CreatedOn,
-                    CreatorId = l.CreatorId,
-                    Grade = l.Grade,
-                    Id = l.Id,
-                    Likes = c,
-                    Readers = l.Reads.Count(),
-                    Title = l.Title,
-                    School = l.Creator.School,
-                    Subject = l.Subject,
-                    CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
-                    HtmlContent = l.HtmlCotnent
-                });
+                model.Add(ToViewModel(l, c));
             }
 
             return model;

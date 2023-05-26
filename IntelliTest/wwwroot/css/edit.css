@@ -210,6 +210,26 @@ a { text-decoration: none; }
     transition: all 300ms ease-out;
 }
 
+#addAddMoreDiv {
+    width: 60%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+@media screen and (max-width: 425px) {
+    #addAddMoreDiv {
+        width: 90%;
+    }
+    .questTextBox > p {
+        word-wrap: break-word;
+    }
+    .questTextBox {
+        width: 90%;
+    }
+    .questAnswer {
+        margin-left: 0;
+    }
+}
+
 :root {
     --select-border: #777;
     --select-focus: #444;

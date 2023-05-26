@@ -53,7 +53,7 @@ namespace IntelliTest.Controllers
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
                 cache.SetAsync("tests", model, cacheEntryOptions);
             }
             return View(model);
@@ -173,6 +173,7 @@ namespace IntelliTest.Controllers
             }
 
             var studentId = (Guid)TempData.Peek("StudentId");
+            //TODO: Fixing logout login tempdata and try test taking
             if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
                 return RedirectToAction("ReviewAnswers");
@@ -199,8 +200,7 @@ namespace IntelliTest.Controllers
             }
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             TempData["message"] = "Успешно предаде теста!";
-            TempData["TakingTest"] = false;
-            TempData.Remove("TestStart");
+            TempData.Remove("TestStarted");
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
         }
 
