@@ -41,14 +41,14 @@
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
                     <div class="widthMax">
                         <label style="display: flex">Текст</label>
-                        <input name="text" id="prompt"class="input-field widthMax" name="url" class="widthMax" style="color: black">
+                        <textarea onkeyup="textAreaAdjust(this)" name="text" id="prompt"class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
                     </div>
                     <br/>
                     <button type="button" class="btn btn-secondary" id="gen">Генерирай</button>
                     <br/>
                     <div class="widthMax">
                         <label style="display: flex">От линк(URL) или заглавие</label>
-                        <input id="lessonName" class="input-field widthMax" name="url" class="widthMax" style="color: black">
+                        <textarea onkeyup="textAreaAdjust(this)" id="lessonName" class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
                     </div>
                     <span class="text-danger" id="lessonError"></span>
                     <br/>
@@ -113,5 +113,5 @@
         var count = @Model.ClosedQuestions.Count();
         var id = "@Model.Id";
     </script>
-    <script src="~/js/testEdit.js"></script>
+    <script src="~/js/testEdit.js" asp-append-version="true"></script>
 }

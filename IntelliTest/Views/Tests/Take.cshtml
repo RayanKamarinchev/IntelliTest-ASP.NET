@@ -34,40 +34,9 @@
 @section Scripts
 {
     <script>
-                function onFocus(e) {
-                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
-                }
-                function onFocusOut(e){
-                    e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
-                }
-                var timer = document.getElementById("timer");
-                var interval = 1000; 
-                var expected = Date.now() + interval;
-                let min = @mins;
-                var sec = @sec;
-                //setTimeout(document.forms["test"].submit(), min*60+sec)
-                setTimeout(step, interval);
-                function step() {
-                    var dt = Date.now() - expected;
-                    sec--;
-                    if(sec < 0){
-                        sec+=60;
-                        min--;
-                    }
-                    if(min<0 || sec<=0){
-                        document.forms["test"].submit(); 
-                    }
-                    timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
-                    expected += interval;
-                    setTimeout(step, Math.max(0, interval - dt));
-                }
-                document.addEventListener("visibilitychange", () => {
-                    if(document.hidden){
-                        console.log("here")
-                        document.forms["test"].submit();
-                    }
-                });
-            </script>
+            let min = @mins;
+            let sec = @sec;
+    </script>
     <script src="~/js/testTake.js"></script>
 }
 @{

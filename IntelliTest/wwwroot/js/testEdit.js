@@ -8,7 +8,6 @@
                     .build();
             connection.on("Add", (question, answer) => {
                 let el = createElementFromHTML(openQuestionPartialView(question, answer, count, 0));
-                textAreaAdjust(el);
                 questions.prepend(el)
                 count++;
             });
@@ -25,7 +24,8 @@
         setupConnection();
 
 
-        function openQuestionPartialView(question, answer, order, maxScore){return `
+function openQuestionPartialView(question, answer, order, maxScore) {
+   return `
                     <div class="questBox">
                     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
                         <span>Points:</span>
@@ -49,7 +49,8 @@
                     </div>
                 </div>
         `}
-            function answerPartialView(answer, order, questionOrder){return `
+function answerPartialView(answer, order, questionOrder) {
+    return `
                         <div class="questTextBox option">
                             <div>
                                     <input type="checkbox" name="ClosedQuestions[${questionOrder}].AnswerIndexes[${order}]"/>
@@ -60,7 +61,7 @@
                         </div>
             `}
 
-            function closedQuestionPartialView(question, answers, order, maxScore){console.log(answers); return `
+function closedQuestionPartialView(question, answers, order, maxScore) {return `
                 <div class="questBox" name="ClosedQuestions${order}">
                     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
                         <span>Points:</span>
@@ -117,7 +118,8 @@
         let promptInput = document.getElementById("prompt")
         function deleteAble(item){
             item.addEventListener('click', e => {
-                e.target.parentNode.parentNode.remove();
+                console.log(e)
+                e.target.parentNode.parentNode.parentNode.remove();
                 count--;
             })
         }
@@ -169,7 +171,6 @@
             console.log(value)
             while(true)
             {
-                debugger;
                 question = getByKey(`OpenQuestions[${i}]`, value);
                 if (Object.keys(question).length === 0){
                      question = getByKey(`ClosedQuestions[${i}]`, value);

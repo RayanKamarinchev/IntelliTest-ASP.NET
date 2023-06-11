@@ -9,7 +9,6 @@ using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace IntelliTest.Controllers
 {
@@ -38,8 +37,8 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
-        {
-            if (cache.TryGetValue("tests", out QueryModel<TestViewModel>? model))
+        { 
+            if (cache.TryGetValue("tests", out QueryModel<TestViewModel>? model) && false)
             {
             }
             else
@@ -63,8 +62,7 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> MyTests([FromQuery] QueryModel<TestViewModel> query)
         {
-            QueryModel<TestViewModel> model = new QueryModel<TestViewModel>();
-            model = await testService.GetMy((Guid?)TempData.Peek("TeacherId") ?? null, (Guid?)TempData.Peek("StudentId") ?? null, query);
+            QueryModel<TestViewModel> model = await testService.GetMy((Guid?)TempData.Peek("TeacherId") ?? null, (Guid?)TempData.Peek("StudentId") ?? null, query);
             return View("Index", model);
         }
         
@@ -173,10 +171,9 @@ namespace IntelliTest.Controllers
             }
 
             var studentId = (Guid)TempData.Peek("StudentId");
-            //TODO: Fixing logout login tempdata and try test taking
             if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
-                return RedirectToAction("ReviewAnswers");
+                return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
             }
 
             var test = testService.ToSubmit(await testService.GetById(testId));
@@ -194,9 +191,9 @@ namespace IntelliTest.Controllers
             }
 
             var studentId = (Guid)TempData.Peek("StudentId");
-            if (await testService.IsTestTakenByStudentId(testId, (Guid)TempData.Peek("StudentId")))
+            if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
-                return RedirectToAction("ReviewAnswers");
+                return RedirectToAction("ReviewAnswers", new {testId = testId, studentId = studentId});
             }
             await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             TempData["message"] = "Успешно предаде теста!";
@@ -208,6 +205,7 @@ namespace IntelliTest.Controllers
         [Route("Review/{testId}/{studentId}")]
         public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
+            
             var teacherId = (Guid?)TempData.Peek("TeacherId") ?? null;
             var student = await studentService.GetStudent(studentId);
             bool isStudentsTeacher = student.Classes

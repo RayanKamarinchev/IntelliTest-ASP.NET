@@ -38,7 +38,8 @@ namespace IntelliTest.Core.Services
             Time = t.Time,
             Title = t.Title,
             MultiSubmit = t.MultiSubmission,
-            PublicityLevel = t.PublicyLevel
+            PublicityLevel = t.PublicyLevel,
+            Students = t.TestResults.Count()
         };
 
         public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId)
@@ -402,6 +403,10 @@ namespace IntelliTest.Core.Services
 
         public async Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore)
         {
+            if (Answer is null)
+            {
+                return new Tuple<decimal, string>(0, $"Правилният отговор е \"{RightAnswer}\"");
+            }
             if (Regex.Matches(RightAnswer, @"\w+")
                      .Select(m => m.Value).Count() <= 4)
             {
@@ -409,7 +414,7 @@ namespace IntelliTest.Core.Services
                                       .Select(m => m.Value)
                                       .SequenceEqual(Regex.Matches(RightAnswer, @"\w+")
                                                           .Select(m => m.Value));
-                return new Tuple<decimal, string>(isCorrect ? MaxScore : 0, $"Правилният отговор беше \"{RightAnswer}\"");
+                return new Tuple<decimal, string>(isCorrect ? MaxScore : 0, $"Правилният отговор е \"{RightAnswer}\"");
             }
             var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
             var chat = api.Chat.CreateConversation();
@@ -433,25 +438,23 @@ namespace IntelliTest.Core.Services
 
         public async Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId)
         {
-            if (!context.OpenQuestionAnswers
-                      .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
-                      .Any(q=>q.Explanation!="")
-               )
+            var openQuestions = await context.OpenQuestionAnswers
+                                             .Include(q => q.Question)
+                                             .Where(q => q.StudentId == studentId
+                                                      && q.Question.TestId == testId
+                                                         && string.IsNullOrEmpty(q.Explanation))
+                                             .ToListAsync();
+            foreach (var q in openQuestions)
             {
-                var openQuestions = await context.OpenQuestionAnswers
-                                                 .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
-                                                 .Include(q => q.Question)
-                                                 .ToListAsync();
-                foreach (var q in openQuestions)
-                {
-                    var eval = 
-                        await CalculateOpenQuestionScore(q.Answer, q.Question.Answer, q.Question.MaxScore);
-                    q.Points = eval.Item1;
-                    q.Explanation = eval.Item2;
-                }
-
-                await context.SaveChangesAsync();
+                var eval = 
+                    await CalculateOpenQuestionScore(q.Answer, q.Question.Answer, q.Question.MaxScore);
+                q.Points = eval.Item1;
+                q.Explanation = eval.Item2;
             }
+
+            await context.SaveChangesAsync();
+
+
             var openQuestionsViewModels = await context.OpenQuestionAnswers
                                                        .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
                                                        .Include(q => q.Question)

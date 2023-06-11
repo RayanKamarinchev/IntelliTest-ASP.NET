@@ -30,7 +30,8 @@ namespace IntelliTest.Core.Hubs
         {
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            start.Arguments = string.Format("translate.py \"{0}\"", text);
+            string formattedText = text.Replace("\"", "\\\"");
+            start.Arguments = string.Format("translate.py \"{0}\"", formattedText);
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             string last = "";
@@ -89,7 +90,6 @@ namespace IntelliTest.Core.Hubs
             };
 
             int i = 0;
-            List<OpenQuestionViewModel> questions = new List<OpenQuestionViewModel>();
             while (i < encoded.Count)
             {
                 var part = encoded.Skip(i).Take(2000).ToArray();
@@ -102,10 +102,13 @@ namespace IntelliTest.Core.Hubs
                         i--;
                     }
                 }
-                string text = "Generate questions \"Q\" in bulgarian and answers \"A\" only on the text and only in bulgarian . " + tikToken.Decode(part.Take(i).ToList());
+
+                string decodedText = tikToken.Decode(part.Take(i).ToList());
+                //string text = "Generate questions \"Q\" in bulgarian and answers \"A\" only on the text and only in bulgarian . " + decodedText;
+                string text =
+                    "Generate questions \"Q\" and answers \"A\" only in Bulgarian, focusing exclusively on the content of the following text: '''" + decodedText + "'''.Ensure the questions and answers can be found in the text. Generate 3 questions without enumerating them.";
                 chat.AppendUserInput(text);
-                
-                List<Tuple<string, string>> final = new List<Tuple<string, string>>();
+
                 var res = "";
                 string question = "";
                 await foreach (var response in chat.StreamResponseEnumerableFromChatbotAsync())

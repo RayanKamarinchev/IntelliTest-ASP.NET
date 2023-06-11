@@ -89,6 +89,6 @@ function textAreaAdjust(element) {
 [...document.querySelectorAll("div > div.questTextBox.questAnswer > div > textarea")].forEach(e => {
     textAreaAdjust(e)
 });
-[...document.querySelectorAll("юdiv > div.choice > div > div > input[type=checkbox]")].forEach(e => {
+[...document.querySelectorAll("#questions > div > div.customRow > div > textarea")].forEach(e => {
     textAreaAdjust(e)
 });
