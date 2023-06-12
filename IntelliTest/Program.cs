@@ -22,7 +22,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<IntelliTestDbContext>(options =>
-                                                            options.UseSqlServer(connectionString));
+                                                            options.UseSqlServer(connectionString)
+                                                            ,ServiceLifetime.Transient);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>

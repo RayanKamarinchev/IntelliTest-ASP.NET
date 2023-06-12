@@ -25,12 +25,9 @@ namespace IntelliTest.Core.Contracts
         Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query);
         Task<Guid> Create(TestViewModel model, Guid teacherId, string[] classNames);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore);
-
-        Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore);
         public Task<bool> StudentHasAccess(Guid testId, Guid studentId);
         public Task DeleteTest(Guid id);
         public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
-        string Translate(string text);
         Task SaveChanges();
         bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes);
         public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId);

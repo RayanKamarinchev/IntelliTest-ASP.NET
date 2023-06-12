@@ -82,27 +82,27 @@ namespace IntelliTest.Tests.Unit_Tests
                                       .Include(l => l.Creator)
                                       .ThenInclude(c => c.User);
             query.Filters.Subject = Subject.Математика;
-            var bySubject = await lessonService.Filter(lessonsDb, query);
+            var bySubject = await lessonService.Filter(lessonsDb, query,"StudentUser");
             Assert.AreEqual(id, bySubject.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Grade = 10;
-            var byGrade = await lessonService.Filter(lessonsDb, query);
+            var byGrade = await lessonService.Filter(lessonsDb, query, "StudentUser");
             Assert.AreEqual(id2, byGrade.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.SearchTerm = "Bul";
-            var bySearchTerm = await lessonService.Filter(lessonsDb, query);
+            var bySearchTerm = await lessonService.Filter(lessonsDb, query, "StudentUser");
             Assert.AreEqual(id2, bySearchTerm.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Readers;
-            var byExaminers = await lessonService.Filter(lessonsDb, query);
+            var byExaminers = await lessonService.Filter(lessonsDb, query, "StudentUser");
             Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.ReadingTime;
-            var byScore = await lessonService.Filter(lessonsDb, query);
+            var byScore = await lessonService.Filter(lessonsDb, query, "StudentUser");
             Assert.AreEqual(id, byScore.Items.FirstOrDefault().Id);
 
             SetUpQuery();

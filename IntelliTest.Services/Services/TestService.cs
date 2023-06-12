@@ -10,6 +10,7 @@ using System.Diagnostics;
 using TiktokenSharp;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
+using static IntelliTest.Core.Objects.Translator;
 
 namespace IntelliTest.Core.Services
 {
@@ -17,11 +18,13 @@ namespace IntelliTest.Core.Services
     {
         private readonly IntelliTestDbContext context;
         private readonly IConfiguration config;
+        private readonly TestResultsProcessorService testResultsProcessor;
 
         public TestService(IntelliTestDbContext _context, IConfiguration _config)
         {
             context = _context;
             config = _config;
+            testResultsProcessor = new TestResultsProcessorService(config["OpenAIKey"], config["ConnectionString"], _context);
         }
 
         private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
@@ -331,7 +334,6 @@ namespace IntelliTest.Core.Services
                 test.Grade = model.Grade;
                 test.Time = model.Time;
                 test.PublicyLevel = model.PublicityLevel;
-                //context.Update(test);
             }
             else
             {
@@ -378,84 +380,29 @@ namespace IntelliTest.Core.Services
             return score;
         }
 
-        public string Translate(string text)
-        {
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            start.Arguments = string.Format("translate.py \"{0}\"", text);
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
-            string last = "";
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    last = reader.ReadToEnd();
-                }
-            }
-            return last;
-        }
-
         public async Task SaveChanges()
         {
             await context.SaveChangesAsync();
         }
 
-        public async Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore)
-        {
-            if (Answer is null)
-            {
-                return new Tuple<decimal, string>(0, $"Правилният отговор е \"{RightAnswer}\"");
-            }
-            if (Regex.Matches(RightAnswer, @"\w+")
-                     .Select(m => m.Value).Count() <= 4)
-            {
-                bool isCorrect = Regex.Matches(Answer, @"\w+")
-                                      .Select(m => m.Value)
-                                      .SequenceEqual(Regex.Matches(RightAnswer, @"\w+")
-                                                          .Select(m => m.Value));
-                return new Tuple<decimal, string>(isCorrect ? MaxScore : 0, $"Правилният отговор е \"{RightAnswer}\"");
-            }
-            var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
-            var chat = api.Chat.CreateConversation();
-
-            string translatedCorrectAnswer = Translate(RightAnswer);
-            string translatedAnswer = Translate(Answer);
-
-            TikToken tikToken = TikToken.EncodingForModel("gpt-3.5-turbo");
-            var encodedCorrect = tikToken.Encode(translatedCorrectAnswer);
-            var partOfCorrect = encodedCorrect.Take(2000).ToList();
-            var encodedAnswer = tikToken.Encode(translatedAnswer);
-            var partOfAnswer = encodedAnswer.Take(2000).ToList();
-            string text = "Correct answer \"" + tikToken.Decode(partOfCorrect) + "\" Given answer \"" + tikToken.Decode(partOfAnswer) + $"Answer with \"Score: (score out of {MaxScore*2}) Message: (message in bulgarian)\"";
-            chat.AppendUserInput(text);
-            var response = await chat.GetResponseFromChatbotAsync();
-            decimal score = decimal.Parse(Regex.Match(response, @"\d+").Value)/2;
-            string message = response.Substring(response.IndexOf(':', response.IndexOf(':') + 3))
-                                     .Replace('\n', ' ');
-            return new Tuple<decimal, string>(score, message);
-        }
-
         public async Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId)
         {
-            var openQuestions = await context.OpenQuestionAnswers
+            //context.OpenQuestionAnswers.RemoveRange(context.OpenQuestionAnswers);
+            //context.ClosedQuestionAnswers.RemoveRange(context.ClosedQuestionAnswers);
+            //context.TestResults.RemoveRange(context.TestResults);
+            
+            var openQuestionAnswers = await context.OpenQuestionAnswers
                                              .Include(q => q.Question)
                                              .Where(q => q.StudentId == studentId
                                                       && q.Question.TestId == testId
-                                                         && string.IsNullOrEmpty(q.Explanation))
+                                                      && string.IsNullOrEmpty(q.Explanation))
                                              .ToListAsync();
-            foreach (var q in openQuestions)
+            testResultsProcessor.setOpenQuesitons(openQuestionAnswers);
+            await testResultsProcessor.StartAsync(new CancellationToken());
+
+            try
             {
-                var eval = 
-                    await CalculateOpenQuestionScore(q.Answer, q.Question.Answer, q.Question.MaxScore);
-                q.Points = eval.Item1;
-                q.Explanation = eval.Item2;
-            }
-
-            await context.SaveChangesAsync();
-
-
-            var openQuestionsViewModels = await context.OpenQuestionAnswers
+                var openQuestionsViewModels = await context.OpenQuestionAnswers
                                                        .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
                                                        .Include(q => q.Question)
                                                        .Select(q => new OpenQuestionReviewViewModel()
@@ -470,37 +417,46 @@ namespace IntelliTest.Core.Services
                                                            Explanation = q.Explanation
                                                        })
                                                        .ToListAsync();
-            var closedQuestions = new List<ClosedQuestionReviewViewModel>();
-            var db = context.ClosedQuestionAnswers
-                            .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
-                            .Include(q => q.Question);
-            foreach (var q in db)
-            {
-                var closedQuestionModel = new ClosedQuestionReviewViewModel()
+                var closedQuestions = new List<ClosedQuestionReviewViewModel>();
+                var db = context.ClosedQuestionAnswers
+                                .Where(q => q.StudentId == studentId && q.Question.TestId == testId)
+                                .Include(q => q.Question);
+                foreach (var q in db)
                 {
-                    PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
-                    IsDeleted = false,
-                    Order = q.Question.Order,
-                    Text = q.Question.Text,
-                    Id = q.Id,
-                    Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
-                                                    q.AnswerIndexes),
-                    RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
-                                    .ToArray(),
-                    MaxScore = q.Question.MaxScore
-                };
-                closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.Answers,
-                     closedQuestionModel.RightAnswers,
-                     closedQuestionModel.MaxScore);
-                closedQuestions.Add(closedQuestionModel);
-            }
+                    var closedQuestionModel = new ClosedQuestionReviewViewModel()
+                    {
+                        PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                        IsDeleted = false,
+                        Order = q.Question.Order,
+                        Text = q.Question.Text,
+                        Id = q.Id,
+                        Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                                                        q.AnswerIndexes),
+                        RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
+                                        .ToArray(),
+                        MaxScore = q.Question.MaxScore
+                    };
+                    closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.Answers,
+                         closedQuestionModel.RightAnswers,
+                         closedQuestionModel.MaxScore);
+                    closedQuestions.Add(closedQuestionModel);
+                }
 
+                return new TestReviewViewModel()
+                {
+                    OpenQuestions = openQuestionsViewModels,
+                    ClosedQuestions = closedQuestions,
+                    Score = closedQuestions.Sum(q => q.Score)
+                          + openQuestionsViewModels.Sum(q => q.Score)
+                };
+            }
+            catch (InvalidOperationException e)
+            {
+            }
             return new TestReviewViewModel()
             {
-                OpenQuestions = openQuestionsViewModels,
-                ClosedQuestions = closedQuestions,
-                Score = closedQuestions.Sum(q => q.Score)
-                      + openQuestionsViewModels.Sum(q => q.Score)
+                OpenQuestions = new List<OpenQuestionReviewViewModel>(),
+                ClosedQuestions = new List<ClosedQuestionReviewViewModel>()
             };
         }
 
@@ -548,7 +504,7 @@ namespace IntelliTest.Core.Services
             });
             await context.SaveChangesAsync();
         }
-        //
+        
         public bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes)
         {
             var list = Enumerable.Repeat(false, answers.Length).ToArray();
