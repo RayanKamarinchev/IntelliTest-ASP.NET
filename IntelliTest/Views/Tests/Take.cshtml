@@ -37,7 +37,7 @@
             let min = @mins;
             let sec = @sec;
     </script>
-    <script src="~/js/testTake.js"></script>
+    <script src="~/js/testTake.js" asp-append-version="true"></script>
 }
 @{
     var id = Context.GetRouteData().Values["testId"];
@@ -48,6 +48,7 @@
         {
             TempData.Remove("TestStarted");
             <script defer>
+                    submitted = true;
                     document.forms["test"].submit(); 
             </script>
         }

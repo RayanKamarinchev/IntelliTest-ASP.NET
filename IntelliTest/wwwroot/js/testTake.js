@@ -1,4 +1,5 @@
 ﻿let submitted = false;
+let windowsChangedStartTime = null;
 
 [...document.querySelectorAll("form > div > div.questTextBox.questAnswer > div > textarea")].forEach(e => {
     e.value = localStorage.getItem(e.getAttribute("name"))
@@ -49,7 +50,13 @@ function step() {
     setTimeout(step, Math.max(0, interval - dt));
 }
 document.addEventListener("visibilitychange", () => {
+    debugger;
     if (document.hidden && !submitted) {
-        document.forms["test"].submit();
+        if (windowsChangedStartTime == null) {
+            windowsChangedStartTime = Date.now();
+        }
+        else if (Date.now() - windowsChangedStartTime > 3000) {
+            document.forms["test"].submit();
+        }
     }
 });

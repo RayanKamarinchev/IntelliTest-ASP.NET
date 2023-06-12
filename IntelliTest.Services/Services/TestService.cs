@@ -387,16 +387,13 @@ namespace IntelliTest.Core.Services
 
         public async Task<TestReviewViewModel> TestResults(Guid testId, Guid studentId)
         {
-            //context.OpenQuestionAnswers.RemoveRange(context.OpenQuestionAnswers);
-            //context.ClosedQuestionAnswers.RemoveRange(context.ClosedQuestionAnswers);
-            //context.TestResults.RemoveRange(context.TestResults);
-            
+
             var openQuestionAnswers = await context.OpenQuestionAnswers
-                                             .Include(q => q.Question)
-                                             .Where(q => q.StudentId == studentId
-                                                      && q.Question.TestId == testId
-                                                      && string.IsNullOrEmpty(q.Explanation))
-                                             .ToListAsync();
+                                                   .Include(q => q.Question)
+                                                   .Where(q => q.StudentId == studentId
+                                                            && q.Question.TestId == testId
+                                                            && string.IsNullOrEmpty(q.Explanation))
+                                                   .ToListAsync();
             testResultsProcessor.setOpenQuesitons(openQuestionAnswers);
             await testResultsProcessor.StartAsync(new CancellationToken());
 
@@ -493,11 +490,10 @@ namespace IntelliTest.Core.Services
             }
             await context.SaveChangesAsync();
             
-            var review = await TestResults(testId, studentId);
             await context.TestResults.AddAsync(new TestResult()
             {
                 Mark = Mark.Unmarked,
-                Score = review.Score,
+                Score = 0,
                 StudentId = studentId,
                 TestId = testId,
                 TakenOn = DateTime.Now

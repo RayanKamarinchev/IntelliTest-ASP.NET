@@ -1,10 +1,13 @@
 ﻿using System.Text.RegularExpressions;
+using IntelliTest.Core.Models;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using TiktokenSharp;
 using static IntelliTest.Core.Objects.Translator;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace IntelliTest.Core.Services
 {
@@ -52,12 +55,12 @@ namespace IntelliTest.Core.Services
             var partOfCorrect = encodedCorrect.Take(2000).ToList();
             var encodedAnswer = tikToken.Encode(translatedAnswer);
             var partOfAnswer = encodedAnswer.Take(2000).ToList();
-            string text = "Correct answer \"" + tikToken.Decode(partOfCorrect) + "\" Given answer \"" + tikToken.Decode(partOfAnswer) + $"Answer with \"Score: (score out of {MaxScore * 2}) Message: (message in bulgarian)\"";
-            chat.AppendUserInput(text);
-            var response = await chat.GetResponseFromChatbotAsync();
-            decimal score = decimal.Parse(Regex.Match(response, @"\d+").Value) / 2;
-            string message = response.Substring(response.IndexOf(':', response.IndexOf(':') + 3))
-                                     .Replace('\n', ' ');
+            string prompt = "Correct answer \"" + tikToken.Decode(partOfCorrect) + "\" Given answer \"" + tikToken.Decode(partOfAnswer) + $"\" Answer with json containing score out of {MaxScore*2} and message in bulgarian";
+            chat.AppendUserInput(prompt);
+            var responseJson = await chat.GetResponseFromChatbotAsync();
+            Response? response = JsonSerializer.Deserialize<Response>(responseJson);
+            decimal score = response.score / 2;
+            string message = response.message;
             return new Tuple<decimal, string>(score, message);
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
