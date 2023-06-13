@@ -181,6 +181,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         public async Task Create_Teacher_Post_Correct()
         {
             SetUserRole("Teacher");
+            testsController.TempData.Remove("Classes");
             var res = await testsController.Create(new TestViewModel());
             Assert.NotNull(res);
             SetUserRole("Student");

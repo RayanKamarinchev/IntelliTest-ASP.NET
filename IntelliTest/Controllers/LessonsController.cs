@@ -54,6 +54,10 @@ namespace IntelliTest.Controllers
         [Route("Read/{id}")]
         public async Task<IActionResult> Read(Guid id)
         {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 return BadRequest();
@@ -86,6 +90,10 @@ namespace IntelliTest.Controllers
 
             if (model == null)
             {
+                if (TempData.Peek("TeacherId") is null)
+                {
+                    return RedirectToAction("Logout", "User");
+                }
                 if (!await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
                 {
                     return RedirectToAction("Read", new { id = id });
@@ -122,6 +130,11 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
+
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 await lessonService.Create(model, (Guid)TempData.Peek("TeacherId"));
@@ -140,6 +153,10 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Like(Guid lessonId, string userId)
         {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
             {
                 return NotFound();
@@ -150,6 +167,10 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Unlike(Guid lessonId, string userId)
         {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
             {
                 return NotFound();

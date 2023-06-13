@@ -128,7 +128,8 @@ namespace IntelliTest.Controllers
             {
                 return View("Edit", model);
             }
-            if (!model.ClosedQuestions.All(c => c.AnswerIndexes.Any(ai => ai)))
+            
+            if (model.ClosedQuestions is null || !model.ClosedQuestions.All(c => c.AnswerIndexes.Any(ai => ai)))
             {
                 return View("Edit", model);
             }
@@ -167,6 +168,10 @@ namespace IntelliTest.Controllers
             }
             string[] allClasses = (string[])TempData["Classes"];
             string[] classNames = allClasses.Where((c, i) => model.Selected[i]).ToArray();
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             Guid id = await testService.Create(model, (Guid)TempData.Peek("TeacherId"), classNames);
             return RedirectToAction("Edit", new {id = id});
         }

@@ -14,6 +14,8 @@ namespace IntelliTest.Tests.Mocks
                 Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
                 classServiceMock.Setup(s => s.GetById(id))
                                .ReturnsAsync(new ClassViewModel());
+                classServiceMock.Setup(s => s.IsClassOwner(id, It.IsAny<string>()))
+                                .ReturnsAsync(true);
                 return classServiceMock.Object;
             }
         }

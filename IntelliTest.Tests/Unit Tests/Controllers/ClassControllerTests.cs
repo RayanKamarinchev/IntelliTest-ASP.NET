@@ -20,6 +20,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
     {
         private ClassesController classesController;
         Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
+        Guid id2 = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e88");
 
         private void SetUserRole(string roleName)
         {
@@ -102,7 +103,15 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             SetUserRole("Student");
         }
         [Test]
-        public async Task Edit_Post_Teacher_Correct()
+        public async Task Edit_Post_Teacher_FakeId_Correct()
+        {
+            SetUserRole("Teacher");
+            var res = await classesController.Edit(new ClassViewModel(), id2);
+            Assert.NotNull(res);
+            SetUserRole("Student");
+        }
+        [Test]
+        public async Task Edit_Post_Teacher_ValidId_Correct()
         {
             SetUserRole("Teacher");
             var res = await classesController.Edit(new ClassViewModel(), id);
