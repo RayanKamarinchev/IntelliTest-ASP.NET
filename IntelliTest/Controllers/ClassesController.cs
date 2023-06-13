@@ -54,6 +54,10 @@ namespace IntelliTest.Controllers
             var model = new ClassViewModel();
             model.Description = "";
             model.Name = "";
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             model.Teacher = new TeacherViewModel()
             {
                 Id = (Guid)TempData.Peek("TeacherId")
@@ -82,6 +86,10 @@ namespace IntelliTest.Controllers
                 await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
             }
 
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             model.Teacher = new TeacherViewModel()
             {
                 Id = (Guid)TempData.Peek("TeacherId")
@@ -241,7 +249,11 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
-            
+
+            if (TempData.Peek("StudentId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             bool success = await classService.AddStudent((Guid)TempData.Peek("StudentId"), model.Id);
             if (!success)
             {

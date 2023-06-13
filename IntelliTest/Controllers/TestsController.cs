@@ -9,6 +9,7 @@ using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Org.BouncyCastle.Ocsp;
 
 namespace IntelliTest.Controllers
 {
@@ -83,6 +84,11 @@ namespace IntelliTest.Controllers
                     {
                         testId = (Guid)TempData.Peek("testId");
                     }
+
+                    if (TempData.Peek("TeacherId") is null)
+                    {
+                        return RedirectToAction("Logout", "User");
+                    }
                     bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek("TeacherId"));
                     if (!isCreator)
                     {
@@ -118,11 +124,11 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            if (!model.ClosedQuestions.All(c => c.AnswerIndexes.Any(ai => ai)))
+            if (!ModelState.IsValid)
             {
                 return View("Edit", model);
             }
-            if (!ModelState.IsValid)
+            if (!model.ClosedQuestions.All(c => c.AnswerIndexes.Any(ai => ai)))
             {
                 return View("Edit", model);
             }
@@ -154,6 +160,11 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
+
+            if (TempData.Peek("Classes") is null)
+            {
+                return View(model);
+            }
             string[] allClasses = (string[])TempData["Classes"];
             string[] classNames = allClasses.Where((c, i) => model.Selected[i]).ToArray();
             Guid id = await testService.Create(model, (Guid)TempData.Peek("TeacherId"), classNames);
@@ -170,6 +181,10 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
+            if (TempData.Peek("StudentId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             var studentId = (Guid)TempData.Peek("StudentId");
             if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
@@ -189,7 +204,10 @@ namespace IntelliTest.Controllers
             {
                 return NotFound();
             }
-
+            if (TempData.Peek("StudentId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             var studentId = (Guid)TempData.Peek("StudentId");
             if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
@@ -253,7 +271,7 @@ namespace IntelliTest.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Authorize(Roles = "Teacher")]
         [Route("Test/Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
