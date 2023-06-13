@@ -146,6 +146,10 @@ function closedQuestionPartialView(question, answers, order, maxScore) {return `
             e.preventDefault();
             connection.invoke("AddQuestion", promptInput.value)
         })
+        genLesson.addEventListener("click", (e) => {
+            e.preventDefault();
+            connection.invoke("FromLesson", lessonNameInput.value)
+        })
 
         function getByKey(allowed, value){
             return Object.keys(value)

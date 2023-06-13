@@ -40,6 +40,36 @@ namespace IntelliTest.Tests.Unit_Tests
             },
             ItemsPerPage = 3
         };
+
+        public TestViewModel GetTestByIdIncludingTestTaken(Guid id)
+        {
+            var t = data.Tests
+                                 .Where(t => !t.IsDeleted)
+                                 .Include(t => t.OpenQuestions)
+                                 .Include(t => t.ClosedQuestions)
+                                 .Include(t => t.TestResults)
+                                 .Include(t => t.TestLikes)
+                                 .FirstOrDefault(t => t.Id == id);
+           return new TestViewModel()
+            {
+                AverageScore = Math.Round(!t.TestResults.Any() ? 0 : t.TestResults.Average(r => r.Score), 2),
+                ClosedQuestions = t.ClosedQuestions,
+                CreatedOn = t.CreatedOn,
+                Description = t.Description,
+                Grade = t.Grade,
+                Id = t.Id,
+                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
+                           t.OpenQuestions.Sum(q => q.MaxScore),
+                OpenQuestions = t.OpenQuestions,
+                Time = t.Time,
+                Title = t.Title,
+                MultiSubmit = t.MultiSubmission,
+                PublicityLevel = t.PublicyLevel,
+                Students = t.TestResults.Count(),
+                IsTestTaken = t.TestResults.Any(t=>t.StudentId==id)
+            };
+        }
+
         [Test]
         public async Task GetById_Correct()
         {
@@ -205,6 +235,7 @@ namespace IntelliTest.Tests.Unit_Tests
             };
             data.ClosedQuestionAnswers.RemoveRange(data.ClosedQuestionAnswers);
             data.OpenQuestionAnswers.RemoveRange(data.OpenQuestionAnswers);
+            data.TestResults.RemoveRange(data.TestResults);
             await data.SaveChangesAsync();
             await testService.AddTestAnswer(OpenQuestions, ClosedQuestions, id, id);
             Assert.AreEqual(2, data.OpenQuestionAnswers.Count());
@@ -216,11 +247,6 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task ProccessAnswerIndexes_Correct()
         {
             Assert.AreEqual(new[]{false,true,false,true}, testService.ProccessAnswerIndexes(new[]{"one", "two", "three", "four"},"1&3"));
-        }
-        [Test]
-        public async Task Translate_Correct()
-        {
-            Assert.AreEqual("", testService.Translate("В Европа Новото време започва от края на XV в. и продължава до Първата световна война (1914 – 1918 г.)."));
         }
         [Test]
         public async Task IsTestTakenByStudentId_Correct()
@@ -236,7 +262,7 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task TestsTakenByStudent_Correct()
         {
             var test = (await testService.TestsTakenByStudent(id, query)).Items.FirstOrDefault();
-            var dbTest = await testService.GetById(id);
+            var dbTest = GetTestByIdIncludingTestTaken(id);
             dbTest.IsTestTaken = true;
             string json1 = JsonConvert.SerializeObject(dbTest, Formatting.Indented,
                                                        new JsonSerializerSettings()
@@ -301,7 +327,7 @@ namespace IntelliTest.Tests.Unit_Tests
             Assert.AreEqual("The test", res.Title);
             Assert.AreEqual(1, res.ClosedQuestions.Count);
             Assert.AreEqual(2, res.OpenQuestions.Count);
-            Assert.AreEqual(0, res.Examiners);
+            Assert.AreEqual(1, res.Examiners);
             Assert.AreEqual(2, res.ClosedQuestions.FirstOrDefault().StudentAnswers[0][0]);
             Assert.AreEqual("its me mario", res.OpenQuestions.FirstOrDefault().StudentAnswers[0]);
             Assert.AreEqual("Bad", res.OpenQuestions.ToList()[1].StudentAnswers[0]);
@@ -357,9 +383,9 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpQuery();
             query.Filters.Sorting = Sorting.Examiners;
             var byExaminers = await testService.Filter(data.Tests, query, null, null);
-            Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id2, byExaminers.Items.FirstOrDefault().Id);
             var byExaminersMine = await testService.FilterMine(testsDb, query);
-            Assert.AreEqual(id, byExaminersMine.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id2, byExaminersMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Score;

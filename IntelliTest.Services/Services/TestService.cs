@@ -24,7 +24,10 @@ namespace IntelliTest.Core.Services
         {
             context = _context;
             config = _config;
-            testResultsProcessor = new TestResultsProcessorService(config["OpenAIKey"], config["ConnectionString"], _context);
+            if (!(string.IsNullOrEmpty(config["ConnectionString"]) || string.IsNullOrEmpty(config["OpenAIKey"])))
+            {
+                testResultsProcessor = new TestResultsProcessorService(config["OpenAIKey"], config["ConnectionString"], _context);
+            }
         }
 
         private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
@@ -143,8 +146,9 @@ namespace IntelliTest.Core.Services
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
-                                .Select(x=>ToViewModel(x));
-            test.ToList().ForEach(t => t.IsTestTaken = true);
+                                .Select(x=>ToViewModel(x))
+                                .ToList();
+            test.ForEach(t => t.IsTestTaken = true);
             query.Items = test.ToList();
             query.TotalItemsCount = test.Count();
             return query;
@@ -394,8 +398,11 @@ namespace IntelliTest.Core.Services
                                                             && q.Question.TestId == testId
                                                             && string.IsNullOrEmpty(q.Explanation))
                                                    .ToListAsync();
-            testResultsProcessor.setOpenQuesitons(openQuestionAnswers);
-            await testResultsProcessor.StartAsync(new CancellationToken());
+            if (testResultsProcessor is not null)
+            {
+                testResultsProcessor.setOpenQuesitons(openQuestionAnswers);
+                await testResultsProcessor.StartAsync(new CancellationToken());
+            }
 
             try
             {
@@ -522,8 +529,6 @@ namespace IntelliTest.Core.Services
 
         public async Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId)
         {
-            var student = await context.Students
-                                       .FirstOrDefaultAsync(s => s.Id == studentId);
             return context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId);
         }
 
@@ -614,36 +619,18 @@ namespace IntelliTest.Core.Services
 
         public async Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query)
         {
-            var student = await context.Students
-                                       .Include(s=>s.ClosedAnswers)
-                                       .ThenInclude(a=>a.Question)
-                                       .ThenInclude(q=>q.Test)
-                                       .ThenInclude(t=>t.TestResults)
-                                       
+            var testsQuery = context.TestResults
+                                    .Include(t=>t.Test)
+                                    .ThenInclude(t=>t.TestResults)
 
-                                       .Include(s => s.ClosedAnswers)
-                                       .ThenInclude(a => a.Question)
-                                       .ThenInclude(q => q.Test)
-                                       .ThenInclude(t=>t.TestLikes)
+                                    .Include(t => t.Test)
+                                    .ThenInclude(t => t.TestLikes)
 
-                                       .Include(s=>s.OpenAnswers)
-                                       .ThenInclude(a => a.Question)
-                                       .ThenInclude(q => q.Test)
-                                       .ThenInclude(t=>t.TestResults)
+                                    .Include(t => t.Test)
+                                    .ThenInclude(t => t.TestResults)
 
-                                       .Include(s => s.OpenAnswers)
-                                       .ThenInclude(a => a.Question)
-                                       .ThenInclude(q => q.Test)
-                                       .ThenInclude(t=>t.TestLikes)
-
-                                       .FirstOrDefaultAsync(s=>s.Id == studentId);
-            var closedQuestionTests = student?.ClosedAnswers
-                                 ?.Select(a => a.Question.Test)
-                                 ?.Distinct() ?? new List<Test>();
-            var openQuestionTests = student?.OpenAnswers
-                                  ?.Select(a => a.Question.Test)
-                                  ?.Distinct() ?? new List<Test>();
-            var testsQuery = closedQuestionTests.Union(openQuestionTests);
+                                    .Where(r => r.StudentId == studentId)
+                                    .Select(tr => tr.Test);
             return await FilterMine(testsQuery, query);
         }
 

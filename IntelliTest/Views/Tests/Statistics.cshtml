@@ -46,11 +46,12 @@
                         </div>
                         @if (all.Any(s=>s!=0))
                         {
+                            string chartId = "избери";
                             <div class="chart">
-                                <canvas id="@question.Text.ToLower()"></canvas>
+                                <canvas id="@chartId"></canvas>
                             </div>
                             <script>
-                                const ctx =  document.getElementById('@question.Text.ToLower()');
+                                const ctx =  document.getElementById('@Html.Raw(chartId)');
                                 let myBarGradeChart;
 
                                 const data = {
@@ -96,7 +97,7 @@
                         <div class="answersView">
                             @foreach (var studentAnswer in question.StudentAnswers)
                             {
-                                <p>@studentAnswer</p>
+                                <p>@(string.IsNullOrEmpty(studentAnswer) ? "Няма отговор" : studentAnswer))</p>
                             }
                         </div>
                     </div>

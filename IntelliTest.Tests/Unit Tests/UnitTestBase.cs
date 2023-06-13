@@ -241,6 +241,15 @@ namespace IntelliTest.Tests.Unit_Tests
                 }
             };
             data.Messages.AddRange(messages);
+            var testResult = new TestResult()
+            {
+                Mark = Mark.Unmarked,
+                Score = 0,
+                StudentId = id,
+                TestId = id,
+                TakenOn = new DateTime(2023, 5, 21, 2, 42, 0)
+            };
+            data.TestResults.Add(testResult);
             //Test result
             data.SaveChanges();
         }

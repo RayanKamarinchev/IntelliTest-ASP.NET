@@ -37,7 +37,7 @@ namespace IntelliTest.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
-        { 
+        {
             if (cache.TryGetValue("tests", out QueryModel<TestViewModel>? model) && false)
             {
             }
@@ -239,6 +239,10 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Statistics(Guid testId)
         {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await testService.IsTestCreator(testId, (Guid)TempData.Peek("TeacherId")))
             {
                 return NotFound();
@@ -254,6 +258,10 @@ namespace IntelliTest.Controllers
         [Route("Test/Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
             if (!await testService.IsTestCreator(id, (Guid)TempData.Peek("TeacherId")))
             {
                 return NotFound();
@@ -267,6 +275,10 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public IActionResult AddQuestion(OpenQuestionViewModel question)
         {
+            if (TempData.Peek("editModel") is null)
+            {
+                return View("Edit");
+            }
             var model = JsonSerializer.Deserialize<TestEditViewModel>(TempData.Peek("editModel").ToString());
             model.OpenQuestions.Add(question);
             TempData["editModel"] = JsonSerializer.Serialize(model);

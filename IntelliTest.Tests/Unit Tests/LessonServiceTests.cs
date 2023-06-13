@@ -18,6 +18,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NUnit.Framework.Constraints;
 using OpenAI_API.Models;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 namespace IntelliTest.Tests.Unit_Tests
 {
@@ -251,7 +252,34 @@ namespace IntelliTest.Tests.Unit_Tests
         {
             await lessonService.LikeLesson(id, "StudentUser");
             var likedLesson = (await lessonService.LikedLessons("StudentUser")).FirstOrDefault();
-            Assert.AreEqual(JsonConvert.SerializeObject(await lessonService.GetById(id)), JsonConvert.SerializeObject(likedLesson));
+            var l = await data.Lessons
+                                 .Where(l => !l.IsDeleted)
+                                 .Include(l => l.LessonLikes)
+                                 .Include(l => l.ClosedQuestions)
+                                 .Include(l => l.OpenQuestions)
+                                 .Include(l => l.Reads)
+                                 .Include(l => l.Creator)
+            .ThenInclude(c => c.User)
+                                 .FirstOrDefaultAsync(l => l.Id == id);
+            LessonViewModel lessonViewModel = new LessonViewModel()
+            {
+                ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
+                OpenQuestions = l.OpenQuestions ?? new List<OpenQuestion>(),
+                Content = l.Content,
+                CreatedOn = l.CreatedOn,
+                CreatorId = l.CreatorId,
+                Grade = l.Grade,
+                Id = l.Id,
+                Likes = l.LessonLikes.Count,
+                Readers = l.Reads.Count(),
+                Title = l.Title,
+                School = l.Creator.School,
+                Subject = l.Subject,
+                CreatorName = l.Creator.User.FirstName + l.Creator.User.LastName,
+                HtmlContent = l.HtmlCotnent,
+                IsLiked = l.LessonLikes.Any(l => l.UserId == "StudentUser")
+            };
+            Assert.AreEqual(JsonConvert.SerializeObject(lessonViewModel), JsonConvert.SerializeObject(likedLesson));
             SetUpBase();
             SetUp();
         }
