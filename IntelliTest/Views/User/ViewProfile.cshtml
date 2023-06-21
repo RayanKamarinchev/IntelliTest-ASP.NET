@@ -66,8 +66,10 @@
         </div>
     </div>
 </div>
-
+<script>
+    const userId = "@User.Id()";
+</script>
 @section Scripts
 {
-    <script src="~/js/viewProfile.js" runat="server"></script>
+    <script src="~/js/viewProfile.js" runat="server" asp-append-version="true"></script>
 }

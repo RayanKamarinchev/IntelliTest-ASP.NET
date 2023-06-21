@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\js\chat.js" />
+    <Content Remove="wwwroot\js\lessonsLike.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
     <_ContentIncludedByDefault Remove="wwwroot\img\question-feedback.png" />
     <_ContentIncludedByDefault Remove="wwwroot\img\users-line.svg" />
     <_ContentIncludedByDefault Remove="wwwroot\js\chat.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\lessonsLike.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -318,6 +320,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\js\chat.js" />
+    <None Include="wwwroot\js\lessonsLike.js" />
   </ItemGroup>
 
   <ItemGroup>

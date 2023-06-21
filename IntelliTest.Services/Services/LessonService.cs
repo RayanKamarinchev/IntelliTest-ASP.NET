@@ -18,6 +18,24 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
+        private List<LessonViewModel> AddLessonCountProperty(List<Lesson> lessons, string userId)
+        {
+            List<LessonViewModel> model = new List<LessonViewModel>();
+            foreach (var l in lessons)
+            {
+                var lessonLikes = l.LessonLikes;
+                int countOfLessonLikes = 0;
+                if (lessonLikes != null)
+                {
+                    countOfLessonLikes = lessonLikes.Count();
+                }
+
+                model.Add(ToViewModel(l, countOfLessonLikes, userId));
+            }
+
+            return model;
+        }
+
         private Func<Lesson, int, string, LessonViewModel> ToViewModel = (l, c, userId) => new LessonViewModel()
         {
             ClosedQuestions = l.ClosedQuestions ?? new List<ClosedQuestion>(),
@@ -82,18 +100,7 @@ namespace IntelliTest.Core.Services
                                        .Include(l=>l.ClosedQuestions)
                                        .Include(l=>l.LessonLikes)
                                        .ToListAsync();
-            var lessons = new List<LessonViewModel>();
-            foreach (var l in lessonsDb)
-            {
-                var n = l.LessonLikes;
-                int c = 0;
-                if (n != null)
-                {
-                    c = n.Count();
-                }
-
-                lessons.Add(ToViewModel(l,c, userId));
-            }
+            var lessons = AddLessonCountProperty(lessonsDb, userId);
 
             query.Items = lessons;
             query.TotalItemsCount = lessons.Count;
@@ -231,26 +238,23 @@ namespace IntelliTest.Core.Services
             }
         }
 
-        public async Task<QueryModel<LessonViewModel>> ReadLessons(string userId)
+        public async Task<IEnumerable<LessonViewModel>> ReadLessons(string userId)
         {
-            List<LessonViewModel> model = new List<LessonViewModel>();
-            var lessons = context.Lessons
+            var lessons = await context.Lessons
                                        .Where(l => l.Reads.Any(r => r.UserId == userId) && !l.IsDeleted)
                                        .Include(l => l.LessonLikes)
                                        .Include(l => l.ClosedQuestions)
                                        .Include(l => l.OpenQuestions)
                                        .Include(l => l.Reads)
                                        .Include(l => l.Creator)
-                                       .ThenInclude(c => c.User);
-            var filteredLessons = await Filter(lessons, new QueryModel<LessonViewModel>(), userId);
-
-            return filteredLessons;
+                                       .ThenInclude(c => c.User)
+                                       .ToListAsync();
+            return AddLessonCountProperty(lessons, userId);
         }
 
-        public async Task<QueryModel<LessonViewModel>> LikedLessons(string userId)
+        public async Task<IEnumerable<LessonViewModel>> LikedLessons(string userId)
         {
-            List<LessonViewModel> model = new List<LessonViewModel>();
-            var lessons = context.Lessons
+            var lessons = await context.Lessons
                                        .Where(l => l.LessonLikes != null)
                                        .Where(l => l.LessonLikes.Any(l => l.UserId == userId))
                                        .Where(l => !l.IsDeleted)
@@ -259,10 +263,10 @@ namespace IntelliTest.Core.Services
                                        .Include(l => l.OpenQuestions)
                                        .Include(l => l.Reads)
                                        .Include(l => l.Creator)
-                                       .ThenInclude(c => c.User);
-            var filteredLessons = await Filter(lessons, new QueryModel<LessonViewModel>(), userId);
-
-            return filteredLessons;
+                                       .ThenInclude(c => c.User)
+                                       .ToListAsync();
+            
+            return AddLessonCountProperty(lessons, userId);
         }
 
         public Task<bool> ExistsById(Guid teacherId,Guid lessonId)

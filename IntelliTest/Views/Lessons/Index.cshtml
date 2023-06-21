@@ -63,38 +63,16 @@
         </div>
         @if (User.IsTeacher())
         {
-                <div class="floating-container">
-                    <a class="floating-button" asp-action="Create">+</a>
-                </div>
+            <div class="floating-container">
+                <a class="floating-button" asp-action="Create">+</a>
+            </div>
         }
     </div>
 </div>
-<script>
-    var root = document.querySelector(":root");
-
-    root.style.fontSize = "16px";
-    function onLike(e){
-        console.log(e)
-        e = e.parentNode.children[1]
-        console.log(e)
-        if (e.style.backgroundPositionX === "-2800px"){
-            $.ajax({
-              type: 'get',
-              url: `/Lessons/Unlike?lessonId=${e.id}&userId=@User.Id()`
-            });
-            e.parentNode.children[2].textContent = parseInt(e.parentNode.children[2].textContent.replace(" Likes", ""))-1 + " Likes";
-            e.style.transitionDuration = "0s";
-            e.style.backgroundPosition = '0 0';
-        }
-        else{
-            $.ajax({
-              type: 'get',
-              url: `/Lessons/Like?lessonId=${e.id}&userId=@User.Id()`
-            });
-            e.parentNode.children[2].textContent = parseInt(e.parentNode.children[2].textContent.replace(" Likes", ""))+1 + " Likes";
-            e.style.transitionDuration = "1s";
-            e.style.backgroundPosition = '-2800px 0';
-        }
-    }
-    $("#main").css("margin-bottom", "0px");
-</script>
+@section Scripts
+{
+    <script>
+        const userId = "@User.Id()";
+    </script>
+    <script src="~/js/lessonsLike.js" asp-append-version="true"></script>
+}

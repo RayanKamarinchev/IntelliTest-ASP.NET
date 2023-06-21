@@ -307,10 +307,10 @@ namespace IntelliTest.Controllers
                     return PartialView("Panels/UserTestResultsPartialView", results);
                 case "read":
                     var read = await lessonService.ReadLessons(User.Id());
-                    return PartialView("~/Views/Lessons/Index.cshtml", read);
+                    return PartialView("Panels/ReadLikedLeassonsPartialView", read);
                 case "like":
                     var liked = await lessonService.LikedLessons(User.Id());
-                    return PartialView("~/Views/Lessons/Index.cshtml", liked);
+                    return PartialView("Panels/ReadLikedLeassonsPartialView", liked);
                 case "myTests":
                     QueryModel<TestViewModel> myTests = new QueryModel<TestViewModel>();
                     if (User.IsTeacher())
