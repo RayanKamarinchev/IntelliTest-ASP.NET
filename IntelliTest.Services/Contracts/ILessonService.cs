@@ -22,8 +22,8 @@ namespace IntelliTest.Core.Contracts
         Task UnlikeLesson(Guid lessonId, string userId);
         Task<bool> IsLiked(Guid lessonId, string userId);
         Task Read(Guid lessonId, string userId);
-        Task<IEnumerable<LessonViewModel>> ReadLessons(string userId);
-        Task<IEnumerable<LessonViewModel>> LikedLessons(string userId);
+        Task<QueryModel<LessonViewModel>> ReadLessons(string userId);
+        Task<QueryModel<LessonViewModel>> LikedLessons(string userId);
 
         public Task<QueryModel<LessonViewModel>> Filter(IQueryable<Lesson> lessonQuery,
                                                         QueryModel<LessonViewModel> query, string userId);

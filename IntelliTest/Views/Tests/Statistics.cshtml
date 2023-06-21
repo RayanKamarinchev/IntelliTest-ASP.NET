@@ -23,89 +23,91 @@
 </script>
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
-        <form method="post" name="test">
-            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+        @if (Model.ClosedQuestions.Count + Model.OpenQuestions.Count == 0)
+        {
+            <div class="cd-fail-message">Няма резултати</div>
+        }
+        @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
+        {
+            if (Model.ClosedQuestions.Any(q => q.Order == i))
             {
-                if (Model.ClosedQuestions.Any(q => q.Order == i))
+                var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+                int[] all = new int[question.Answers.Length];
+                for (int j = 0; j < question.StudentAnswers.Count; j++)
                 {
-                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                    int[] all = new int[question.Answers.Length];
-                    for (int j = 0; j < question.StudentAnswers.Count; j++)
+                    for (int k = 0; k < question.StudentAnswers[j].Count; k++)
                     {
-                        for (int k = 0; k < question.StudentAnswers[j].Count; k++)
-                        {
-                            all[question.StudentAnswers[j][k]]++;
-                        }
+                        all[question.StudentAnswers[j][k]]++;
                     }
-
-                    <div class="questBox">
-                        <div class="customRow">
-                            <div class="questTextBox">
-                                <p>@question.Text</p>
-                            </div>
-                        </div>
-                        @if (all.Any(s=>s!=0))
-                        {
-                            string chartId = "избери";
-                            <div class="chart">
-                                <canvas id="@chartId"></canvas>
-                            </div>
-                            <script>
-                                const ctx =  document.getElementById('@Html.Raw(chartId)');
-                                let myBarGradeChart;
-
-                                const data = {
-                                    labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
-                                    datasets: [{
-                                        label: "Клас 8а",
-                                        data: @Html.Raw(JsonSerializer.Serialize(all)),
-                                        fill: true,
-                                        lineTension: 0.1,
-                                        borderCapStyle: 'square',
-                                        pointBorderColor: "white",
-                                        pointBorderWidth: 1,
-                                        pointHoverRadius: 8,
-                                        pointHoverBorderWidth: 2,
-                                        pointRadius: 4,
-                                        pointHitRadius: 10,
-                                        spanGaps: true,
-                                        backgroundColor:colors[0],
-                                    }]
-                                };
-                                new Chart(ctx, {
-                                        type: "bar",
-                                        data: data,
-                                        options: options
-                                    });
-                            </script>
-                        }
-                        else
-                        {
-                            <h5>No Answers...</h5>
-                        }
-                    </div>
                 }
-                else
-                {
-                    var question = Model.OpenQuestions.FirstOrDefault(q => q.Order == i);
-                    <div class="questBox">
-                        <div class="customRow">
-                            <div class="questTextBox">
-                                <p>@question.Text</p>
-                            </div>
-                        </div>
-                        <div class="answersView">
-                            @foreach (var studentAnswer in question.StudentAnswers)
-                            {
-                                <p>@(string.IsNullOrEmpty(studentAnswer) ? "Няма отговор" : studentAnswer))</p>
-                            }
+
+                <div class="questBox">
+                    <div class="customRow">
+                        <div class="questTextBox">
+                            <p>@question.Text</p>
                         </div>
                     </div>
-                }
+                    @if (all.Any(s => s != 0))
+                    {
+                        string chartId = "избери";
+                        <div class="chart">
+                            <canvas id="@chartId"></canvas>
+                        </div>
+                        <script>
+                            const ctx =  document.getElementById('@Html.Raw(chartId)');
+                            let myBarGradeChart;
+
+                            const data = {
+                                labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
+                                datasets: [{
+                                    label: "Клас 8а",
+                                    data: @Html.Raw(JsonSerializer.Serialize(all)),
+                                    fill: true,
+                                    lineTension: 0.1,
+                                    borderCapStyle: 'square',
+                                    pointBorderColor: "white",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 8,
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHitRadius: 10,
+                                    spanGaps: true,
+                                    backgroundColor:colors[0],
+                                }]
+                            };
+                            new Chart(ctx, {
+                                    type: "bar",
+                                    data: data,
+                                    options: options
+                                });
+                        </script>
+                    }
+                    else
+                    {
+                        <h5>No Answers...</h5>
+                    }
+                </div>
             }
-            <hr/>
-            <button class="btn blue btn-primary" type="submit">Готово</button>
-        </form>
+            else
+            {
+                var question = Model.OpenQuestions.FirstOrDefault(q => q.Order == i);
+                <div class="questBox">
+                    <div class="customRow">
+                        <div class="questTextBox">
+                            <p>@question.Text</p>
+                        </div>
+                    </div>
+                    <div class="answersView">
+                        @foreach (var studentAnswer in question.StudentAnswers)
+                        {
+                            <p>@(string.IsNullOrEmpty(studentAnswer) ? "Няма отговор" : studentAnswer)</p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        <hr/>
+        <button class="btn blue btn-primary" type="submit" asp-action="Index">Готово</button>
     </div>
 </div>
 

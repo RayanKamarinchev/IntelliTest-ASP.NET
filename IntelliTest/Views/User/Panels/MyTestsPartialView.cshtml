@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Infrastructure
-@model IEnumerable<TestViewModel>
+@model QueryModel<TestViewModel>
 <div>
     <main class="cd-main-content">
         @if (User.IsTeacher())
@@ -11,12 +11,15 @@
         }
         <section class="cd-gallery">
             <ul style="width: 100%">
-                @foreach (var test in Model)
+                @foreach (var test in Model.Items)
                 {
-                        <partial name="~/Views/Tests/TestCreatorPartialView.cshtml" for="@test"/>
+                    <partial name="~/Views/Tests/TestCreatorPartialView.cshtml" for="@test"/>
                 }
             </ul>
-            <div class="cd-fail-message">Няма резултати</div>
+            @if (Model.Items.Count() == 0)
+            {
+                <div class="cd-fail-message">Няма резултати</div>
+            }
         </section>
     </main>
 </div>

@@ -231,61 +231,38 @@ namespace IntelliTest.Core.Services
             }
         }
 
-        public async Task<IEnumerable<LessonViewModel>> ReadLessons(string userId)
+        public async Task<QueryModel<LessonViewModel>> ReadLessons(string userId)
         {
             List<LessonViewModel> model = new List<LessonViewModel>();
-            var lessons = await context.Lessons
+            var lessons = context.Lessons
                                        .Where(l => l.Reads.Any(r => r.UserId == userId) && !l.IsDeleted)
                                        .Include(l => l.LessonLikes)
                                        .Include(l => l.ClosedQuestions)
                                        .Include(l => l.OpenQuestions)
                                        .Include(l => l.Reads)
                                        .Include(l => l.Creator)
-                                       .ThenInclude(c => c.User)
-                                       .ToListAsync();
-            foreach (var l in lessons)
-            {
-                var n = l.LessonLikes;
-                int c = 0;
-                if (n != null)
-                {
-                    c = n.Count();
-                }
+                                       .ThenInclude(c => c.User);
+            var filteredLessons = await Filter(lessons, new QueryModel<LessonViewModel>(), userId);
 
-                model.Add(ToViewModel(l, c, userId));
-            }
-
-            return model;
+            return filteredLessons;
         }
 
-        public async Task<IEnumerable<LessonViewModel>> LikedLessons(string userId)
+        public async Task<QueryModel<LessonViewModel>> LikedLessons(string userId)
         {
             List<LessonViewModel> model = new List<LessonViewModel>();
-            var lessons = await context.Lessons
+            var lessons = context.Lessons
                                        .Where(l => l.LessonLikes != null)
                                        .Where(l => l.LessonLikes.Any(l => l.UserId == userId))
-                                       .Where(l=>!l.IsDeleted)
+                                       .Where(l => !l.IsDeleted)
                                        .Include(l => l.LessonLikes)
                                        .Include(l => l.ClosedQuestions)
                                        .Include(l => l.OpenQuestions)
                                        .Include(l => l.Reads)
                                        .Include(l => l.Creator)
-                                       .ThenInclude(c => c.User)
-                                       .ToListAsync();
+                                       .ThenInclude(c => c.User);
+            var filteredLessons = await Filter(lessons, new QueryModel<LessonViewModel>(), userId);
 
-            foreach (var l in lessons)
-            {
-                var n = l.LessonLikes;
-                int c = 0;
-                if (n != null)
-                {
-                    c = n.Count();
-                }
-
-                model.Add(ToViewModel(l, c, userId));
-            }
-
-            return model;
+            return filteredLessons;
         }
 
         public Task<bool> ExistsById(Guid teacherId,Guid lessonId)

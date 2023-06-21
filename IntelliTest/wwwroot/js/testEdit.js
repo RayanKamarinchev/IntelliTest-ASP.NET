@@ -1,4 +1,15 @@
-﻿//Remove hidden checkboxes
+﻿function textAreaAdjust(element) {
+    element.style.height = "1px";
+    element.style.height = element.scrollHeight + "px";
+}
+function isNumeric(value) {
+    return /^-?\d+$/.test(value);
+}
+function countWords(str) {
+    return str.trim().split(/\s+/).length;
+}
+
+//Remove hidden checkboxes
         document.querySelectorAll('input[type=hidden]').forEach(e=>e.remove())
         //Connection
         let connection = null;
@@ -9,6 +20,8 @@
             connection.on("Add", (question, answer) => {
                 let el = createElementFromHTML(openQuestionPartialView(question, answer, count, 0));
                 questions.prepend(el)
+                textAreaAdjust(el.children[2].children[0].children[0])
+                textAreaAdjust(el.children[3].children[0].children[0])
                 count++;
             });
             connection.on("WrongLesson", () => {
@@ -114,8 +127,9 @@ function closedQuestionPartialView(question, answers, order, maxScore) {return `
         let generateBtn = document.getElementById("gen");
         let genLesson = document.getElementById("genLesson");
         let questions = document.getElementById("questions");
-        let lessonNameInput = document.getElementById("lessonName")
-        let promptInput = document.getElementById("prompt")
+        let lessonNameInput = document.getElementById("lessonName");
+        let promptInput = document.getElementById("prompt");
+        let questionCount = document.getElementById("questionCount");
         function deleteAble(item){
             item.addEventListener('click', e => {
                 console.log(e)
@@ -144,11 +158,17 @@ function closedQuestionPartialView(question, answers, order, maxScore) {return `
         //Generate
         generateBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            connection.invoke("AddQuestion", promptInput.value)
+            if (!isNumeric(questionCount.value) || questionCount.value == 0) {
+                questionCount.value = Math.round(countWords(promptInput.value) / 40);
+            }
+            connection.invoke("AddQuestion", promptInput.value, Number(questionCount.value))
         })
         genLesson.addEventListener("click", (e) => {
             e.preventDefault();
-            connection.invoke("FromLesson", lessonNameInput.value)
+            if (!isNumeric(questionCount.value) || questionCount.value == 0) {
+                questionCount.value = Math.round(countWords(promptInput.value) / 40);
+            }
+            connection.invoke("FromLesson", lessonNameInput.value, Number(questionCount.value))
         })
 
         function getByKey(allowed, value){
@@ -172,7 +192,6 @@ function closedQuestionPartialView(question, answers, order, maxScore) {return `
                     ClosedQuestions: []
             };
             let i = 0;
-            console.log(value)
             while(true)
             {
                 question = getByKey(`OpenQuestions[${i}]`, value);
@@ -208,7 +227,6 @@ function closedQuestionPartialView(question, answers, order, maxScore) {return `
             res["description"] = document.getElementById("desc").value;
             res["time"] = document.getElementById("time").value;
             res["grade"] = document.getElementById("grade").value;
-            console.log(JSON.stringify(res))
             $.ajax({
                 url: "/Tests/Edit",
                 method: 'POST',

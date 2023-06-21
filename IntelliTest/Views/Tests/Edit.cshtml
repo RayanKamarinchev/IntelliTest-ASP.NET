@@ -39,6 +39,12 @@
             </div>
             <div class="customRow">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
+                    <div class="widthMax" style="display: flex">
+                        <label style="margin-right: 10px">Брой въпроси: </label>
+                        <div class="smallInput">
+                            <input maxlength="2" value="0" class="fs-4" id="questionCount" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" style="text-align: center" />
+                        </div>
+                    </div>
                     <div class="widthMax">
                         <label style="display: flex">Текст</label>
                         <textarea onkeyup="textAreaAdjust(this)" name="text" id="prompt"class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>

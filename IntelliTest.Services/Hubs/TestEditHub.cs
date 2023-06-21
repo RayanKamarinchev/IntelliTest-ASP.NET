@@ -45,7 +45,7 @@ namespace IntelliTest.Core.Hubs
             return last;
         }
 
-        public async Task FromLesson(string name)
+        public async Task FromLesson(string name, int questionCount)
         {
             string text = "";
             string guidString = name.Split('/').Last();
@@ -72,10 +72,10 @@ namespace IntelliTest.Core.Hubs
 
                 text = lesson.Content;
             }
-            await AddQuestion(text);
+            await AddQuestion(text, questionCount);
         }
 
-        public async Task AddQuestion(string prompt)
+        public async Task AddQuestion(string prompt, int questionCount)
         {
             var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
             var chat = api.Chat.CreateConversation();
@@ -106,7 +106,7 @@ namespace IntelliTest.Core.Hubs
                 string decodedText = tikToken.Decode(part.Take(i).ToList());
                 //string text = "Generate questions \"Q\" in bulgarian and answers \"A\" only on the text and only in bulgarian . " + decodedText;
                 string text =
-                    "Generate questions \"Q\" and answers \"A\" only in Bulgarian, focusing exclusively on the content of the following text: '''" + decodedText + "'''.Ensure the questions and answers can be found in the text. Generate 3 questions without enumerating them.";
+                    "Generate questions \"Q\" and answers \"A\" only in Bulgarian, focusing exclusively on the content of the following text: '''" + decodedText + "'''.Ensure the questions and answers can be found in the text. Generate " + questionCount + " questions without enumerating them.";
                 chat.AppendUserInput(text);
 
                 var res = "";
