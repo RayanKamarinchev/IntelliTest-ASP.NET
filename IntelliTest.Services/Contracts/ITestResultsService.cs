@@ -1,0 +1,24 @@
+﻿using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Tests;
+
+namespace IntelliTest.Core.Contracts
+{
+    public interface ITestResultsService
+    {
+        //Answer processing
+        Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
+                           List<ClosedQuestionAnswerViewModel> closedQuestions,
+                           Guid studentId,
+                           Guid testId);
+        decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore);
+        bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes);
+        TestEditViewModel ToEdit(TestViewModel model);
+        //Statistics and results
+        Guid[] GetExaminersIds(Guid testId);
+        Task<TestStatsViewModel> GetStatistics(Guid testId);
+        public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
+        Task<TestResultsViewModel> GetStudentsTestResult(Guid testId, Guid studentId);
+        Task<TestReviewViewModel> GetAllStudentsTestResults(Guid testId, Guid studentId);
+        Task<IEnumerable<TestResultsViewModel>> GetStudentsTestsResults(Guid studentId);
+    }
+}

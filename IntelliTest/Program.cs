@@ -6,18 +6,9 @@ using IntelliTest.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
-using Microsoft.AspNetCore.Builder;
-using MailKit;
 using IntelliTest.Core.Models.Mails;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Google;
-using System;
 using System.Text.Json.Serialization;
 using IntelliTest.Core.Hubs;
-using Org.BouncyCastle.Ocsp;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -77,6 +68,7 @@ builder.Services.AddControllers()
 builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddTransient<IRoomService, RoomService>();
 builder.Services.AddTransient<ITestService, TestService>();
+builder.Services.AddTransient<ITestResultsService, TestResultsService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<IEmailService, EmailService>();

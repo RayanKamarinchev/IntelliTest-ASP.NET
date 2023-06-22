@@ -24,6 +24,7 @@ namespace IntelliTest.Controllers
         private readonly ILessonService lessonService;
         private readonly IEmailService emailService;
         private readonly ITestService testService;
+        private readonly ITestResultsService testResultsService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public UserController(UserManager<User> _userManager,
@@ -34,7 +35,8 @@ namespace IntelliTest.Controllers
                               ILessonService _lessonService,
                               IEmailService email_service,
                               ITestService testService,
-                              IWebHostEnvironment webHostEnvironment)
+                              IWebHostEnvironment webHostEnvironment,
+                              ITestResultsService testResultsService)
         {
             userManager = _userManager;
             signInManager = _signInManager;
@@ -45,6 +47,7 @@ namespace IntelliTest.Controllers
             roleManager = _roleManager;
             this.testService = testService;
             this.webHostEnvironment = webHostEnvironment;
+            this.testResultsService = testResultsService;
         }
 
         private string GetEmailTemplate(string link)
@@ -303,7 +306,7 @@ namespace IntelliTest.Controllers
             switch (type)
             {
                 case "results":
-                    var results = await studentService.GetAllResults((Guid)TempData.Peek("StudentId"));
+                    var results = await testResultsService.GetStudentsTestsResults((Guid)TempData.Peek("StudentId"));
                     return PartialView("Panels/UserTestResultsPartialView", results);
                 case "read":
                     var read = await lessonService.ReadLessons(User.Id());

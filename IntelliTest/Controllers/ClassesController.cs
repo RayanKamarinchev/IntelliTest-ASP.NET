@@ -14,19 +14,19 @@ namespace IntelliTest.Controllers
     public class ClassesController : Controller
     {
         private readonly IClassService classService;
-        private readonly ITestService testService;
+        private readonly ITestResultsService testResultsService;
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
         private readonly IWebHostEnvironment webHostEnvironment;
 
 
         public ClassesController(IClassService _classService, IMemoryCache _cache,
-                                 IWebHostEnvironment _webHostEnvironment, ITestService _testService)
+                                 IWebHostEnvironment _webHostEnvironment, ITestResultsService testResultsService)
         {
             classService = _classService;
             cache = _cache;
             webHostEnvironment = _webHostEnvironment;
-            testService = _testService;
+            this.testResultsService = testResultsService;
         }
         public async Task<IActionResult> Index()
         {
@@ -175,13 +175,13 @@ namespace IntelliTest.Controllers
                 
             }
 
-            var tests = await testService.TestsTakenByClass(id);
+            var tests = await testResultsService.TestsTakenByClass(id);
             if (tests == null)
             {
                 return NotFound();
             }
 
-            var students = await classService.getClassStudents(id);
+            var students = await classService.GetClassStudents(id);
             var classModel = await classService.GetById(id);
             return View("Details", new ClassDetailsModel()
             {

@@ -160,5 +160,26 @@ namespace IntelliTest.Core.Services
             });
             return true;
         }
+        public async Task<List<StudentViewModel>> GetClassStudents(Guid id)
+        {
+            var clasDb = await context.Classes
+                                      .Include(c => c.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .ThenInclude(s => s.User)
+                                      .Include(s => s.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .ThenInclude(s => s.TestResults)
+                                      .FirstOrDefaultAsync(c => c.Id == id);
+            return clasDb.Students.Select(s => new StudentViewModel()
+            {
+                Name = s.Student.User.FirstName + " " + s.Student.User.LastName,
+                Email = s.Student.User.Email,
+                TestResults = s.Student.TestResults
+                               .Where(t => clasDb.ClassTests.Any(ct => ct.TestId == t.TestId))
+                               .Select(t => t.Score)
+                               .ToList(),
+                Id = id
+            }).ToList();
+        }
     }
 }

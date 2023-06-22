@@ -18,17 +18,19 @@ namespace IntelliTest.Controllers
     public class TestsController : Controller
     {
         private readonly ITestService testService;
+        private readonly ITestResultsService testResultsService;
         //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService, IClassService _classService)
+        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService, IClassService _classService, ITestResultsService testResultsService)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             classService = _classService;
+            this.testResultsService = testResultsService;
         }
 
         [HttpGet]
@@ -102,7 +104,7 @@ namespace IntelliTest.Controllers
                 return BadRequest();
             }
             var model = await testService.GetById(id);
-            var testEdit = testService.ToEdit(model);
+            var testEdit = testResultsService.ToEdit(model);
             testEdit.Id = id;
             TempData["PublicityLevel"] = testEdit.PublicityLevel;
             return View("Edit", testEdit);
@@ -219,7 +221,7 @@ namespace IntelliTest.Controllers
             {
                 return RedirectToAction("ReviewAnswers", new {testId = testId, studentId = studentId});
             }
-            await testService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
+            await testResultsService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
             TempData["message"] = "Успешно предаде теста!";
             TempData.Remove("TestStarted");
             return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
@@ -255,7 +257,7 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            var test = await testService.TestResults(testId, studentId);
+            var test = await testResultsService.GetAllStudentsTestResults(testId, studentId);
             return View(test);
         }
 
@@ -272,7 +274,7 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            var model = await testService.GetStatistics(testId);
+            var model = await testResultsService.GetStatistics(testId);
 
             return View(model);
         }
@@ -314,8 +316,7 @@ namespace IntelliTest.Controllers
         [Route("Examiners/{testId}")]
         public async Task<IActionResult> ExaminersAll(Guid testId)
         {
-            IEnumerable<StudentViewModel> examiners;
-            examiners = await studentService.GetExaminers(testId);
+            IEnumerable<StudentViewModel> examiners = await studentService.GetExaminers(testId);
             return View("ExaminersAll", examiners);
         }
 
@@ -324,7 +325,7 @@ namespace IntelliTest.Controllers
         [Route("Examiners/{testId}/{studentId}")]
         public async Task<IActionResult> TestGrading(Guid testId, Guid studentId)
         {
-            var testResult = await testService.getTestResult(testId, studentId);
+            var testResult = await testResultsService.GetStudentsTestResult(testId, studentId);
             return View("TestGrading", testResult);
         }
     }

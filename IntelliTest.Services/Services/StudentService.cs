@@ -88,22 +88,6 @@ namespace IntelliTest.Core.Services
                                 .FirstOrDefaultAsync(s=>s.Id==studentId);
         }
 
-        public async Task<IEnumerable<TestResultsViewModel>> GetAllResults(Guid studentId)
-        {
-            return await context.TestResults
-                         .Where(t => t.StudentId == studentId)
-                         .Select(t => new TestResultsViewModel()
-                         {
-                             TakenOn = t.TakenOn,
-                             Title = t.Test.Title,
-                             Description = t.Test.Description,
-                             Grade = t.Test.Grade,
-                             Mark = t.Mark,
-                             Score = t.Score,
-                             TestId = t.TestId
-                         }).ToListAsync();
-        }
-
         public async Task<List<StudentViewModel>> getClassStudents(Guid id)
         {
             var clasDb = await context.Classes
