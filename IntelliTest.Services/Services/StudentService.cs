@@ -22,6 +22,37 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
+        private static Func<Student, Class?, StudentViewModel> CreateViewModel = (student, classDb) =>
+        {
+            var viewModel = new StudentViewModel()
+            {
+                Name = student.User.FirstName + " " + student.User.LastName,
+                Email = student.User.Email,
+                Id = student.Id,
+                Picture = student.User.PhotoPath
+            };
+
+            if (classDb != null)
+            {
+                viewModel.TestResults = student.TestResults
+                                               .Where(t => classDb.ClassTests.Any(ct => ct.TestId == t.TestId))
+                                               .Select(t => t.Score)
+                                               .ToList();
+            }
+            else
+            {
+                viewModel.TestResults = student.TestResults
+                                               .Select(t => t.Score)
+                                               .ToList();
+            }
+
+            return viewModel;
+        };
+        
+        private Func<Student, Class, StudentViewModel> ToViewModelWithClass = (s, classDb) => CreateViewModel(s, classDb);
+        
+        private Func<Student, StudentViewModel> ToViewModel = s => CreateViewModel(s, null);
+
         public async Task AddStudent(UserType model, string userId)
         {
             Student student = new Student()
@@ -71,6 +102,31 @@ namespace IntelliTest.Core.Services
                              Score = t.Score,
                              TestId = t.TestId
                          }).ToListAsync();
+        }
+
+        public async Task<List<StudentViewModel>> getClassStudents(Guid id)
+        {
+            var clasDb = await context.Classes
+                                      .Include(c => c.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .ThenInclude(s => s.User)
+                                      .Include(s => s.Students)
+                                      .ThenInclude(s => s.Student)
+                                      .ThenInclude(s => s.TestResults)
+                                      .FirstOrDefaultAsync(c => c.Id == id);
+            return clasDb.Students
+                         .Select(s => ToViewModelWithClass(s.Student, clasDb))
+                         .ToList();
+        }
+
+        public async Task<IEnumerable<StudentViewModel>> GetExaminers(Guid testId)
+        {
+            return await context.TestResults
+                                .Include(t => t.Student)
+                                .Where(t => t.TestId == testId)
+                                .Select(s => s.Student)
+                                .Select(s => ToViewModel(s))
+                                .ToListAsync();
         }
     }
 }

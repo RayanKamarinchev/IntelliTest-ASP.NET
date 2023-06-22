@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Entities;
 
 namespace IntelliTest.Core.Contracts
@@ -33,5 +34,6 @@ namespace IntelliTest.Core.Contracts
         public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId);
         public Task<QueryModel<TestViewModel>> FilterMine(IEnumerable<Test> testQuery, QueryModel<TestViewModel> query);
         public Task<bool> IsTestCreator(Guid testId, Guid teacherId);
+        Task<TestResultsViewModel> GetTestResult(Guid testId, Guid studentId);
     }
 }

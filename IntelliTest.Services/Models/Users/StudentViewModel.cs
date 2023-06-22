@@ -11,6 +11,7 @@ namespace IntelliTest.Core.Models.Users
         public string Name { get; set; }
         public Guid Id { get; set; }
         public string Email { get; set; }
+        public string Picture { get; set; }
         public List<decimal> TestResults { get; set; }
     }
 }

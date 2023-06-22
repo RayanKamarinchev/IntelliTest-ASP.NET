@@ -5,12 +5,9 @@ using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
-using System.Diagnostics;
-using TiktokenSharp;
 using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
-using static IntelliTest.Core.Objects.Translator;
 
 namespace IntelliTest.Core.Services
 {
@@ -736,6 +733,11 @@ namespace IntelliTest.Core.Services
             }
             return teacher.Tests.Any(t => t.Id == testId);
 
+        }
+
+        public async Task<TestResultsViewModel> GetTestResult(Guid testId, Guid studentId)
+        {
+            return await context.TestResults.FirstOrDefaultAsync(t => t.TestId == testId && t.StudentId == studentId);
         }
     }
 }

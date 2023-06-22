@@ -4,6 +4,7 @@ using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
@@ -306,6 +307,25 @@ namespace IntelliTest.Controllers
             model.OpenQuestions.Add(question);
             TempData["editModel"] = JsonSerializer.Serialize(model);
             return View("Edit", model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        [Route("Examiners/{testId}")]
+        public async Task<IActionResult> ExaminersAll(Guid testId)
+        {
+            IEnumerable<StudentViewModel> examiners;
+            examiners = await studentService.GetExaminers(testId);
+            return View("ExaminersAll", examiners);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        [Route("Examiners/{testId}/{studentId}")]
+        public async Task<IActionResult> TestGrading(Guid testId, Guid studentId)
+        {
+            var testResult = await testService.getTestResult(testId, studentId);
+            return View("TestGrading", testResult);
         }
     }
 }

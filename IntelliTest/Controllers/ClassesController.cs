@@ -30,7 +30,7 @@ namespace IntelliTest.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            if (cache.TryGetValue("tests", out IEnumerable<ClassViewModel>? model))
+            if (false && cache.TryGetValue("tests", out IEnumerable<ClassViewModel>? model))
             {
             }
             else

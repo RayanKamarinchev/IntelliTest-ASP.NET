@@ -12,5 +12,7 @@ namespace IntelliTest.Core.Contracts
 
         Task<Student> GetStudent(Guid studentId);
         Task<IEnumerable<TestResultsViewModel>> GetAllResults(Guid studentId);
+        public Task<List<StudentViewModel>> getClassStudents(Guid id);
+        public Task<IEnumerable<StudentViewModel>> GetExaminers(Guid testId);
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IntelliTest.Core.Contracts;
+﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Classes;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data;
@@ -42,6 +37,7 @@ namespace IntelliTest.Core.Services
             var query = context.Classes
                                .Include(c=>c.Students)
                                .Include(c=>c.Teacher)
+                               .ThenInclude(t=>t.User)
                                .Where(c => !c.IsDeleted);
             if (isStudent)
             {
@@ -102,28 +98,6 @@ namespace IntelliTest.Core.Services
             var c = await context.Classes.FindAsync(id);
             context.Classes.Remove(c);
             await context.SaveChangesAsync();
-        }
-
-        public async Task<List<StudentViewModel>> getClassStudents(Guid id)
-        {
-            var clasDb = await context.Classes
-                                      .Include(c => c.Students)
-                                      .ThenInclude(s => s.Student)
-                                      .ThenInclude(s => s.User)
-                                      .Include(s=>s.Students)
-                                      .ThenInclude(s=>s.Student)
-                                      .ThenInclude(s=>s.TestResults)
-                                      .FirstOrDefaultAsync(c => c.Id == id);
-            return clasDb.Students.Select(s => new StudentViewModel()
-            {
-                Name = s.Student.User.FirstName + " " + s.Student.User.LastName,
-                Email = s.Student.User.Email,
-                TestResults = s.Student.TestResults
-                               .Where(t=>clasDb.ClassTests.Any(ct=>ct.TestId == t.TestId))
-                               .Select(t=>t.Score)
-                               .ToList(),
-                Id = id
-            }).ToList();
         }
 
         public async Task<bool> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher)
