@@ -257,7 +257,7 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            var test = await testResultsService.GetAllStudentsTestResults(testId, studentId);
+            var test = await testResultsService.GetStudentsTestResults(testId, studentId);
             return View(test);
         }
 
@@ -325,8 +325,40 @@ namespace IntelliTest.Controllers
         [Route("Examiners/{testId}/{studentId}")]
         public async Task<IActionResult> TestGrading(Guid testId, Guid studentId)
         {
-            var testResult = await testResultsService.GetStudentsTestResult(testId, studentId);
+            var testResult = await testResultsService.GetStudentsTestResults(testId, studentId);
+            TempData["QuestionIds"] = testResult.OpenQuestions.Select(q => q.Id).ToArray();
+            TempData["TestId"] = testId;
             return View("TestGrading", testResult);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Teacher")]
+        [Route("ExaminersPost/{testId}/{studentId}")]
+        public async Task<IActionResult> TestGrading(Guid testId, Guid studentId, TestReviewViewModel scoredTest)
+        {
+            if (TempData.Peek("TeacherId") is null)
+            {
+                return RedirectToAction("Logout", "User");
+            }
+            if (!await testService.IsTestCreator(testId, (Guid)TempData.Peek("TeacherId")))
+            {
+                return NotFound();
+            }
+
+            if (TempData["QuestionIds"] is null || TempData["TestId"] is null || (Guid)TempData["TestId"] != testId)
+            {
+
+            }
+            Guid[] quesitonIds = (Guid[])TempData["QuestionIds"];
+            for (int i = 0; i < quesitonIds.Length; i++)
+            {
+                scoredTest.OpenQuestions[i].Id = quesitonIds[i];
+            }
+
+            await testResultsService.SubmitTestScore(testId, studentId, scoredTest);
+
+            TempData.Remove("TestId");
+            TempData["Message"] = "Успешно оценихте теста";
+            return RedirectToAction("ExaminersAll");
         }
     }
 }

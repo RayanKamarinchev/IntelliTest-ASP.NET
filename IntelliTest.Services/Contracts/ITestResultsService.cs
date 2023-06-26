@@ -17,8 +17,8 @@ namespace IntelliTest.Core.Contracts
         Guid[] GetExaminersIds(Guid testId);
         Task<TestStatsViewModel> GetStatistics(Guid testId);
         public Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId);
-        Task<TestResultsViewModel> GetStudentsTestResult(Guid testId, Guid studentId);
-        Task<TestReviewViewModel> GetAllStudentsTestResults(Guid testId, Guid studentId);
+        Task<TestReviewViewModel> GetStudentsTestResults(Guid testId, Guid studentId);
         Task<IEnumerable<TestResultsViewModel>> GetStudentsTestsResults(Guid studentId);
+        Task SubmitTestScore(Guid testId, Guid studentId, TestReviewViewModel scoredTest);
     }
 }

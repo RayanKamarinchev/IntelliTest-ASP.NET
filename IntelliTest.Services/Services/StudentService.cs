@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IntelliTest.Core.Contracts;
-using IntelliTest.Core.Models.Questions;
-using IntelliTest.Core.Models.Tests;
+﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -107,9 +100,11 @@ namespace IntelliTest.Core.Services
         {
             return await context.TestResults
                                 .Include(t => t.Student)
+                                .ThenInclude(s=>s.User)
+                                .Include(t=>t.Student)
+                                .ThenInclude(s=>s.TestResults)
                                 .Where(t => t.TestId == testId)
-                                .Select(s => s.Student)
-                                .Select(s => ToViewModel(s))
+                                .Select(s => ToViewModel(s.Student))
                                 .ToListAsync();
         }
     }

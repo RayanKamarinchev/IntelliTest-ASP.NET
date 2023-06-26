@@ -1,0 +1,33 @@
+﻿@model OpenQuestionReviewViewModel
+<div class="questBox">
+    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
+        <span>Точки:</span>
+        <input type="text" value="@Model.Score" asp-for="Score" max="@Model.MaxScore" min="0" class="body_size scoreBox" />
+        <span>/ @Model.MaxScore</span>
+    </div>
+    <div class="customRow">
+        <div class="questTextBox" style="width: calc(100% - 250px);">
+            <p>Въпрос: @Model.Text</p>
+            <span class="underline"></span>
+        </div>
+    </div>
+    <div class="customRow">
+        <div class="questTextBox" style="width: calc(100% - 250px);">
+            <p>Правилен отговор: @Model.RightAnswer</p>
+            <span class="underline"></span>
+        </div>
+    </div>
+    <div class="customRow">
+        <div class="questTextBox" style="width: calc(100% - 250px);">
+            <p>Отговор на ученикът: @Model.Answer</p>
+            <span class="underline"></span>
+        </div>
+    </div>
+    <div class="customRow">
+        <div class="questTextBox" style="width: calc(100% - 250px);">
+            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Обяснение"
+            type="text" value="@Model.Explanation" asp-for="Explanation"></textarea>
+            <span class="underline"></span>
+        </div>
+    </div>
+</div>

@@ -186,7 +186,7 @@ namespace IntelliTest.Core.Services
             List<TestReviewViewModel> res = new List<TestReviewViewModel>();
             foreach (var studentId in studentIds)
             {
-                res.Add(await GetAllTestResults(testId, studentId));
+                res.Add(await GetStudentsTestResults(testId, studentId));
             }
 
             TestStatsViewModel model = new TestStatsViewModel();
@@ -274,16 +274,7 @@ namespace IntelliTest.Core.Services
 
             return model;
         }
-
-        public async Task<TestResultsViewModel> GetTestResult(Guid testId, Guid studentId)
-        {
-            TestResult testResult = await context
-                         .TestResults
-                         .FirstOrDefaultAsync(t => t.TestId == testId && t.StudentId == studentId);
-            return ToResultsViewModel(testResult);
-        }
-
-        public async Task<TestReviewViewModel> GetAllTestResults(Guid testId, Guid studentId)
+        public async Task<TestReviewViewModel> GetStudentsTestResults(Guid testId, Guid studentId)
         {
 
             var openQuestionAnswers = await context.OpenQuestionAnswers
@@ -365,5 +356,21 @@ namespace IntelliTest.Core.Services
                                 .ToListAsync();
         }
 
+        public async Task SubmitTestScore(Guid testId, Guid studentId, TestReviewViewModel scoredTest)
+        {
+            var openQuestionAnswers = await context.OpenQuestionAnswers
+                                                   .Include(q => q.Question)
+                                                   .Where(q => q.StudentId == studentId
+                                                            && q.Question.TestId == testId)
+                                                   .ToListAsync();
+            foreach (var openQuestionAnswer in openQuestionAnswers)
+            {
+                var scoredQuestion = scoredTest.OpenQuestions.FirstOrDefault(q=>q.Id == openQuestionAnswer.Id);
+                openQuestionAnswer.Explanation = scoredQuestion.Explanation;
+                openQuestionAnswer.Points = scoredQuestion.Score;
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }

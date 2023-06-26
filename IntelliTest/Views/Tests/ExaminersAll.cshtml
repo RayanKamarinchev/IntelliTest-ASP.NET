@@ -3,18 +3,13 @@
 }
 @model IEnumerable<StudentViewModel>
 <div class="row" style="justify-content: center">
-    <div class="table-responsive" style="width: 80%; justify-content: center">
+    <div class="table-responsive" style="width: 80%;">
         <table class="table project-list-table table-nowrap align-middle table-borderless">
             <thead>
             <tr>
-                <th scope="col" class="ps-4" style="width: 50px;">
-                    <div class="form-check font-size-16">
-                        <input type="checkbox" class="form-check-input" id="contacusercheck"/><label class="form-check-label" for="contacusercheck"></label>
-                    </div>
-                </th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
-                <th scope="col" style="width: 200px;">Action</th>
+                <th scope="col" style="width: 200px;"></th>
             </tr>
             </thead>
             <tbody>
@@ -22,12 +17,12 @@
             {
                 <tr>
                     <td>
-                        <img src="@student.Picture" alt="" class="avatar-sm rounded-circle me-2"/><a href="#" class="text-body"></a>
+                       <img src="~/@student.Picture" class="avatar-sm rounded-circle me-2"/>
+                        @student.Name
                     </td>
-                        <td>@student.Name</td>
-                        <td>@student.Email</td>
+                    <td>@student.Email</td>
                     <td>
-                        <a class="btn-primary" asp-action="TestGrading" asp-route-testId="@ViewContext.RouteData.Values["testId"]" asp-route-studentId="@student.Id"></a>
+                        <a class=" btn btn-secondary" asp-action="TestGrading" asp-controller="Tests" asp-route-testId="@ViewContext.RouteData.Values["testId"]" asp-route-studentId="@student.Id">Оцени</a>
                     </td>
                 </tr>
             }

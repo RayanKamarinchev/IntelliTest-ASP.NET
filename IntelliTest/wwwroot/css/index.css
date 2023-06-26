@@ -672,10 +672,6 @@ body {
         color: #727686;
     }
 
-        .widget-49 .widget-49-meeting-points .widget-49-meeting-item span {
-            margin-left: .5rem;
-        }
-
 .widget-49 .widget-49-meeting-action {
     text-align: right;
     margin-top: 15px;
@@ -733,4 +729,15 @@ body {
     .contentOnly {
         width: 95%;
     }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }

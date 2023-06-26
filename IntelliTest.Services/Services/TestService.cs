@@ -214,7 +214,6 @@ namespace IntelliTest.Core.Services
             return t;
         }
 
-
         public async Task Edit(Guid id, TestEditViewModel model, Guid teacherId)
         {
             var test = await context.Tests

@@ -525,3 +525,10 @@ textarea { border-radius: 5px; }
     width: 95%;
     height: 100%;
 }
+
+.scoreBox {
+    width: 50px;
+    border: none;
+    outline: none;
+    box-shadow: none
+}
