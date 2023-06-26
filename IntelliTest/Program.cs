@@ -25,7 +25,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireDigit = false;
 })
-       .AddEntityFrameworkStores<IntelliTestDbContext>();
+       .AddEntityFrameworkStores<IntelliTestDbContext>()
+       .AddDefaultTokenProviders();
 
 //builder.Services.AddCors(options =>
 //{
