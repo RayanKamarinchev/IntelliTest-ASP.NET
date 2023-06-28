@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntelliTest.Core.Models
+namespace IntelliTest.Core.Models.Enums
 {
-    public enum Sorting
+    public enum QuestionType
     {
-        Likes, Examiners, Score, Questions, Readers, ReadingTime
+        Open, Closed
     }
 }

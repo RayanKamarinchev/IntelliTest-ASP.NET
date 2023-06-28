@@ -1,4 +1,5 @@
-﻿using IntelliTest.Data.Enums;
+﻿using IntelliTest.Core.Models.Enums;
+using IntelliTest.Data.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

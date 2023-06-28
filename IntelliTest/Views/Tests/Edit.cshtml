@@ -1,4 +1,5 @@
-﻿@model TestEditViewModel
+﻿@using IntelliTest.Core.Models.Enums
+@model TestEditViewModel
 @{
     ViewBag.Title = "Edit Test";
     if (Model.ClosedQuestions == null)
@@ -64,31 +65,29 @@
             <div id="questions">
                 @{
                     int closedQuestionCount = Model.OpenQuestions.Count;
-                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(){Order=-1}, Model.OpenQuestions.Count));
-                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(){Order=-1}, closedQuestionCount));
-                    var closedQuestionsDummy = new List<ClosedQuestionViewModel>();
-                    var openQuestionsDummy = new List<OpenQuestionViewModel>();
-                    foreach (var question in Model.ClosedQuestions)
+                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel() { Order = -1 }, Model.OpenQuestions.Count));
+                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel() { Order = -1 }, closedQuestionCount));
+
+                    QuestionType[] questionsOrder = (QuestionType[])TempData["QuestionsOrder"];
+                    for (int i = 0; i < questionsOrder.Length; i++)
                     {
-                        closedQuestionsDummy.Add(question);
-                    }
-                    foreach (var question in Model.OpenQuestions)
-                    {
-                        openQuestionsDummy.Add(question);
-                    }
-                    for (int i = 0; i < closedQuestionsDummy.Count; i++)
-                    {
-                        if (Model.ClosedQuestions.Any(q => q.Order == i))
+                        if (questionsOrder[i] == QuestionType.Closed)
                         {
-                            var question = closedQuestionsDummy.FirstOrDefault(q => q.Order == i);
-                            Model.ClosedQuestions[i] = question;
+                            var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
+                            if (question is not null)
+                            {
+                                Model.ClosedQuestions[i] = question;
                                 <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
+                            }
                         }
-                        else
+                        else if (questionsOrder[i] == QuestionType.Open)
                         {
-                            var q = openQuestionsDummy.FirstOrDefault(j => j.Order == i);
-                            Model.OpenQuestions[i] = q;
+                            var question = Model.OpenQuestions.FirstOrDefault(j => j.Order == i);
+                            if (question is not null)
+                            {
+                                Model.OpenQuestions[i] = question;
                                 <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
+                            }
                         }
                     }
                 }
@@ -104,19 +103,9 @@
 @section Scripts
 {
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/js/test.js" asp-append-version="true"></script>
     <script>
-        btns = document.getElementsByTagName("button");
-        input = Array.prototype.slice.call(btns);
-        input.forEach(b=>b.addEventListener("click", save));
-        function onFocus(e) {
-            e.parentNode.parentNode.parentNode.style.backgroundPosition = "0";
-        }
-        function onFocusOut(e){
-            e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
-        }
-    </script>
-    <script>
-        var count = @Model.ClosedQuestions.Count();
+        var questionCount = @Model.ClosedQuestions.Count() + @Model.OpenQuestions.Count();
         var id = "@Model.Id";
     </script>
     <script src="~/js/testEdit.js" asp-append-version="true"></script>

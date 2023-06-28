@@ -1,5 +1,6 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Lessons;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data;

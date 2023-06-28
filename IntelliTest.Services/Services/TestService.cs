@@ -8,6 +8,7 @@ using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
 using Microsoft.Extensions.Configuration;
+using IntelliTest.Core.Models.Enums;
 
 namespace IntelliTest.Core.Services
 {

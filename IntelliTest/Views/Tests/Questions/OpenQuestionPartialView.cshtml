@@ -7,7 +7,6 @@
             <i class="fa-solid fa-trash"></i>
         </button>
     </div>
-    <input style="display: none" value="@Model.Order" asp-for="Order"/>
     <div class="customRow">
         <div class="questTextBox" style="width: calc(100% - 250px);">
             <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"></textarea>

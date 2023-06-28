@@ -1,5 +1,4 @@
 ﻿using IntelliTest.Controllers;
-using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
 using IntelliTest.Tests.Mocks;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using IntelliTest.Core.Models.Enums;
 
 namespace IntelliTest.Tests.Unit_Tests.Controllers
 {

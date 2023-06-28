@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NUnit.Framework.Constraints;
 using OpenAI_API.Models;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using IntelliTest.Core.Models.Enums;
 
 namespace IntelliTest.Tests.Unit_Tests
 {

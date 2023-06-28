@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IntelliTest.Controllers;
 using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Enums;

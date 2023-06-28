@@ -10,7 +10,9 @@ using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using static IntelliTest.Infrastructure.Constraints;
 using Org.BouncyCastle.Ocsp;
+using IntelliTest.Core.Models.Enums;
 
 namespace IntelliTest.Controllers
 {
@@ -19,12 +21,12 @@ namespace IntelliTest.Controllers
     {
         private readonly ITestService testService;
         private readonly ITestResultsService testResultsService;
-        //private readonly IDistributedCache cache;
         private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly IClassService classService;
 
-        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService, IClassService _classService, ITestResultsService testResultsService)
+        public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
+                               IClassService _classService, ITestResultsService testResultsService)
         {
             testService = _testService;
             cache = _cache;
@@ -66,49 +68,67 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> MyTests([FromQuery] QueryModel<TestViewModel> query)
         {
-            QueryModel<TestViewModel> model = await testService.GetMy((Guid?)TempData.Peek("TeacherId") ?? null, (Guid?)TempData.Peek("StudentId") ?? null, query);
+            Guid? teacherId = (Guid?)TempData.Peek(TeacherId);
+            Guid? studentId = (Guid?)TempData.Peek(StudentId);
+            QueryModel<TestViewModel> model = await testService.GetMy(teacherId, studentId, query);
             return View("Index", model);
         }
         
 
         [Route("Tests/Edit/{id}")]
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id, TestEditViewModel viewModel)
         {
             if (!User.IsTeacher())
             {
                 return Unauthorized();
             }
-            if (viewModel.PublicityLevel!=PublicityLevel.Link && viewModel.PublicityLevel != PublicityLevel.Public)
-            {
-                if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
-                {
-                    Guid testId = id;
-                    if (id == new Guid("257a4a2e-42cd-4180-ae5d-5b74a9f55b14"))
-                    {
-                        testId = (Guid)TempData.Peek("testId");
-                    }
 
-                    if (TempData.Peek("TeacherId") is null)
-                    {
-                        return RedirectToAction("Logout", "User");
-                    }
-                    bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek("TeacherId"));
-                    if (!isCreator)
-                    {
-                        return Unauthorized();
-                    }
+            if (viewModel.PublicityLevel == PublicityLevel.Private
+                || !await testService.ExistsbyId(id))
+            {
+                return NotFound();
+            }
+
+            if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
+            {
+                Guid testId = (Guid)TempData.Peek("testId");
+
+                if (TempData.Peek("TeacherId") is null)
+                {
+                    return RedirectToAction("Logout", "User");
+                }
+
+                bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek("TeacherId"));
+                if (!isCreator)
+                {
+                    return Unauthorized();
                 }
             }
-            if (!await testService.ExistsbyId(id))
-            {
-                return BadRequest();
-            }
-            var model = await testService.GetById(id);
-            var testEdit = testResultsService.ToEdit(model);
-            testEdit.Id = id;
-            TempData["PublicityLevel"] = testEdit.PublicityLevel;
-            return View("Edit", testEdit);
+
+            var testModel = await testService.GetById(id);
+            var testToEdit = testResultsService.ToEdit(testModel);
+            testToEdit.Id = id;
+            TempData["PublicityLevel"] = testToEdit.PublicityLevel;
+            TempData["QuestionsOrder"] = GetQuestionOrder(viewModel);
+            return View("Edit", testToEdit);
         }
+
+        private QuestionType[] GetQuestionOrder(TestEditViewModel test)
+        {
+            int questionsCount = test.OpenQuestions.Count + test.ClosedQuestions.Count;
+            QuestionType[] questionOrder = new QuestionType[questionsCount];
+            foreach (var closedQuestion in test.ClosedQuestions)
+            {
+                questionOrder[closedQuestion.Order] = QuestionType.Closed;
+            }
+            foreach (var openQuestion in test.OpenQuestions)
+            {
+                questionOrder[openQuestion.Order] = QuestionType.Open;
+            }
+            return questionOrder;
+        }
+
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
