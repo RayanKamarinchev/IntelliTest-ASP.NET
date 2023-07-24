@@ -6,11 +6,12 @@
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
         @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
         {
+
             if (Model.ClosedQuestions.Any(q => q.Order == i))
             {
                 var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
                 int indx = Model.ClosedQuestions.IndexOf(question);
-                <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[indx]"/>
+               <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[indx]"/>
             }
             else
             {

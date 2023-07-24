@@ -12,9 +12,9 @@ function RemoveHiddenCheckboxes() {
 
 RemoveHiddenCheckboxes();
 
+let connection = null;
 function EstablishSignalRConnection() {
     //Connection
-    let connection = null;
     setupConnection = () => {
         connection = new signalR.HubConnectionBuilder()
             .withUrl("/testEditHub")
@@ -83,8 +83,8 @@ let emptyAnswers = [
     {
         answer: "",
         order: 3
-    },
-]
+    }
+];
 let lessonError = document.getElementById("lessonError");
 let openQuestionAddBtn = document.getElementById("openQuestionAdd");
 let closedQuestionAddBtn = document.getElementById("closedQuestionAdd");
@@ -93,12 +93,12 @@ let genLesson = document.getElementById("genLesson");
 let questions = document.getElementById("questions");
 let lessonNameInput = document.getElementById("lessonName");
 let promptInput = document.getElementById("prompt");
-let questionCount = document.getElementById("questionCount");
+let questionsToGenerateCount = document.getElementById("questionCount");
 
 function makeDeleteAble(item) {
     item.addEventListener('click',
         e => {
-            e.target.parentNode.parentNode.parentNode.remove();
+            e.target.parentNode.parentNode.remove();
             questionCount--;
         });
 }
@@ -136,14 +136,14 @@ function handleSubmit(event) {
         if (isQuestionEmpty(question)) {
             question = GetByDictKey(`ClosedQuestions[${i}]`, value);
         } else {
-            res["OpenQuestions"].push(createOpenQuestion(question));
+            res["OpenQuestions"].push(createOpenQuestion(question, i));
             i++;
             continue;
         }
         if (isQuestionEmpty()) {
             break;
         } else {
-            res["ClosedQuestions"].push(createClosedQuestion(question));
+            res["ClosedQuestions"].push(createClosedQuestion(question, i));
         }
         i++;
     }
@@ -170,27 +170,27 @@ function isQuestionEmpty(question) {
     return Object.keys(question).length === 0;
 }
 function GetParameter(questionParams, questionIndex, parameter) {
-    return Object.values(GetByDictKey(questionIndex + "." + parameter, question))[0];
+    return Object.values(GetByDictKey(questionIndex + "." + parameter, questionParams))[0];
 }
-function createOpenQuestion(questionParams) {
-    let questionIndex = `OpenQuestions[${i}]`;
+function createOpenQuestion(questionParams, index) {
+    let questionIndex = `OpenQuestions[${index}]`;
 
     return{
         text: GetParameter(questionParams, questionIndex, "Text"),
         answer: GetParameter(questionParams, questionIndex, "Answer"),
-        order: i,
+        order: index,
         maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
     }
 }
-function createClosedQuestion(questionParams) {
-    let questionIndex = `ClosedQuestions[${i}]`;
+function createClosedQuestion(questionParams, index) {
+    let questionIndex = `ClosedQuestions[${index}]`;
 
     return {
         text: GetParameter(questionParams, questionIndex, "Text"),
         answers: GetParameter(questionParams, questionIndex, "Answers"),
         answerIndexes: GetParameter(questionParams, questionIndex, "AnswerIndexes")
             .map(v => v === "on" || v === "true"), 
-        order: i,
+        order: index,
         maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
     }
 }
@@ -219,18 +219,18 @@ function GenerateButtonsFunctionality() {
     generateBtn.addEventListener("click",
         (e) => {
             e.preventDefault();
-            if (!isNumeric(questionCount.value) || questionCount.value == 0) {
-                questionCount.value = Math.round(getWordsCount(promptInput.value) / 40);
+            if (!isNumeric(questionsToGenerateCount.value) || questionsToGenerateCount.value == 0) {
+                questionsToGenerateCount.value = Math.round(getWordsCount(promptInput.value) / 40);
             }
-            connection.invoke("AddQuestion", promptInput.value, Number(questionCount.value));
+            connection.invoke("AddQuestion", promptInput.value, Number(questionsToGenerateCount.value));
         });
     genLesson.addEventListener("click",
         (e) => {
             e.preventDefault();
-            if (!isNumeric(questionCount.value)) {
-                questionCount.value = 0;
+            if (!isNumeric(questionsToGenerateCount.value)) {
+                questionsToGenerateCount.value = 0;
             }
-            connection.invoke("FromLesson", lessonNameInput.value, Number(questionCount.value));
+            connection.invoke("FromLesson", lessonNameInput.value, Number(questionsToGenerateCount.value));
         });
 }
 

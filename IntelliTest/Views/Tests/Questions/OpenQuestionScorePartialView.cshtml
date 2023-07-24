@@ -2,7 +2,7 @@
 <div class="questBox">
     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
         <span>Точки:</span>
-        <input type="text" value="@Model.Score" asp-for="Score" max="@Model.MaxScore" min="0" class="body_size scoreBox" />
+        <input type="text" value="@Model.Score" asp-for="Score" max="@Model.MaxScore" min="0" class="body_size scoreBox" style = "width: 30%;"/>
         <span>/ @Model.MaxScore</span>
     </div>
     <div class="customRow">
@@ -13,13 +13,13 @@
     </div>
     <div class="customRow">
         <div class="questTextBox" style="width: calc(100% - 250px);">
-            <p>Правилен отговор: @Model.RightAnswer</p>
+            <p><i class="fa-solid fa-square-check" style="color: #198754;"></i> Правилен отговор: @Model.RightAnswer</p>
             <span class="underline"></span>
         </div>
     </div>
     <div class="customRow">
         <div class="questTextBox" style="width: calc(100% - 250px);">
-            <p>Отговор на ученикът: @Model.Answer</p>
+            <p><i class="fa-solid fa-square-check" style="color: #358DF1;"></i> Отговор на ученикът: @Model.Answer</p>
             <span class="underline"></span>
         </div>
     </div>
