@@ -40,7 +40,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
-            classesController = new ClassesController(ClassServiceMock.Instance, new MemoryCache(new MemoryCacheOptions()), null, TestServiceMock.Instance)
+            classesController = new ClassesController(ClassServiceMock.Instance, new MemoryCache(new MemoryCacheOptions()), null, TestResultsServiceMock.Instance)
             {
                 TempData = tempData
             };

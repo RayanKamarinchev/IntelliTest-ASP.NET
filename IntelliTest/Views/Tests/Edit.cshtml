@@ -65,29 +65,27 @@
             <div id="questions">
                 @{
                     int closedQuestionCount = Model.OpenQuestions.Count;
-                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel() { Order = -1 }, Model.OpenQuestions.Count));
-                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel() { Order = -1 }, closedQuestionCount));
+                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(), Model.OpenQuestions.Count));
+                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(), closedQuestionCount));
 
-                    QuestionType[] questionsOrder = (QuestionType[])TempData["QuestionsOrder"];
-                    for (int i = 0; i < questionsOrder.Length; i++)
+                    int closedQuestionsIndex = 0;
+                    int openQuestionsIndex = 0;
+
+                    for (int i = 0; i < Model.QuestionsOrder.Count; i++)
                     {
-                        if (questionsOrder[i] == QuestionType.Closed)
+                        if (Model.QuestionsOrder[i] == QuestionType.Closed)
                         {
-                            var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                            if (question is not null)
-                            {
-                                Model.ClosedQuestions[i] = question;
-                                <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
-                            }
+                            var question = Model.ClosedQuestions[closedQuestionsIndex];
+                            closedQuestionsIndex++;
+                            Model.ClosedQuestions[i] = question;
+                            <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
                         }
-                        else if (questionsOrder[i] == QuestionType.Open)
+                        else if (Model.QuestionsOrder[i] == QuestionType.Open)
                         {
-                            var question = Model.OpenQuestions.FirstOrDefault(j => j.Order == i);
-                            if (question is not null)
-                            {
-                                Model.OpenQuestions[i] = question;
-                                <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
-                            }
+                            var question = Model.OpenQuestions[openQuestionsIndex];
+                            openQuestionsIndex++;
+                            Model.OpenQuestions[i] = question;
+                            <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
                         }
                     }
                 }

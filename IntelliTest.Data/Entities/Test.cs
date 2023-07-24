@@ -38,6 +38,7 @@ namespace IntelliTest.Data.Entities
         public List<ClassTest> ClassesWithAccess { get; set; }
         public PublicityLevel PublicyLevel { get; set; }
         public string PhotoPath { get; set; }
+        public string QuestionsOrder { get; set; }
 
         public IEnumerable<TestLike> TestLikes { get; set; }
         public IEnumerable<TestResult> TestResults { get; set; }

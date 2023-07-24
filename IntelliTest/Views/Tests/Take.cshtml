@@ -1,4 +1,5 @@
-﻿@model TestSubmitViewModel
+﻿@using IntelliTest.Core.Models.Enums
+@model TestSubmitViewModel
 @{
     ViewBag.Title = "Taking Test";
 
@@ -11,18 +12,21 @@
             <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>
         </div>
         <form method="post" name="test">
-            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
-            {
-                if (Model.ClosedQuestions.Any(q => q.Order == i))
+            @{
+                int closedQuestionsIndex = 0;
+                int openQuestionsIndex = 0;
+                for (int i = 0; i < Model.QuestionOrder.Count; i++)
                 {
-                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                    int indx = Model.ClosedQuestions.IndexOf(question);
-                    <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[indx]"/>
-                }
-                else
-                {
-                    var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                    <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[q]"/>
+                    if (Model.QuestionOrder[i] == QuestionType.Closed)
+                    {
+                        <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[closedQuestionsIndex]" />
+                        closedQuestionsIndex++;
+                    }
+                    else
+                    {
+                        <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[openQuestionsIndex]" />
+                        openQuestionsIndex++;
+                    }
                 }
             }
             <hr/>

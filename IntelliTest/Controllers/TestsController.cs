@@ -110,23 +110,7 @@ namespace IntelliTest.Controllers
             var testToEdit = testResultsService.ToEdit(testModel);
             testToEdit.Id = id;
             TempData["PublicityLevel"] = testToEdit.PublicityLevel;
-            TempData["QuestionsOrder"] = GetQuestionOrder(testToEdit);
             return View("Edit", testToEdit);
-        }
-
-        private QuestionType[] GetQuestionOrder(TestEditViewModel test)
-        {
-            int questionsCount = test.OpenQuestions.Count + test.ClosedQuestions.Count;
-            QuestionType[] questionOrder = new QuestionType[questionsCount];
-            foreach (var closedQuestion in test.ClosedQuestions)
-            {
-                questionOrder[closedQuestion.Order] = QuestionType.Closed;
-            }
-            foreach (var openQuestion in test.OpenQuestions)
-            {
-                questionOrder[openQuestion.Order] = QuestionType.Open;
-            }
-            return questionOrder;
         }
 
 
@@ -258,7 +242,6 @@ namespace IntelliTest.Controllers
         [Route("Review/{testId}/{studentId}")]
         public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
-            
             var teacherId = (Guid?)TempData.Peek(TeacherId);
             var student = await studentService.GetStudent(studentId);
             bool isStudentsTeacher = student.Classes

@@ -36,8 +36,17 @@ namespace IntelliTest.Core.Services
             Title = t.Title,
             MultiSubmit = t.MultiSubmission,
             PublicityLevel = t.PublicyLevel,
-            Students = t.TestResults.Count()
+            Students = t.TestResults.Count(),
+            QuestionOrder = t.QuestionsOrder
         };
+
+        private List<QuestionType> ProcessQuestionOrder(string questionOrderText)
+        {
+            return questionOrderText.Split("|")
+                                    .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
+                                    .ToList();
+        }
+
 
         public async Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId)
         {
@@ -191,7 +200,6 @@ namespace IntelliTest.Core.Services
                                      .Where(q => !q.IsDeleted)
                                      .Select(q => new OpenQuestionAnswerViewModel()
                                      {
-                                         Order = q.Order,
                                          Text = q.Text,
                                          Id = q.Id,
                                          MaxScore = q.MaxScore
@@ -203,14 +211,14 @@ namespace IntelliTest.Core.Services
                                        {
                                            PossibleAnswers = q.Answers.Split("&"),
                                            IsDeleted = false,
-                                           Order = q.Order,
                                            Text = q.Text,
                                            Id = q.Id,
                                            MaxScore = q.MaxScore
                                        })
                                        .ToList(),
                 Time = model.Time,
-                Title = model.Title
+                Title = model.Title,
+                QuestionOrder = ProcessQuestionOrder(model.QuestionOrder)
             };
             return t;
         }
@@ -232,7 +240,6 @@ namespace IntelliTest.Core.Services
                 model.OpenQuestions.Remove(modelQuestion);
                 x.Text = modelQuestion.Text;
                 x.Answer = modelQuestion.Answer;
-                x.Order = modelQuestion.Order;
                 x.MaxScore = modelQuestion.MaxScore;
                 return x;
             })
@@ -242,7 +249,6 @@ namespace IntelliTest.Core.Services
                                                  {
                                                      Text = q.Text,
                                                      Answer = q.Answer,
-                                                     Order = q.Order,
                                                      MaxScore = q.MaxScore
                                                  }))
                                      .ToList();
@@ -261,7 +267,6 @@ namespace IntelliTest.Core.Services
                                          x.Text = modelQuestion.Text;
                                          x.Answers = string.Join(
                                              "&", modelQuestion.Answers.Where(a => !string.IsNullOrEmpty(a)));
-                                         x.Order = modelQuestion.Order;
                                          x.AnswerIndexes = string.Join("&", modelQuestion.AnswerIndexes
                                                                                          .Select((val, indx) =>
                                                                                                      new { val, indx })
@@ -280,7 +285,6 @@ namespace IntelliTest.Core.Services
                                                                                        .Where(q => q.val)
                                                                                        .Select(q => q.indx)),
                                                      Answers = string.Join("&", q.Answers.Where(a => !string.IsNullOrEmpty(a))),
-                                                     Order = q.Order,
                                                      MaxScore = q.MaxScore
                                                  }))
                                      .ToList();

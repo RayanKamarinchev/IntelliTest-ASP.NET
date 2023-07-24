@@ -11,8 +11,6 @@ namespace IntelliTest.Core.Models.Questions
     {
         [Required]
         public string Text { get; set; }
-        [Required]
-        public int Order { get; set; }
         public bool IsDeleted { get; set; }
         public Guid Id { get; set; }
     }

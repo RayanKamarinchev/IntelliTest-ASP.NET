@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IntelliTest.Core.Contracts;
+﻿using IntelliTest.Core.Contracts;
+using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data;
@@ -40,6 +36,13 @@ namespace IntelliTest.Core.Services
             Score = t.Score,
             TestId = t.TestId
         };
+
+        private List<QuestionType> ProcessQuestionOrder(string questionOrderText)
+        {
+            return questionOrderText.Split("|")
+                             .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
+                             .ToList();
+        }
 
 
         public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
@@ -140,7 +143,6 @@ namespace IntelliTest.Core.Services
                                      {
                                          Answer = q.Answer,
                                          IsDeleted = false,
-                                         Order = q.Order,
                                          Text = q.Text,
                                          MaxScore = q.MaxScore
                                      })
@@ -152,7 +154,6 @@ namespace IntelliTest.Core.Services
                                            Answers = q.Answers.Split("&"),
                                            AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
                                            IsDeleted = false,
-                                           Order = q.Order,
                                            Text = q.Text,
                                            MaxScore = q.MaxScore
                                        })
@@ -162,7 +163,8 @@ namespace IntelliTest.Core.Services
                 Grade = model.Grade,
                 Title = model.Title,
                 Id = model.Id,
-                PublicityLevel = model.PublicityLevel
+                PublicityLevel = model.PublicityLevel,
+                QuestionsOrder = ProcessQuestionOrder(model.QuestionOrder)
             };
             return t;
         }
@@ -196,6 +198,7 @@ namespace IntelliTest.Core.Services
             model.AverageScore = Math.Round(!test.TestResults.Any() ? 0 : test.TestResults.Average(r => r.Score), 2);
             model.Title = test.Title;
             model.Examiners = test.TestResults.Count();
+            model.QuestionOrder = ProcessQuestionOrder(test.QuestionsOrder);
 
             List<List<List<int>>> allClosedAnswers = new List<List<List<int>>>();
             res.ForEach(r =>
@@ -222,8 +225,7 @@ namespace IntelliTest.Core.Services
                     {
                         StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
                         Text = res[0].ClosedQuestions[i].Text,
-                        Answers = res[0].ClosedQuestions[i].PossibleAnswers,
-                        Order = res[0].ClosedQuestions[i].Order
+                        Answers = res[0].ClosedQuestions[i].PossibleAnswers
                     });
                 }
             }
@@ -245,8 +247,7 @@ namespace IntelliTest.Core.Services
                     model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
                     {
                         StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
-                        Text = res[0].OpenQuestions[i].Text,
-                        Order = res[0].OpenQuestions[i].Order
+                        Text = res[0].OpenQuestions[i].Text
                     });
                 }
             }
@@ -296,7 +297,6 @@ namespace IntelliTest.Core.Services
                                                        .Include(q => q.Question)
                                                        .Select(q => new OpenQuestionReviewViewModel()
                                                        {
-                                                           Order = q.Question.Order,
                                                            Text = q.Question.Text,
                                                            Id = q.Id,
                                                            RightAnswer = q.Question.Answer,
@@ -316,7 +316,6 @@ namespace IntelliTest.Core.Services
                     {
                         PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
                         IsDeleted = false,
-                        Order = q.Question.Order,
                         Text = q.Question.Text,
                         Id = q.Id,
                         Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
@@ -331,12 +330,18 @@ namespace IntelliTest.Core.Services
                     closedQuestions.Add(closedQuestionModel);
                 }
 
+                Test test = await context.Tests.FindAsync(testId);
+
                 return new TestReviewViewModel()
                 {
                     OpenQuestions = openQuestionsViewModels,
                     ClosedQuestions = closedQuestions,
                     Score = closedQuestions.Sum(q => q.Score)
-                          + openQuestionsViewModels.Sum(q => q.Score)
+                          + openQuestionsViewModels.Sum(q => q.Score),
+                    QuestionOrder = test.QuestionsOrder
+                                        .Split("|")
+                                        .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
+                                        .ToList()
                 };
             }
             catch (InvalidOperationException e)

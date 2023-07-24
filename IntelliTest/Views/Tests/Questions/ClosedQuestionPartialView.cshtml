@@ -16,7 +16,6 @@
             <span class="underline"></span>
         </div>
     </div>
-    <input type="text" value="@Model.Order" asp-for="Order" class="d-none"/>
     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
         @for (int i = 0; i < Model.Answers.Count(); i++)
         {

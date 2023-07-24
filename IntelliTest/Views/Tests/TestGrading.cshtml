@@ -1,26 +1,26 @@
-﻿@model TestReviewViewModel
+﻿@using IntelliTest.Core.Models.Enums
+@model TestReviewViewModel
 @{
     ViewBag.Title = "Оценяване";
 }
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
         <form asp-action="TestGrading" method="post">
-            @for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
-            {
-                if (Model.ClosedQuestions.Any(q => q.Order == i))
+            @{
+                int closedQuestionsIndex = 0;
+                int openQuestionsIndex = 0;
+                for (int i = 0; i < Model.QuestionOrder.Count; i++)
                 {
-                    var question = Model.ClosedQuestions.FirstOrDefault(q => q.Order == i);
-                    int indx = Model.ClosedQuestions.IndexOf(question);
-                    <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[indx]"/>
-                }
-                else
-                {
-                    var q = Model.OpenQuestions.FindIndex(j => j.Order == i);
-                    if (q==-1)
+                    if (Model.QuestionOrder[i] == QuestionType.Closed)
                     {
-                        continue;
+                        <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[closedQuestionsIndex]" />
+                        closedQuestionsIndex++;
                     }
-                    <partial name="Questions/OpenQuestionScorePartialView" for="OpenQuestions[q]"/>
+                    else
+                    {
+                        <partial name="Questions/OpenQuestionScorePartialView" for="OpenQuestions[openQuestionsIndex]"/>
+                        openQuestionsIndex++;
+                    }
                 }
             }
             <hr/>

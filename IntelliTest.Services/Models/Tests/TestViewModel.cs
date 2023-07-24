@@ -33,6 +33,7 @@ namespace IntelliTest.Core.Models.Tests
         public decimal AverageScore { get; set; }
         public int MaxScore { get; set; }
         public int Students { get; set; }
+        public string QuestionOrder { get; set; }
         [Required]
         [Display(Name = "Време (в минути)")]
         public int Time { get; set; }

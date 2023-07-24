@@ -46,7 +46,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
-            testsController = new TestsController(TestServiceMock.Instance, new MemoryCache(new MemoryCacheOptions()), StudentsServiceMock.Instance, ClassServiceMock.Instance)
+            testsController = new TestsController(TestServiceMock.Instance, new MemoryCache(new MemoryCacheOptions()), StudentsServiceMock.Instance, ClassServiceMock.Instance,TestResultsServiceMock.Instance)
             {
                 TempData = tempData
             };
@@ -116,7 +116,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         [Test]
         public async Task Edit_Student_NoId_Post_Correct()
         {
-            var res = await testsController.Edit(new TestEditViewModel());
+            var res = await testsController.Edit(new TestEditViewModel(), id);
             Assert.NotNull(res);
         }
         [Test]
@@ -126,7 +126,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             var res = await testsController.Edit(new TestEditViewModel()
             {
                 Id = id
-            });
+            }, id);
             Assert.NotNull(res);
             SetUserRole("Student");
         }
@@ -144,7 +144,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
                 PublicityLevel = PublicityLevel.Public,
                 Time = 10,
                 Title = "Tests"
-            });
+            }, id);
             Assert.NotNull(res);
             SetUserRole("Student");
         }
@@ -161,7 +161,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         public async Task Edit_Teacher_Post_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(new TestEditViewModel());
+            var res = await testsController.Edit(new TestEditViewModel(), id);
             Assert.NotNull(res);
             SetUserRole("Student");
         }

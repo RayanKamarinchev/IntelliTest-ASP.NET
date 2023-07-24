@@ -20,10 +20,6 @@ namespace IntelliTest.Tests.Mocks
                                .ReturnsAsync(new QueryModel<TestViewModel>());
                 testServiceMock.Setup(s => s.ExistsbyId(id))
                                .ReturnsAsync(true);
-                testServiceMock.Setup(s => s.ToEdit(It.IsAny<TestViewModel>()))
-                               .Returns(new TestEditViewModel());
-                testServiceMock.Setup(s => s.TestsTakenByClass(id))
-                               .ReturnsAsync(new List<TestStatsViewModel>());
                 testServiceMock.Setup(s => s.IsTestCreator(id, id))
                                .ReturnsAsync(true);
                 testServiceMock.Setup(s => s.IsTestCreator(id, id2))

@@ -115,7 +115,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task getClassStudents_Correct()
         {
-            var firstClassStudent = (await classService.getClassStudents(id)).FirstOrDefault();
+            var firstClassStudent = (await classService.GetClassStudents(id)).FirstOrDefault();
             var expectedStudent = new StudentViewModel()
             {
                 Name = "Pesho Peshov",

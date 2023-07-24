@@ -121,7 +121,6 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answers = "едно&две&три&четири",
                     AnswerIndexes = "1",
                     MaxScore = 2,
-                    Order = 0,
                     Test = test,
                     Text = "Избери",
                     Id = id
@@ -136,7 +135,6 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Its me, Mario",
                     Test = test,
                     MaxScore = 3,
-                    Order = 1,
                     Id = id
                 },
                 new OpenQuestion()
@@ -145,7 +143,6 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Fine",
                     Test = test,
                     MaxScore = 1,
-                    Order = 2,
                     Id = id2
                 },
             };

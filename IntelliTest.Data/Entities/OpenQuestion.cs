@@ -11,8 +11,6 @@ namespace IntelliTest.Data.Entities
         public string Text { get; set; }
         [Required]
         public string Answer { get; set; }
-        [Required]
-        public int Order { get; set; }
         public bool IsDeleted { get; set; }
         [Required]
         public Guid TestId { get; set; }

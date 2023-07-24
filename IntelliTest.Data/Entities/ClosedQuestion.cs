@@ -13,8 +13,6 @@ namespace IntelliTest.Data.Entities
         public string AnswerIndexes { get; set; }
         [Required]
         public string Answers { get; set; }
-        [Required]
-        public int Order { get; set; }
 
         public bool IsDeleted { get; set; }
         [Required]
