@@ -26,6 +26,8 @@ function EstablishSignalRConnection() {
 
                 questions.prepend(element);
 
+                console.log(element);
+                console.log(GetQuestionTextarea(element));
                 textAreaAdjust(GetQuestionTextarea(element));
                 textAreaAdjust(GetAnswerTextarea(element));
                 questionCount++;
@@ -51,11 +53,11 @@ function AddQuestionToDom(question) {
 }
 
 function GetQuestionTextarea(element) {
-    return element.children[2].children[0].children[0];
+    return element.children[1].children[0].children[0];
 }
 
 function GetAnswerTextarea(element) {
-    return element.children[3].children[0].children[0];
+    return element.children[2].children[0].children[0];
 }
 
 EstablishSignalRConnection();
@@ -98,7 +100,11 @@ let questionsToGenerateCount = document.getElementById("questionCount");
 function makeDeleteAble(item) {
     item.addEventListener('click',
         e => {
-            e.target.parentNode.parentNode.remove();
+            let btnElement = e.target;
+            while (!btnElement.classList.contains("delete")) {
+                btnElement = btnElement.parentNode;
+            }
+            btnElement.parentNode.parentNode.remove();
             questionCount--;
         });
 }
@@ -125,10 +131,11 @@ function handleSubmit(event) {
     const data = new FormData(event.target);
 
     let value = Object.fromEntries(data.entries());
-
+    console.log(value);
     let res = {
         OpenQuestions: [],
-        ClosedQuestions: []
+        ClosedQuestions: [],
+        QuestionsOrder: []
     };
     let i = 0;
     while (true) {
@@ -137,28 +144,30 @@ function handleSubmit(event) {
             question = GetByDictKey(`ClosedQuestions[${i}]`, value);
         } else {
             res["OpenQuestions"].push(createOpenQuestion(question, i));
+            res["QuestionsOrder"].push(0);
             i++;
             continue;
         }
-        if (isQuestionEmpty()) {
+        if (isQuestionEmpty(question)) {
             break;
         } else {
             res["ClosedQuestions"].push(createClosedQuestion(question, i));
+            res["QuestionsOrder"].push(1);
         }
         i++;
     }
     res["id"] = id;
     res["title"] = document.getElementById("title").value;
     res["description"] = document.getElementById("desc").value;
-    res["time"] = document.getElementById("time").value;
-    res["grade"] = document.getElementById("grade").value;
-
+    res["time"] = parseInt(document.getElementById("time").value);
+    res["grade"] = parseInt(document.getElementById("grade").value);
+    
     $.ajax({
-        url: "/Tests/Edit",
+        url: "/Tests/Edit/" + id,
         method: 'POST',
-        data: JSON.stringify(res),
         contentType: 'application/json',
-        success: function(response) {
+        data: JSON.stringify(res),
+        success: function (response) {
             if (response === "redirect") {
                 window.location.href = "/Tests";
             }
@@ -169,28 +178,47 @@ function handleSubmit(event) {
 function isQuestionEmpty(question) {
     return Object.keys(question).length === 0;
 }
-function GetParameter(questionParams, questionIndex, parameter) {
-    return Object.values(GetByDictKey(questionIndex + "." + parameter, questionParams))[0];
+function GetParameter(questionParams, questionIndex, parameter, isMultiple = false) {
+    let foundValues = Object.values(GetByDictKey(questionIndex + "." + parameter, questionParams));
+    if (isMultiple) {
+        return foundValues;
+    } else {
+        return foundValues[0];
+    }
 }
+function GetAnswerIndexes(questionParams, questionIndex) {
+    let foundKeys = Object.keys(GetByDictKey(questionIndex + ".AnswerIndexes", questionParams));
+    let answersCount = Object.keys(GetByDictKey(questionIndex + ".Answers", questionParams)).length;
+    let indexes = [];
+    for (let i = 0; i < answersCount; i++) {
+        let isContained = foundKeys
+            .map(k => parseInt(k
+                .replace(questionIndex + ".AnswerIndexes[", "")
+                .replace("]", "")))
+            .some(k => k === i);
+        if (isContained) {
+            indexes.push(true);
+        } else {
+            indexes.push(false);
+        }
+    }
+    return indexes;
+}
+
 function createOpenQuestion(questionParams, index) {
     let questionIndex = `OpenQuestions[${index}]`;
-
     return{
         text: GetParameter(questionParams, questionIndex, "Text"),
         answer: GetParameter(questionParams, questionIndex, "Answer"),
-        order: index,
         maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
     }
 }
 function createClosedQuestion(questionParams, index) {
     let questionIndex = `ClosedQuestions[${index}]`;
-
     return {
         text: GetParameter(questionParams, questionIndex, "Text"),
-        answers: GetParameter(questionParams, questionIndex, "Answers"),
-        answerIndexes: GetParameter(questionParams, questionIndex, "AnswerIndexes")
-            .map(v => v === "on" || v === "true"), 
-        order: index,
+        answers: GetParameter(questionParams, questionIndex, "Answers", true),
+        answerIndexes: GetAnswerIndexes(questionParams, questionIndex, "AnswerIndexes"), 
         maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
     }
 }
@@ -247,7 +275,6 @@ function openQuestionPartialView(question, answer, order, maxScore) {
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
-                    <input style="display: none" value="${order}" asp-for="Order"/>
                     <div class="customRow">
                         <div class="questTextBox" style="width: calc(100% - 250px);">
                             <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this)  placeholder="Въпрос" type="text" name="OpenQuestions[${
@@ -299,7 +326,6 @@ function closedQuestionPartialView(question, answers, order, maxScore) {
                             <span class="underline"></span>
                         </div>
                     </div>
-                    <input type="text" value="${order}" asp-for="Order" class="d-none"/>
                     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">` +
         answers.map(a => answerPartialView(a.answer, a.order, order)).join('') +
         `

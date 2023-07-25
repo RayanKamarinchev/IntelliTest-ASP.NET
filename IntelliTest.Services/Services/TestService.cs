@@ -229,21 +229,9 @@ namespace IntelliTest.Core.Services
                                     .Include(t=>t.OpenQuestions)
                                     .Include(t=>t.ClosedQuestions)
                                     .FirstOrDefaultAsync(t=>t.Id==id);
-            
-            test.OpenQuestions = test.OpenQuestions.Select(x =>
-            {
-                var modelQuestion = model.OpenQuestions.FirstOrDefault(q => q.Answer == x.Answer || q.Text == x.Text);
-                if (modelQuestion is null)
-                {
-                    return new OpenQuestion();
-                }
-                model.OpenQuestions.Remove(modelQuestion);
-                x.Text = modelQuestion.Text;
-                x.Answer = modelQuestion.Answer;
-                x.MaxScore = modelQuestion.MaxScore;
-                return x;
-            })
-                                     .Where(q=>q.Text!="")
+
+            test.OpenQuestions = test.OpenQuestions.Select(q => EditOpenQuestion(model.OpenQuestions, q))
+                                     .Where(q => !string.IsNullOrEmpty(q.Text))
                                      .Union(model.OpenQuestions
                                                  .Select(q => new OpenQuestion()
                                                  {
@@ -252,39 +240,20 @@ namespace IntelliTest.Core.Services
                                                      MaxScore = q.MaxScore
                                                  }))
                                      .ToList();
-
-            test.ClosedQuestions = test.ClosedQuestions.Select(x =>
-                                     {
-                                         var modelQuestion = model.ClosedQuestions
-                                                                  .FirstOrDefault(q =>
-                                                                                      string.Join("&", q.Answers.Where(a => !string.IsNullOrEmpty(a)))
-                                                                                   == x.Answers || q.Text == x.Text);
-                                         if (modelQuestion is null)
-                                         {
-                                             return new ClosedQuestion();
-                                         }
-                                         model.ClosedQuestions.Remove(modelQuestion);
-                                         x.Text = modelQuestion.Text;
-                                         x.Answers = string.Join(
-                                             "&", modelQuestion.Answers.Where(a => !string.IsNullOrEmpty(a)));
-                                         x.AnswerIndexes = string.Join("&", modelQuestion.AnswerIndexes
-                                                                                         .Select((val, indx) =>
-                                                                                                     new { val, indx })
-                                                                                         .Where(q => q.val)
-                                                                                         .Select(q => q.indx));
-                                         x.MaxScore = modelQuestion.MaxScore;
-                                         return x;
-                                     })
+            
+            test.ClosedQuestions = test.ClosedQuestions.Select(q => EditClosedQuestion(model.ClosedQuestions, q))
                                      .Where(q => q.Text != "")
                                      .Union(model.ClosedQuestions
                                                  .Select(q => new ClosedQuestion()
                                                  {
                                                      Text = q.Text,
                                                      AnswerIndexes = string.Join("&", q.AnswerIndexes
-                                                                                       .Select((val, indx) => new { val, indx })
+                                                                                       .Select((val, indx) =>
+                                                                                                   new { val, indx })
                                                                                        .Where(q => q.val)
                                                                                        .Select(q => q.indx)),
-                                                     Answers = string.Join("&", q.Answers.Where(a => !string.IsNullOrEmpty(a))),
+                                                     Answers = string.Join(
+                                                         "&", q.Answers.Where(a => !string.IsNullOrEmpty(a))),
                                                      MaxScore = q.MaxScore
                                                  }))
                                      .ToList();
@@ -296,6 +265,7 @@ namespace IntelliTest.Core.Services
                 test.Grade = model.Grade;
                 test.Time = model.Time;
                 test.PublicyLevel = model.PublicityLevel;
+                test.QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]));
             }
             else
             {
@@ -309,11 +279,53 @@ namespace IntelliTest.Core.Services
                     OpenQuestions = test.OpenQuestions,
                     CreatedOn = DateTime.Now,
                     CreatorId = teacherId,
-                    PublicyLevel = model.PublicityLevel
+                    PublicyLevel = model.PublicityLevel,
+                    QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]))
                 };
                 context.Tests.Add(newTest);
             }
             await context.SaveChangesAsync();
+        }
+
+        private Func<List<OpenQuestionViewModel>, OpenQuestion, OpenQuestion> EditOpenQuestion = (allQuestions, question) =>
+        {
+            var testQuestion = allQuestions.FirstOrDefault(q => q.Answer == question.Answer || q.Text == question.Text);
+            if (testQuestion is null)
+            {
+                return new OpenQuestion();
+            }
+            allQuestions.Remove(testQuestion);
+            question.Text = testQuestion.Text;
+            question.Answer = testQuestion.Answer;
+            question.MaxScore = testQuestion.MaxScore;
+            return question;
+        };
+        private Func<List<ClosedQuestionViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
+        {
+            var modelQuestion = allQuestions
+                                     .FirstOrDefault(q => CheckForSameAnswers(q, question.Answers) || q.Text == question.Text);
+            if (modelQuestion is null)
+            {
+                return new ClosedQuestion();
+            }
+            allQuestions.Remove(modelQuestion);
+
+            question.Text = modelQuestion.Text;
+            question.Answers = string.Join(
+                "&", modelQuestion.Answers.Where(a => !string.IsNullOrEmpty(a)));
+
+            question.AnswerIndexes = string.Join("&", modelQuestion.AnswerIndexes
+                                                                   .Select((val, indx) =>
+                                                                               new { val, indx })
+                                                                   .Where(q => q.val)
+                                                                   .Select(q => q.indx));
+            question.MaxScore = modelQuestion.MaxScore;
+            return question;
+        };
+
+        private static bool CheckForSameAnswers(ClosedQuestionViewModel questionViewModel, string savedQuestionAnswers)
+        {
+            return string.Join("&", questionViewModel.Answers.Where(a => !string.IsNullOrEmpty(a))) == savedQuestionAnswers;
         }
 
         public async Task SaveChanges()

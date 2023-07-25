@@ -100,7 +100,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Edit/{id}")]
+        [Route("Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id)
         {
             if (User.IsStudent())
@@ -119,7 +119,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpPost]
-        [Route("Edit/{id}")]
+        [Route("Edit/{Id}")]
         public async Task<IActionResult> Edit(ClassViewModel model, Guid id)
         {
             if (User.IsStudent())
@@ -148,7 +148,7 @@ namespace IntelliTest.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost]
-        [Route("Delete/{id}")]
+        [Route("Delete/{Id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             if (User.IsStudent())
@@ -167,7 +167,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Details/{id}")]
+        [Route("Details/{Id}")]
         public async Task<IActionResult> Details(Guid id)
         {
             if (await classService.IsInClass(id, User.Id(), User.IsStudent(), User.IsTeacher()))
@@ -242,7 +242,7 @@ namespace IntelliTest.Controllers
             return View();
         }
         [HttpPost]
-        //[Route("Join/{id}")]
+        //[Route("Join/{Id}")]
         public async Task<IActionResult> Join(JoinModel model)
         {
             if (User.IsTeacher())

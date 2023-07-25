@@ -26,25 +26,6 @@ namespace IntelliTest.Core.Hubs
             lessonService = _lessonService;
         }
 
-        private string Translate(string text)
-        {
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = @"C:\Users\raian\AppData\Local\Programs\Python\Python38\python.exe";
-            string formattedText = text.Replace("\"", "\\\"");
-            start.Arguments = string.Format("translate.py \"{0}\"", formattedText);
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
-            string last = "";
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    last = reader.ReadToEnd();
-                }
-            }
-            return last;
-        }
-
         public async Task FromLesson(string name, int questionCount)
         {
             string text = "";
@@ -79,11 +60,8 @@ namespace IntelliTest.Core.Hubs
         {
             var api = new OpenAI_API.OpenAIAPI(config["OpenAIKey"]);
             var chat = api.Chat.CreateConversation();
-
-            string translatedText = Translate(prompt);
-
             TikToken tikToken = TikToken.EncodingForModel("gpt-3.5-turbo");
-            var encoded = tikToken.Encode(translatedText);
+            var encoded = tikToken.Encode(prompt);
             int[] encodedSentenceEnds = new[]
             {
                 13, 382, 497,662,627,1131,2564,3343,4527,6058,6389,7609,
@@ -134,6 +112,9 @@ namespace IntelliTest.Core.Hubs
                         }
                     }
                 }
+
+                res = res.Substring(3, res.Length - 3).Replace("\n", "");
+                await Clients.Caller.SendAsync("Add", question, res);
             }
         }
     }

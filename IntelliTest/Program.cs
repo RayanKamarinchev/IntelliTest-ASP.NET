@@ -137,7 +137,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{Id?}");
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<TestEditHub>("/testEditHub");

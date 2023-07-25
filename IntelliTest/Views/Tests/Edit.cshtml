@@ -1,4 +1,6 @@
 ﻿@using IntelliTest.Core.Models.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Collections
 @model TestEditViewModel
 @{
     ViewBag.Title = "Edit Test";
@@ -64,26 +66,24 @@
             </div>
             <div id="questions">
                 @{
+                    Queue<ClosedQuestionViewModel> closedQuestions = new Queue<ClosedQuestionViewModel>(Model.ClosedQuestions);
+                    Queue<OpenQuestionViewModel> openQuestions = new Queue<OpenQuestionViewModel>(Model.OpenQuestions);
+
                     int closedQuestionCount = Model.OpenQuestions.Count;
                     Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(), Model.OpenQuestions.Count));
                     Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(), closedQuestionCount));
-
-                    int closedQuestionsIndex = 0;
-                    int openQuestionsIndex = 0;
 
                     for (int i = 0; i < Model.QuestionsOrder.Count; i++)
                     {
                         if (Model.QuestionsOrder[i] == QuestionType.Closed)
                         {
-                            var question = Model.ClosedQuestions[closedQuestionsIndex];
-                            closedQuestionsIndex++;
+                            var question = closedQuestions.Dequeue();
                             Model.ClosedQuestions[i] = question;
                             <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
                         }
                         else if (Model.QuestionsOrder[i] == QuestionType.Open)
                         {
-                            var question = Model.OpenQuestions[openQuestionsIndex];
-                            openQuestionsIndex++;
+                            var question = openQuestions.Dequeue();
                             Model.OpenQuestions[i] = question;
                             <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
                         }
@@ -103,7 +103,7 @@
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/test.js" asp-append-version="true"></script>
     <script>
-        var questionCount = @Model.ClosedQuestions.Count() + @Model.OpenQuestions.Count();
+        var questionCount = @Model.QuestionsOrder.Count;
         var id = "@Model.Id";
     </script>
     <script src="~/js/testEdit.js" asp-append-version="true"></script>

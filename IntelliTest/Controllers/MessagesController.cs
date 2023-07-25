@@ -21,7 +21,7 @@ namespace IntelliTest.Controllers
         {
             messageService = _messageService;
         }
-        [HttpGet("Get/{id}")]
+        [HttpGet("Get/{Id}")]
         public async Task<ActionResult<Room>> Get(Guid id)
         {
             var messageViewModel = await messageService.GetById(id);
@@ -58,7 +58,7 @@ namespace IntelliTest.Controllers
             return CreatedAtAction(nameof(Get), new { id = createdMessage.Id }, createdMessage);
         }
 
-        [HttpGet("Delete/{id}")]
+        [HttpGet("Delete/{Id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             bool res = await messageService.Delete(id, User.Id());

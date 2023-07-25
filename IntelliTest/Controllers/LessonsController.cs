@@ -52,7 +52,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Read/{id}")]
+        [Route("Read/{Id}")]
         public async Task<IActionResult> Read(Guid id)
         {
             if (TempData.Peek("TeacherId") is null)
@@ -81,7 +81,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Lessons/Edit/{id}")]
+        [Route("Lessons/Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id, EditLessonViewModel model)
         {
             if (!User.IsTeacher())
@@ -106,7 +106,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Lessons/SubmitEdit/{id}")]
+        [Route("Lessons/SubmitEdit/{Id}")]
         public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string htmlContent, string school, Subject subject, int grade)
         {
             EditLessonViewModel model = new EditLessonViewModel()

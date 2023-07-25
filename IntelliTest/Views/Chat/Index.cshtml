@@ -29,8 +29,8 @@
                     </div>
                 </div>
                 <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
-                    style="overflow: auto; overflow: hidden; padding-left: 0" data-bind="foreach: chatRooms">
-                    <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-roomId': id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}">
+                    style="overflow: auto; overflow: hIdden; padding-left: 0" data-bind="foreach: chatRooms">
+                    <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-roomId': Id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}">
                         <div class="w-100">
                             <div class="d-flex pl-0">
                                 <img class="rounded-circle shadow avatar-sm mr-3" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="d-flex flex-row mb-3 navigation-mobile scrollable-chat-panel chat-panel-scroll">
-                    <div class="w-100 p-3" style="overflow: scroll; overflow-x: hidden;">
+                    <div class="w-100 p-3" style="overflow: scroll; overflow-x: hIdden;">
                         <div data-bind="if: chatMessages().length > 0">
                             <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
                             <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3" data-bind="text: chatMessages()[0].timestampRelative"></div>
@@ -161,7 +161,7 @@
             </div>
         </div>
         <ul class="col-md-3 col-12 chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
-            style="overflow: auto; overflow-x: hidden;background-color: white"
+            style="overflow: auto; overflow-x: hIdden;background-color: white"
             id="users-list" data-bind="foreach: chatUsers">
             <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-username': userName }">
                 <div class="w-100">

@@ -28,7 +28,7 @@ namespace IntelliTest.Controllers
             return Ok(roomsViewModel);
         }
 
-        [HttpGet("Get/{id}")]
+        [HttpGet("Get/{Id}")]
         public async Task<ActionResult<Room>> Get(Guid id)
         {
             var roomViewModel = await roomService.GetById(id, User.Id());
@@ -54,7 +54,7 @@ namespace IntelliTest.Controllers
             return CreatedAtAction(nameof(Get), new { id = createdRoom.Id }, createdRoom);
         }
 
-        [HttpGet("Edit/{id}")]
+        [HttpGet("Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id,string name)
         {
             var status = await roomService.Edit(id, new RoomViewModel()
@@ -73,7 +73,7 @@ namespace IntelliTest.Controllers
             return Ok();
         }
 
-        [HttpGet("Delete/{id}")]
+        [HttpGet("Delete/{Id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             bool isOkay = await roomService.Delete(id, User.Id());
@@ -83,7 +83,7 @@ namespace IntelliTest.Controllers
             }
             return Ok();
         }
-        [HttpGet("Join/{id}")]
+        [HttpGet("Join/{Id}")]
         public async Task<IActionResult> Join(Guid id)
         {
             bool isOkay = await roomService.AddUser(id, User.Id());

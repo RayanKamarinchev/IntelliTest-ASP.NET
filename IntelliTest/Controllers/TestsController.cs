@@ -75,9 +75,9 @@ namespace IntelliTest.Controllers
         }
         
 
-        [Route("Tests/Edit/{id}")]
+        [Route("Tests/Edit/{Id}")]
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid id, TestEditViewModel viewModel)
+        public async Task<IActionResult> Edit(TestEditViewModel viewModel, Guid id)
         {
             if (!User.IsTeacher())
             {
@@ -115,9 +115,9 @@ namespace IntelliTest.Controllers
 
 
         [HttpPost]
-        [Route("Tests/Edit/{id}")]
+        [Route("Tests/Edit/{Id}")]
         [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Edit([FromBody]TestEditViewModel model, Guid id)
+        public async Task<IActionResult> Edit(Guid id, [FromBody]TestEditViewModel model)
         {
             if (!User.IsTeacher())
             {
@@ -292,7 +292,7 @@ namespace IntelliTest.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Teacher")]
-        [Route("Test/Delete/{id}")]
+        [Route("Test/Delete/{Id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             if (TempData.Peek("TeacherId") is null)
