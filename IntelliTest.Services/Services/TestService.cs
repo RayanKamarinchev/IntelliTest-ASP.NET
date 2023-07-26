@@ -369,7 +369,8 @@ namespace IntelliTest.Core.Services
                 CreatorId = teacherId,
                 OpenQuestions = new List<OpenQuestion>(),
                 ClosedQuestions = new List<ClosedQuestion>(),
-                PhotoPath = model.PhotoPath
+                PhotoPath = model.PhotoPath,
+                QuestionsOrder = model.QuestionOrder
             };
             var classes = await context.Classes.Where(c => classNames.Contains(c.Name)).ToListAsync();
             var e = await context.Tests.AddAsync(test);

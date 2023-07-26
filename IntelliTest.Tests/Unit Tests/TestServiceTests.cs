@@ -71,7 +71,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 MultiSubmit = t.MultiSubmission,
                 PublicityLevel = t.PublicyLevel,
                 Students = t.TestResults.Count(),
-                IsTestTaken = t.TestResults.Any(t=>t.StudentId==id)
+                IsTestTaken = t.TestResults.Any(t=>t.StudentId==id),
+                QuestionOrder = t.QuestionsOrder
             };
         }
 
@@ -150,7 +151,8 @@ namespace IntelliTest.Tests.Unit_Tests
                         Text = "Избери",
                         Id = id
                     }
-                }
+                },
+                QuestionOrder = new List<QuestionType>() { QuestionType.Open , QuestionType.Closed, QuestionType.Open}
             };
             Assert.AreEqual(JsonConvert.SerializeObject(real), JsonConvert.SerializeObject(test));
         }
@@ -214,7 +216,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 Title = "The test",
                 Id = id2,
                 PublicityLevel = PublicityLevel.Public,
-                PhotoPath = ""
+                PhotoPath = "",
+                QuestionOrder = "O|C|O"
             };
             await testService.Create(testModel, id, new string[0]);
             int testsCountNow = (await testService.GetAll(id, id, query)).Items.Count();
@@ -261,7 +264,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     PublicyLevel = PublicityLevel.TeachersOnly,
                     Id = id2,
                     PhotoPath = "",
-                    Subject = Subject.Математика
+                    Subject = Subject.Математика,
+                    QuestionsOrder = "O|C|O"
                 }
             };
             data.Tests.AddRange(tests);

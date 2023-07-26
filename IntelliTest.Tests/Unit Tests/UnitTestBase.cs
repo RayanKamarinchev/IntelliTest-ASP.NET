@@ -111,7 +111,8 @@ namespace IntelliTest.Tests.Unit_Tests
                 Title = "The test",
                 PublicyLevel = PublicityLevel.TeachersOnly,
                 Id = id,
-                PhotoPath = ""
+                PhotoPath = "",
+                QuestionsOrder = "O|C|O"
             };
             data.Tests.Add(test);
             var closedQuestions = new List<ClosedQuestion>()
