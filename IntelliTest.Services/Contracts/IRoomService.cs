@@ -16,5 +16,6 @@ namespace IntelliTest.Core.Contracts
         public Task<HttpError> Edit(Guid id, RoomViewModel viewModel, string userId);
         public Task<bool> Delete(Guid id, string userId);
         public Task<bool> AddUser(Guid roomId, string userId);
+        public Task<ChatsViewModel> GetChatsViewModel(string userId);
     }
 }

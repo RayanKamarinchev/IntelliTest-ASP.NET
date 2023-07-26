@@ -118,8 +118,7 @@ namespace IntelliTest.Core.Services
         {
             var message = await context.Messages
                                         .Include(u => u.Sender)
-                                        .Where(m => m.Id == id && m.SenderId == userId && !m.IsDeleted)
-                                        .FirstOrDefaultAsync();
+                                        .FirstOrDefaultAsync(m => m.Id == id && m.SenderId == userId && !m.IsDeleted);
 
             if (message == null)
                 return false;

@@ -25,9 +25,7 @@ function EstablishSignalRConnection() {
                 let element = createElementFromHTML(openQuestionHtml);
 
                 questions.prepend(element);
-
-                console.log(element);
-                console.log(GetQuestionTextarea(element));
+                
                 textAreaAdjust(GetQuestionTextarea(element));
                 textAreaAdjust(GetAnswerTextarea(element));
                 questionCount++;

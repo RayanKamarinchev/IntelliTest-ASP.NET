@@ -1,63 +1,74 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IntelliTest.Core.Models.Chat.ChatsViewModel
+@{
     ViewBag.Title = "Чат";
 }
+<script>
+    let username = "@Model.Profile.Name";
+</script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>
 <div class="col-12 row" style="height: calc(100vh - 80px); margin-top: 9px" id="chat">
-        <div class="col-md-3 col-12 card-stacked">
-            <div class="card shadow-line mb-3 chat">
+    <div class="col-md-3 col-12 card-stacked">
+        <div class="card shadow-line mb-3 chat">
 
-                <div class="p-3 chat-header">
-                    <div class="d-flex">
-                        <div class="w-100 d-flex pl-0">
-                            <img class="user-detail-trigger rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://user-images.githubusercontent.com/35243461/168796876-2e363a49-b32c-4218-b5a3-ce12493af69e.jpg"/>
-                            <p data-bind="text: myProfile()?.fullName()"></p>
-                        </div>
-                        <div class="flex-shrink-0 margin-auto">
-                            <a id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
-                                <i class="fa-solid fa-plus"></i>
-                            </a>
-                        </div>
+            <div class="p-3 chat-header">
+                <div class="d-flex">
+                    <div class="w-100 d-flex pl-0">
+                        <img class="user-detail-trigger rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://user-images.githubusercontent.com/35243461/168796876-2e363a49-b32c-4218-b5a3-ce12493af69e.jpg"/>
+                        <p>@Model.Profile.Name</p>
+                    </div>
+                    <div class="flex-shrink-0 margin-auto">
+                        <a id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="chat-search pl-3 pr-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search a conversation">
-                        <div class="input-group-append prepend-white">
-                            <span class="input-group-text pl-2 pr-2">
-                                <i class="fs-17 las la-search drop-shadow"></i>
-                            </span>
-                        </div>
+            </div>
+            <div class="chat-search pl-3 pr-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search a conversation">
+                    <div class="input-group-append prepend-white">
+                        <span class="input-group-text pl-2 pr-2">
+                            <i class="fs-17 las la-search drop-shadow"></i>
+                        </span>
                     </div>
                 </div>
+            </div>
+            @foreach (var room in Model.Rooms)
+            {
                 <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
-                    style="overflow: auto; overflow: hIdden; padding-left: 0" data-bind="foreach: chatRooms">
-                    <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-roomId': Id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name()}">
+                    style="overflow: auto; overflow: hIdden; padding-left: 0">
+                    <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" onclick="joinRoom('@(room.Name)')">
                         <div class="w-100">
                             <div class="d-flex pl-0">
                                 <img class="rounded-circle shadow avatar-sm mr-3" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
                                 <div>
-                                    <p class="margin-auto fw-400 text-dark-75" data-bind="text: name"></p>
+                                    <p class="margin-auto fw-400 text-dark-75">@room.Name</p>
                                     <div class="d-flex flex-row mt-1">
                                         <span>
                                             <div class="svg15 double-check"></div>
                                         </span>
-                                        <span class="message-shortcut margin-auto text-muted fs-13 ml-1 mr-4" data-bind="text: lastMessage"></span>
+                                        <span class="message-shortcut margin-auto text-muted fs-13 ml-1 mr-4">@room.LastMessage</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="flex-shrink-0 margin-auto pl-2 pr-3">
                             <div class="d-flex flex-column">
-                                <p class="text-muted text-right fs-13 mb-2" data-bind="text: date"></p>
+                                <p class="text-muted text-right fs-13 mb-2">@room.TimeStamp</p>
                             </div>
                         </div>
                     </il>
                 </ul>
-            </div>
+            }
         </div>
-        <div class="col-md-6 col-12 card-stacked" data-bind="visible: joinedRoom() == null">
+    </div>
+        <div class="col-md-9 col-12 card-stacked" id="noJoinedRoomPanel">
             <span class="m-auto">Please select room to join!</span>
         </div>
-        <div class="col-md-6 col-12 card-stacked" data-bind="visible: joinedRoom() != null">
+        <div class="col-md-9 col-12 card-stacked" id="messagesPanel" style="display: none">
             <div class="card shadow-line mb-3 chat chat-panel">
                 <div class="p-3 chat-header">
                     <div class="d-flex">
@@ -65,71 +76,31 @@
                             <img class="rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
                             <div class="mr-3">
                                 <a href="#">
-                                    <p class="fw-400 mb-0 text-dark-75" data-bind="text: joinedRoom()?.name()"></p>
+                                    <p class="fw-400 mb-0 text-dark-75" id="joinedRoomName"></p>
                                 </a>
                             </div>
                             <div class="flex-shrink-0 margin-auto" style="position: absolute;right: 20px;">
-                                <a data-bs-toggle="modal" data-bs-target="#remove-room-modal"class="btn btn-sm btn-icon btn-light active text-dark ml-2"> 
-                                    <i class="fa-regular fa-trash-can"></i>
-                                </a>
-                                <a data-bs-toggle="modal" data-bs-target="#rename-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
-                                    <i class="fa-solid fa-pencil"></i>
-                                </a>
+
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex flex-row mb-3 navigation-mobile scrollable-chat-panel chat-panel-scroll">
                     <div class="w-100 p-3" style="overflow: scroll; overflow-x: hIdden;">
-                        <div data-bind="if: chatMessages().length > 0">
-                            <div class="svg36 loader-animate3 horizontal-margin-auto mb-2"></div>
-                            <div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3" data-bind="text: chatMessages()[0].timestampRelative"></div>
+                    @*<div class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3" data-bind="text: chatMessages()[0].timestampRelative"></div>*@
+                        <div id="messages">
                         </div>
-                        <div data-bind="foreach: chatMessages">
-                            <p data-bind="if:$index ===0 && $parent.chatMessages()[$index].timestampRelative != timestampRelative"
-                               class="text-center letter-space drop-shadow text-uppercase fs-12 w-100 mb-3">
-                                <span data-bind="text: timestampRelative"></span>
-                            </p>
-                            <div data-bind="if: !isMine()">
-                                <div class="left-chat-message fs-13 mb-2">
-                                    <p class="mb-0 mr-3 pr-4" data-bind="html: content"></p>
-                                    <div class="message-options">
-                                        <div class="message-time" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-row-reverse mb-2" data-bind="if: isMine()">
-                                <div class="right-chat-message fs-13 mb-2">
-                                    <div class="mb-0 mr-3 pr-4">
-                                        <div class="d-flex flex-row">
-                                            <div class="pr-2" data-bind="html: content"></div>
-                                            <div class="pr-4"></div>
-                                        </div>
-                                    </div>
-                                    <div class="message-options dark">
-                                        <div class="message-time">
-                                            <div class="d-flex flex-row">
-                                                <div class="mr-2 message-text-tooltip" data-bind="text: time, attr: { 'data-bs-title': timestampFull }" data-bs-toggle="tooltip" data-bs-placement="top"></div>
-                                                <div class="svg15 double-check"></div>
-                                            </div>
-                                        </div>
-                                        <div class="message-arrow">
-                                            <i class="fa-regular fa-trash-can fs-17" style="color: white;" data-bind="click: deleteMessage"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <br/>
                     </div>
                 </div>
                 <div class="chat-search pl-3 pr-3" id="send-message">
                     <div class="input-group">
-                        <input type="text" class="form-control" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }"
+                    <input type="text" class="form-control" onkeypress="sendToRoom(event)" id="messageInputField"
                                placeholder="Write a message">
                         <div class="input-group-append prepend-white">
                             <span class="input-group-text pl-2 pr-2">
                                 <i class="chat-upload-trigger fs-19 bi bi-file-earmark-plus ml-2 mr-2"></i>
-                                <i class="fs-19 bi bi-cursor ml-2 mr-2" data-bind="click: sendNewMessage"></i>
+                            <i class="fs-19 bi bi-cursor ml-2 mr-2" onclick="sendToRoom(this)"></i>
                                 <div class="chat-upload">
                                     <div class="d-flex flex-column">
                                         <div class="p-2">
@@ -160,32 +131,10 @@
                 </div>
             </div>
         </div>
-        <ul class="col-md-3 col-12 chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
-            style="overflow: auto; overflow-x: hIdden;background-color: white"
-            id="users-list" data-bind="foreach: chatUsers">
-            <il class="chat-item d-flex pl-3 pr-0 pt-3 pb-3" data-bind="attr: { 'data-username': userName }">
-                <div class="w-100">
-                    <div class="d-flex pl-0">
-                        <img class="rounded-circle shadow avatar-sm mr-3" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6wQvepXb0gM_Ft1QUOs6UyYJjPOmA-gq5Yw&usqp=CAU">
-                        <div>
-                            <p class="margin-auto fw-400 text-dark-75" data-bind="text: fullName"></p>
-                        </div>
-                    </div>
-                </div>
-                @*<div class="flex-shrink-0 margin-auto pl-2 pr-3">
-                    <div class="d-flex flex-column">
-                        <p class="text-muted text-right fs-13 mb-2" data-bind="text: date"></p>
-                    </div>
-                </div>*@
-            </il>
-        </ul>
-    </div>
+</div>
 @section Scripts
 {
-    <script src="~/lib/knockout/knockout-latest.min.js"></script>
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/chat.js" asp-append-version="true"></script>
 }
 @section Styles{
     <link rel="stylesheet" href="~/css/chat.css"/>

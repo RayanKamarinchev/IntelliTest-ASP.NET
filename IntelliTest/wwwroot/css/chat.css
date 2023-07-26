@@ -452,7 +452,6 @@ img.shadow {
 }
 
 .chat.chat-panel .message-arrow, .chat.chat-panel .message-time {
-    position: absolute;
     right: 5px;
     bottom: 5px;
     padding: 2px 6px;
@@ -462,13 +461,18 @@ img.shadow {
 }
 
 .chat.chat-panel .message-arrow, .chat.chat-panel .message-time {
-    position: absolute;
     right: 5px;
     bottom: 5px;
     padding: 2px 6px;
     font-size: 11px;
     color: #6c757d;
     cursor: pointer;
+}
+.chat.chat-panel .right-chat-message .message-arrow, .chat.chat-panel .right-chat-message .message-time {
+    position: absolute;
+}
+.chat.chat-panel .left-chat-message .message-time {
+    text-align: end;
 }
 
 .chat.chat-panel .message-arrow {
@@ -494,6 +498,7 @@ img.shadow {
     }
 
 .right-chat-message {
+    align-self: end;
     position: relative;
     margin: 0 10px 0 0;
     background: rgb(53,141,241);
@@ -583,7 +588,7 @@ img.shadow {
     transform: scale(0);
 }
 
-.chat.chat-panel .left-chat-message:hover .message-time, .chat.chat-panel .right-chat-message:hover .message-time {
+.chat.chat-panel .right-chat-message:hover .message-time {
     -webkit-transition: all .25s ease 0s;
     transition: all .25s ease 0s;
     transform: scale(0);
@@ -777,3 +782,8 @@ img.shadow {
         .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
             background-color: #a2adb7
         }
+
+#messages {
+    flex-direction: column;
+    display: flex;
+}

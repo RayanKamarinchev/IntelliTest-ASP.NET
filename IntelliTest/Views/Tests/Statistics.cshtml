@@ -31,7 +31,7 @@
             }
             int closedQuestionsIndex = 0;
             int openQuestionsIndex = 0;
-            for (int i = 0; i < Model.QuestionOrder.Count; i++)
+            for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
             {
                 if (Model.QuestionOrder[i] == QuestionType.Closed)
                 {
@@ -114,7 +114,7 @@
             }
         }
         <hr/>
-        <button class="btn blue btn-primary" type="submit" asp-action="Index">Готово</button>
+        <a class="btn blue btn-primary" asp-action="Index">Готово</a>
     </div>
 </div>
 

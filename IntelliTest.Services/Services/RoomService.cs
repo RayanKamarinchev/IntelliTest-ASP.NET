@@ -27,6 +27,25 @@ namespace IntelliTest.Core.Services
             this._hubContext = _hubContext;
         }
 
+        private async Task<ProfileViewModel> GetCurrentUserProfile(string id)
+        {
+            User user = await context.Users.FindAsync(id);
+            return new ProfileViewModel()
+            {
+                AvatarPhotoPath = user.PhotoPath,
+                Name = user.FirstName + " " + user.LastName,
+            };
+        }
+        public async Task<ChatsViewModel> GetChatsViewModel(string userId)
+        {
+            ProfileViewModel profile = await GetCurrentUserProfile(userId);
+            return new ChatsViewModel()
+            {
+                Profile = profile,
+                Rooms = await GetAll(userId)
+            };
+        }
+
         public async Task<IEnumerable<RoomViewModel>> GetAll(string userId)
         {
             var rooms = await context.Rooms

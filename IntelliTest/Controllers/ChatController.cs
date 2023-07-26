@@ -10,10 +10,17 @@ namespace IntelliTest.Controllers
     [Authorize]
     public class ChatController : Controller
     {
-        [HttpGet("Index")]
-        public IActionResult Index()
+        private readonly IRoomService roomService;
+        public ChatController(IRoomService _roomService)
         {
-            return View();
+            roomService = _roomService;
+        }
+
+        [HttpGet("Index")]
+        public async Task<IActionResult> Index()
+        {
+            var model = await roomService.GetChatsViewModel(User.Id());
+            return View(model);
         }
     }
 }

@@ -36,7 +36,7 @@
         @{
             if (User.IsTeacher() && Model.CreatorId == (Guid)TempData.Peek("TeacherId"))
             {
-                <a asp-action="Edit" style="color: white !important;position: absolute;right: 10px;bottom: 10px;" class="text-black body_size btn btn-primary">Редактирай</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" style="color: white !important;position: absolute;right: 10px;bottom: 10px;" class="text-black body_size btn btn-primary">Редактирай</a>
             }
         }
     </div>
