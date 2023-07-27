@@ -1,10 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Infrastructure
 @model IntelliTest.Core.Models.Chat.ChatsViewModel
 @{
     ViewBag.Title = "Чат";
 }
 <script>
     let username = "@Model.Profile.Name";
+    let userId = "@User.Id()";
 </script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
@@ -12,21 +14,7 @@
 <div class="col-12 row" style="height: calc(100vh - 80px); margin-top: 9px" id="chat">
     <div class="col-md-3 col-12 card-stacked">
         <div class="card shadow-line mb-3 chat">
-
-            <div class="p-3 chat-header">
-                <div class="d-flex">
-                    <div class="w-100 d-flex pl-0">
-                        <img class="user-detail-trigger rounded-circle shadow avatar-sm mr-3 chat-profile-picture" src="~/imgs/@Model.Profile.AvatarPhotoPath"/>
-                        <p>@Model.Profile.Name</p>
-                    </div>
-                    <div class="flex-shrink-0 margin-auto">
-                        <a id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal" class="btn btn-sm btn-icon btn-light active text-dark ml-2">
-                            <i class="fa-solid fa-plus"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="chat-search pl-3 pr-3">
+            @*<div class="chat-search pl-3 pr-3">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search a conversation">
                     <div class="input-group-append prepend-white">
@@ -35,7 +23,7 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </div>*@
             @foreach (var room in Model.Rooms)
             {
                 <ul class="chat-user-panel pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll"
@@ -69,7 +57,7 @@
             <span class="m-auto">Please select room to join!</span>
         </div>
         <div class="col-md-9 col-12 card-stacked" id="messagesPanel" style="display: none">
-            <div class="card shadow-line mb-3 chat chat-panel">
+        <div class="card shadow-line mb-3 chat chat-panel" style="height: calc(100vh - 100px);">
                 <div class="p-3 chat-header">
                     <div class="d-flex">
                         <div class="w-100 d-flex pl-0">

@@ -110,15 +110,30 @@ connection.start().catch(function(err) {
 });
 
 connection.on("newMessage",
-    function(messageView) {
-        var isMine = messageView.fromUserName === userName;
+    function (messageView) {
+        debugger;
+        var isMine = messageView.fromFullName === username;
         var message = new ChatMessage(messageView.id,
             messageView.content,
             messageView.timestamp,
             messageView.fromUserName,
             isMine);
         chatMessages.push(message);
-        $(".messages-container").animate({ scrollTop: $(".messages-container")[0].scrollHeight }, 1000);
+        appendMessage(message);
+    });
+connection.on("deleteMessage",
+    function(msgId) {
+        for (var i = 0; i < chatMessages.length; i++) {
+            if (chatMessages[i].id === msgId) {
+                chatMessages.splice(i, 1);
+                break;;
+            }
+        }
+        let messageElement = e;
+        while (!messageElement.classList.contains("right-chat-message")) {
+            messageElement = messageElement.parentNode;
+        }
+        messageElement.remove();
     });
 
 connection.on("onError",
@@ -151,23 +166,13 @@ function joinRoom(roomName) {
     });
 }
 
-sendToRoom = function(event) {
+function sendToRoom(event) {
     if (('keyCode' in event && event.keyCode === 13) || !('keyCode' in event)) {
         let message = messageInputField.value;
         messageInputField.value = "";
         $.ajax({
-            url: `/Messages/Create?room=${joinedRoomName}&content=${message}`,
+            url: `/Messages/Create?room=${encodeURI(joinedRoomName)}&content=${encodeURI(message)}&userId=${userId}`,
             method: 'GET',
-            success: function (data) {
-                let isMine = data.fromFullName !== username;
-                let message = new ChatMessage(data.id,
-                    data.content,
-                    data.timestamp,
-                    data.fromUserName,
-                    isMine);
-                chatMessages.push(message);
-                appendMessage(message);
-            }
         });
     }
 }
@@ -214,7 +219,7 @@ function appendMessage(message) {
     }
 }
 
-function mineMessage(content, timestampFull) {
+function notMineMessage(content, timestampFull) {
     return `
                         <div class="left-chat-message fs-13 mb-2">
                                     <p class="mb-0 mr-3 pr-4">${content}</p>
@@ -225,7 +230,7 @@ function mineMessage(content, timestampFull) {
             `
 }
 
-function notMineMessage(content, timestampFull, id) {
+function mineMessage(content, timestampFull, id) {
     return `
                         <div class="right-chat-message fs-13 mb-2">
                                     <div class="mb-0 mr-3 pr-4">
@@ -252,18 +257,6 @@ function notMineMessage(content, timestampFull, id) {
 
 function deleteMessage(e, id) {
     fetch('/Messages/Delete/' + id);
-    let msgIndex;
-    for (var i = 0; i < chatMessages.length; i++) {
-        if (chatMessages[i].id === id) {
-            chatMessages.splice(i, 1);
-            break;;
-        }
-    }
-    let messageElement = e;
-    while (!messageElement.classList.contains("right-chat-message")) {
-        messageElement = messageElement.parentNode;
-    }
-    messageElement.remove();
 }
 
 //self.uploadFiles = function() {

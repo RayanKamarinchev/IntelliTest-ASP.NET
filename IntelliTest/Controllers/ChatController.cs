@@ -16,7 +16,8 @@ namespace IntelliTest.Controllers
             roomService = _roomService;
         }
 
-        [HttpGet("Index")]
+        [Route("Chat")]
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var model = await roomService.GetChatsViewModel(User.Id());
