@@ -17,5 +17,9 @@ namespace IntelliTest.Infrastructure
         {
             return user.IsInRole("Student");
         }
+        public static bool IsAdmin(this ClaimsPrincipal user)
+        {
+            return user.IsInRole("Admin");
+        }
     }
 }

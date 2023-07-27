@@ -441,5 +441,13 @@ namespace IntelliTest.Core.Services
 
         }
 
+        public async Task<QueryModel<TestViewModel>> GetAllAdmin(QueryModel<TestViewModel> query)
+        {
+            var testQuery = context.Tests
+                                   .Include(t => t.TestResults)
+                                   .Include(t => t.TestLikes)
+                                   .Where(t => !t.IsDeleted);
+            return await Filter(testQuery, query, null, null);
+        }
     }
 }

@@ -44,6 +44,10 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
         {
+            if (User.IsAdmin())
+            {
+                return RedirectToAction("Index", "Tests", new { area = "Admin" });
+            }
             if (cache.TryGetValue("tests", out QueryModel<TestViewModel>? model) && false)
             {
             }

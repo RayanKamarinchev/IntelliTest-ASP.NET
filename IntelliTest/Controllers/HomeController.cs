@@ -1,16 +1,16 @@
-﻿using System.Security.Claims;
-using IntelliTest.Core.Contracts;
-using IntelliTest.Core.Models;
-using IntelliTest.Core.Services;
-using IntelliTest.Infrastructure;
+﻿using IntelliTest.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntelliTest.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
             return View();
         }
         [Route("/Error/{statusCode}")]

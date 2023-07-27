@@ -1,0 +1,60 @@
+﻿@model LessonViewModel
+@{
+    string ShowTime()
+    {
+        var span = DateTime.Now - Model.CreatedOn;
+        if (span.TotalMinutes<60)
+        {
+            return span.Minutes + " min";
+        }
+        if (span.TotalHours<24)
+        {
+            return span.Hours + " hours";
+        }
+        else
+        {
+            return span.Days + " days";
+        }
+    }
+}
+<div class="align-items-center" style="flex-direction: row;
+                                       display: flex;">
+    <div style="width: 70%">
+        <h2>
+            <a asp-action="Read" asp-route-id="@Model.Id" class="text-primary fs80">@Model.Title</a>
+        </h2>
+        <p style="color: rgba(0, 0, 0, 0.6)" class="fs90">
+            <span class="body_size">Posted</span>
+
+            <a class="text-black body_size" href="#">@(ShowTime())</a>
+            <span class="body_size">ago by</span>
+            <a class="text-black body_size">@Model.CreatorName</a>
+        </p>
+        <p style="color: rgba(0, 0, 0, 0.6)" class="fs90">училище: @Model.School</p>
+        <a class="text-black body_size">#@Model.Subject</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" style="color: white !important;position: absolute;right: 10px;bottom: 10px;" class="text-black body_size btn btn-primary">Редактирай</a>
+    </div>
+    <div class="widthMax">
+        <div class="row text-center op-7" style="height: 80px">
+            <div class="px-1 lessonProp" style="width: 100px">
+                <div class="heartClick" onClick="onLike(this)" id="@Model.Id"></div>
+                <div class="heart" style="@(Model.IsLiked ? "background-position: -2800px 0":"")" id="@Model.Id"></div>
+                <span class="d-block body_size" style="width: 100px">@Model.Likes<span class="iconText"> Likes</span></span>
+            </div>
+            <div style="width: calc(100% - 100px); padding: 0 !important;" class="row text-center op-7">
+                <div class="col px-1 lessonProp">
+                    <i class="fa-regular fa-comment"></i>
+                    <span class="d-block body_size">2<span class="iconText"> Replies</span></span>
+                </div>
+                <div class="col px-1 lessonProp lessImportant">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <span class="d-block body_size">@Model.Readers<span class="iconText"> Readers</span></span>
+                </div>
+                <div class="col px-1 lessonProp lessImportant">
+                    <i class="fa-regular fa-clock"></i>
+                    <span class="d-block body_size">@Math.Round(Model.Content.Split(" ").Length/150.0+1)<span class="iconText"> min</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -25,6 +25,10 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
         {
+            if (User.IsAdmin())
+            {
+                return RedirectToAction("Index", "Lessons", new { area = "Admin" });
+            }
             if (cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model))
             {
             }
@@ -48,11 +52,11 @@ namespace IntelliTest.Controllers
         [Route("Read/{Id}")]
         public async Task<IActionResult> Read(Guid id)
         {
-            if (TempData.Peek("TeacherId") is null)
+            if (TempData.Peek("TeacherId") is null && !User.IsAdmin())
             {
                 return RedirectToAction("Logout", "User");
             }
-            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
+            if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 return BadRequest();
             }
@@ -65,7 +69,7 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            if (!User.IsTeacher())
+            if (!User.IsTeacher() && !User.IsAdmin())
             {
                 return Unauthorized();
             }
@@ -77,18 +81,18 @@ namespace IntelliTest.Controllers
         [Route("Lessons/Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id, EditLessonViewModel model)
         {
-            if (!User.IsTeacher())
+            if (!User.IsTeacher() && !User.IsAdmin())
             {
                 return RedirectToAction("Read", new { id = id });
             }
 
-            if (model == null)
+            if (model is null || model.Title is null)
             {
-                if (TempData.Peek("TeacherId") is null)
+                if (TempData.Peek("TeacherId") is null && !User.IsAdmin())
                 {
                     return RedirectToAction("Logout", "User");
                 }
-                if (!await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
+                if (!User.IsAdmin() && !await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
                 {
                     return RedirectToAction("Read", new { id = id });
                 }
@@ -120,38 +124,38 @@ namespace IntelliTest.Controllers
             {
                 return Content(string.Join('\n', ModelState.Values.SelectMany(v => v.Errors).Select(e=>e.ErrorMessage)));
             }
-            if (!User.IsTeacher())
+            if (!User.IsTeacher() && !User.IsAdmin())
             {
                 return Unauthorized();
             }
 
-            if (TempData.Peek("TeacherId") is null)
+            if (TempData.Peek("TeacherId") is null && !User.IsAdmin())
             {
                 return RedirectToAction("Logout", "User");
             }
-            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
+            if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 await lessonService.Create(model, (Guid)TempData.Peek("TeacherId"));
                 return RedirectToAction("Index");
             }
 
-            if (!await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
+            if (!User.IsAdmin() && !await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
             {
                 return NotFound();
             }
 
             await lessonService.Edit(id, model);
-            return Content($"/Lessons/Read/{id}");
+            return Content($"/Read/{id}");
         }
 
         [HttpGet]
         public async Task<IActionResult> Like(Guid lessonId, string userId)
         {
-            if (TempData.Peek("TeacherId") is null)
+            if (!User.IsAdmin() && TempData.Peek("TeacherId") is null)
             {
                 return RedirectToAction("Logout", "User");
             }
-            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
+            if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
             {
                 return NotFound();
             }
@@ -161,11 +165,11 @@ namespace IntelliTest.Controllers
         [HttpGet]
         public async Task<IActionResult> Unlike(Guid lessonId, string userId)
         {
-            if (TempData.Peek("TeacherId") is null)
+            if (!User.IsAdmin() && TempData.Peek("TeacherId") is null)
             {
                 return RedirectToAction("Logout", "User");
             }
-            if (!await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
+            if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), lessonId))
             {
                 return NotFound();
             }

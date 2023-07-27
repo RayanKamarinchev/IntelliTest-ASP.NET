@@ -12,13 +12,13 @@
     <div class="row">
         <h2 style="text-align: center;" id="lessonHeading">Уроци</h2>
         <div class="col-lg-12 mb-3">
-            <partial name="Filters" model="Model.Filters"/>
+            <partial name="~/Views/Lessons/Filters.cshtml" model="Model.Filters"/>
             @if (Model.Items.Count() != 0)
             {
                 <div class="questBoxHover questBox card py-3 px-3 mb-3 border-top-0 border-bottom-0 widthMax">
                     @foreach (var lesson in Model.Items)
                     {
-                        <partial name="~/Views/Lessons/LessonPartialView.cshtml" model="lesson"/>
+                        <partial name="~/Areas/Admin/Views/Lessons/LessonPartialView.cshtml" model="lesson"/>
                     }
                 </div>
             }
@@ -61,12 +61,6 @@
                 </ul>
             </nav>
         </div>
-        @if (User.IsTeacher())
-        {
-            <div class="floating-container">
-                <a class="floating-button" asp-action="Create">+</a>
-            </div>
-        }
     </div>
 </div>
 @section Scripts

@@ -1,0 +1,76 @@
+﻿@model QueryModel<TestViewModel>
+@{
+    ViewBag.Title = "Тестове";
+    int maxPage = (int)Math.Ceiling((double)Model.TotalItemsCount /
+                               Model.ItemsPerPage);
+    int paginationStart = Model.CurrentPage - (int)Math.Max(0, Math.Min(2, maxPage - 1) - maxPage + Model.CurrentPage);
+}
+
+<div>
+    <main class="cd-main-content">
+        <section class="cd-gallery">
+            @if (TempData["message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["message"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" , aria-label="Close">
+                        <span aria-hIdden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            <ul style="width: 100%">
+                @foreach (var test in Model.Items)
+                {
+                    <partial name="TestPartialView" for="@test" />
+                }
+            </ul>
+        </section>
+        <nav aria-label="Page navigation example" style="position: absolute; bottom: 20px; width: 100%">
+            <ul class="pagination justify-content-center" style="font-size: 1.5rem; position: relative; z-index: -1">
+                <li class="page-item disabled">
+                    <a class="page-link @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+                       asp-action="Index"
+                       asp-route-currentPage="@(Model.CurrentPage - 1)"
+                       asp-route-Subject="@Model.Filters.Subject"
+                       asp-route-Grade="@Model.Filters.Grade"
+                       asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                       asp-route-Sorting="@(Model.Filters.Sorting)">Previous</a>
+                </li>
+                @for (int i = paginationStart; i <= maxPage && i - paginationStart <= 3; i++)
+                {
+                    <li class="page-item">
+                        <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)"
+                           asp-action="Index"
+                           asp-route-currentPage="@i"
+                           asp-route-Subject="@Model.Filters.Subject"
+                           asp-route-Grade="@Model.Filters.Grade"
+                           asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                           asp-route-Sorting="@(Model.Filters.Sorting)">@i</a>
+                    </li>
+                }
+                <li class="page-item disabled">
+                    <a class="page-link @(Model.CurrentPage == maxPage ? "disabled" : string.Empty)"
+                       asp-action="Index"
+                       asp-route-currentPage="@(Model.CurrentPage + 1)"
+                       asp-route-Subject="@Model.Filters.Subject"
+                       asp-route-Grade="@Model.Filters.Grade"
+                       asp-route-SearchTerm="@Model.Filters.SearchTerm"
+                       asp-route-Sorting="@(Model.Filters.Sorting)">Next</a>
+                </li>
+            </ul>
+        </nav>
+        <partial model="Model.Filters" name="FilterMenuPartialView" />
+    </main>
+</div>
+@if (Model.Items.Count() == 0)
+{
+    <div class="cd-fail-message">Няма резултати</div>
+}
+@section Scripts
+    {
+    <script src="~/js/filter.js"></script>
+    <script>
+        OnTrigger();
+        $("#main").css("margin-bottom", "0px");
+    </script>
+}

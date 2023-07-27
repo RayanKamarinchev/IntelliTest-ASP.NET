@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using IntelliTest.Core.Models.Mails;
 using System.Text.Json.Serialization;
 using IntelliTest.Core.Hubs;
+using IntelliTest.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionString"];
@@ -101,6 +102,7 @@ using var scope = app.Services.CreateScope();
 var roleManager = (RoleManager<IdentityRole>)scope.ServiceProvider.GetService(typeof(RoleManager<IdentityRole>));
 string[] roleNames = { "Teacher", "Student" };
 IdentityResult roleResult;
+app.SeedAdmin();
 
 foreach (var roleName in roleNames)
 {
@@ -135,10 +137,18 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{Id?}");
-app.MapRazorPages();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "Areas",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+    );
+    endpoints.MapControllerRoute(
+        name: "Tests",
+        pattern: "{controller}/{action}/{id?}");
+    endpoints.MapDefaultControllerRoute();
+    endpoints.MapRazorPages();
+});
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<TestEditHub>("/testEditHub");
 

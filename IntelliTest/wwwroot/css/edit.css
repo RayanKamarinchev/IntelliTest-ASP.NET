@@ -410,7 +410,7 @@ textarea { border-radius: 5px; }
 .propMenu {
     overflow: hidden;
     width: 20%;
-    min-height: 400px;
+    /*min-height: 400px;*/
     position: sticky;
     left: 3%;
     top: 10%;
@@ -421,7 +421,7 @@ textarea { border-radius: 5px; }
     user-select: none;
 }
 
-.propMenu > * > * { margin-bottom: 24px; }
+.propMenu > * > * > * { margin-bottom: 0; }
 
 .propMenu-description { padding: 10px; }
 

@@ -4,7 +4,7 @@
 }
 <div class="editMain d-flex" style="flex-direction: row;align-items: start">
     <div class="propMenu" style="margin-bottom: 15px;">
-        <img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixId=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">
+        @*<img src="https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?ixlib=rb-4.0.3&ixId=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80" alt="">*@
         <div class="propMenu-description">
             <div class="form-group py-2">
                 <label asp-for="School"></label>
@@ -20,19 +20,17 @@
             </div>
         </div>
     </div>
-    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem;" class="questBox lessonBox">
-        <div class="editor-container">
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem; z-index: 0" class="questBox lessonBox">
                     <div class="editor lessonEditor">
                         <h1 data-placeholder="Напишете заглавието си">@Model.Title</h1>
                         <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
                     </div>
-                </div>
         <br/>
-            <div style="white-space:pre" id="validation" class="small text-danger">
+            <div id="validation" class="small text-danger">
                
             </div>
             <div class="button-container">
-                <button class="btn-hover color-2" onclick="Submit()">Създай</button>
+                <button class="btn-hover color-2" onclick="Submit()">Готово</button>
             </div>
     </div>
 </div>
@@ -42,12 +40,11 @@
     <script src="~/js/ckeditor.js" asp-append-version="true"></script>
     <script>BalloonBlockEditor
 				.create( document.querySelector( '.editor' ), {
-
-					licenseKey: '',
+                    licenseKey: '',
 				} )
 				.then( editor => {
 					window.editor = editor;
-                    editor.setData(@Model.HtmlContent);
+                    editor.setData('@Html.Raw(Model.HtmlContent)');
 				} )
                     let validationSpan = document.getElementById("validation");
                     function Submit(){
@@ -64,7 +61,9 @@
                                 url: `@Url.Action("SubmitEdit", "Lessons", new { id = Model.Id })?title=${titleText}&content=${contentText}&htmlContent=${encodeURIComponent(htmlContentText)}
                         &school=${schoolText}&subject=${subjectText}&grade=${grade}`,
                           success: function(res){
-                              console.log(res);
+                            if (res.startsWith("/Read/")) {
+                                window.location.href = res;
+                            }
                               validationSpan.textContent = res;
                           },
                           error: function(er){

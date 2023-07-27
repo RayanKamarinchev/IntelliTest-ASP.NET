@@ -181,5 +181,17 @@ namespace IntelliTest.Core.Services
                 Id = id
             }).ToList();
         }
+
+        public async Task<IEnumerable<ClassViewModel>> GetAllAdmin()
+        {
+            var query = context.Classes
+                               .Include(c => c.Students)
+                               .Include(c => c.Teacher)
+                               .ThenInclude(t => t.User)
+                               .Where(c => !c.IsDeleted);
+
+            return await query.Select(x => ToViewModel(x)).ToListAsync();
+        }
+
     }
 }

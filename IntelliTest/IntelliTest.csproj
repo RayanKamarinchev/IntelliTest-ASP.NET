@@ -99,11 +99,11 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Update="Views\_ViewImports.cshtml">
+    <Content Update="Areas\Admin\Views\_ViewImports.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Update="Views\_ViewStart.cshtml">
+    <Content Update="Areas\Admin\Views\_ViewStart.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -314,11 +314,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\" />
     <Folder Include="wwwroot\imgs\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Areas\Admin\Views\Home\Index.cshtml" />
     <None Include="wwwroot\js\chat.js" />
     <None Include="wwwroot\js\lessonsLike.js" />
   </ItemGroup>

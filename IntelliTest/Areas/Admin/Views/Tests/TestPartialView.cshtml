@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using IntelliTest.Infrastructure
+@model TestViewModel
+<div class="card card-margin">
+    <div class="card-header no-border">
+        <h6 class="card-title">@Model.Title - @Model.Grade</h6>
+    </div>
+    <div class="card-body pt-0">
+        <div class="widget-49">
+            <a class="btn circle test-trash" asp-action="Delete" asp-controller="Tests" asp-route-id="@Model.Id">
+                <i class="fa-solid fa-trash"></i>
+            </a>
+            <div class="widget-49-title-wrapper">
+                <div class="widget-49-date-primary">
+                    <span class="widget-49-date-day">@($"{Model.AverageScore:f2}")</span>
+                    <span class="widget-49-date-month">score</span>
+                </div>
+                <div class="widget-49-meeting-info">
+                    <span class="widget-49-pro-title">@Model.Subject.ToString()</span>
+                    <span class="widget-49-meeting-time">@Model.CreatedOn.ToShortDateString()</span>
+                </div>
+            </div>
+            <ol class="widget-49-meeting-points">
+                <li class="widget-49-meeting-item">
+                    <span>Въпроси: <strong>@(Model.OpenQuestions.Count() + Model.ClosedQuestions.Count())</strong></span>
+                </li>
+                <li class="widget-49-meeting-item">
+                    <span>Време: <strong>@Model.Time мин</strong></span>
+                </li>
+                <li class="widget-49-meeting-item">
+                    <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
+                </li>
+            </ol>
+            <div class="widget-49-meeting-action d-flex justify-content-end">
+                <a asp-action="Statistics" asp-route-testId="@Model.Id"
+                   class="btn btn-sm btn-primary back-col left-btn">
+                    Статистика
+                </a>
+                <a asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
+                   class="btn btn-sm btn-primary back-col">
+                    Редактирай
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

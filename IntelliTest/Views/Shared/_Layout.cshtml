@@ -27,39 +27,6 @@
         const colors = ["#4797f2", "#ECA400", "#47f2a2", "#a247f2", "#D81159", "#493B2A", "#BF3100"]
         const gradeColors = ["#2CE574", "#CDF03A", "#FFE500", "#FF9600", "#FF3924"]
         const gradeContrastColors = ["#26C282","#309CD7", "#F6CC17", "#F57455", "#EB4E5D"]
-        window.onload=function(){
-            let ctx3 = document.getElementById("pie-chart");
-            var data3 = [{
-                data: [3, 1, 4, 12, 6],
-                backgroundColor: gradeContrastColors.slice(0, 5).reverse(),
-                borderColor: "#fff"
-            }];
-            var options = {
-                plugins: {
-                    datalabels: {
-                        formatter: (value, ctx) => {
-                            let datasets = ctx.chart.data.datasets;
-                            if (datasets.indexOf(ctx.dataset) === datasets.length - 1) {
-                                let sum = datasets[0].data.reduce((a, b) => a + b, 0);
-                                let percentage = Math.round((value / sum) * 100) + '%';
-                                return ("lol", percentage);
-                            } else {
-                                return percentage;
-                            }
-                        },
-                        color: '#fff',
-                    }
-                }
-            };
-            var myChart = new Chart(ctx3, {
-                type: 'pie',
-                data: {
-                    labels: ["Слаб", "Мн. Добър", "Добър", "Среден", "Отличен"],
-                    datasets: data3
-                },
-                options: options
-            });
-        }
 
     </script>
 </head>

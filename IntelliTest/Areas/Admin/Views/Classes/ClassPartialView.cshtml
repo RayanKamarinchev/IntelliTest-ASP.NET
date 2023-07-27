@@ -1,5 +1,4 @@
-﻿@using IntelliTest.Infrastructure
-@model ClassViewModel
+﻿@model ClassViewModel
 @{
     ViewBag.Title = "User Profile";
     string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
@@ -16,10 +15,7 @@
             <div class="card-info" style="width: 400px; background-color: white">
                 <img style="max-width: None" src="@src" alt="user" class="profile-photo-lg">
                 <div class="friend-info">
-                    @if (User.IsTeacher())
-                    {
-                            <a class="pull-right btn btn-secondary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-                    }
+                    <a class="pull-right btn btn-secondary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
                     <h5>@Model.Name</h5>
                     <p>@Model.Subject</p>
                 </div>

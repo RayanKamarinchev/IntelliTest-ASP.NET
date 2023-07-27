@@ -1,12 +1,8 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Classes;
 using IntelliTest.Core.Models.Users;
-using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace IntelliTest.Controllers
@@ -30,17 +26,19 @@ namespace IntelliTest.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            if (false && cache.TryGetValue("tests", out IEnumerable<ClassViewModel>? model))
+            if (User.IsAdmin())
+            {
+                return RedirectToAction("Index", "Classes", new { area = "Admin" });
+            }
+            if (cache.TryGetValue("classes", out IEnumerable<ClassViewModel>? model))
             {
             }
             else
             {
                 model = await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher());
-                //var cacheEntryOptions = new DistributedCacheEntryOptions()
-                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-                cache.SetAsync("tests", model, cacheEntryOptions);
+                cache.SetAsync("classes", model, cacheEntryOptions);
             }
             return View(model);
         }

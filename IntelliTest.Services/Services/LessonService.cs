@@ -303,5 +303,18 @@ namespace IntelliTest.Core.Services
             }
             return teacher.Lessons.Any(t => t.Id == lessonId);
         }
+
+        public async Task<QueryModel<LessonViewModel>> GetAllAdmin(QueryModel<LessonViewModel> query)
+        {
+            var lessonsQuery = context.Lessons
+                                      .Where(l => !l.IsDeleted)
+                                      .Include(l => l.LessonLikes)
+                                      .Include(l => l.ClosedQuestions)
+                                      .Include(l => l.OpenQuestions)
+                                      .Include(l => l.Reads)
+                                      .Include(l => l.Creator)
+                                      .ThenInclude(c => c.User);
+            return await Filter(lessonsQuery, query, null);
+        }
     }
 }

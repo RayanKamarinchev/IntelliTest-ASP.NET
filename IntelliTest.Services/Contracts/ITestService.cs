@@ -23,5 +23,7 @@ namespace IntelliTest.Core.Contracts
         public Task<QueryModel<TestViewModel>> Filter(IQueryable<Test> testQuery, QueryModel<TestViewModel> query, Guid? teacherId, Guid? studentId);
         public Task<QueryModel<TestViewModel>> FilterMine(IEnumerable<Test> testQuery, QueryModel<TestViewModel> query);
         public Task<bool> IsTestCreator(Guid testId, Guid teacherId);
+
+        Task<QueryModel<TestViewModel>> GetAllAdmin(QueryModel<TestViewModel> query);
     }
 }

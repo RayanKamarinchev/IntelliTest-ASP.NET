@@ -29,5 +29,7 @@ namespace IntelliTest.Core.Contracts
                                                         QueryModel<LessonViewModel> query, string userId);
 
         public Task<bool> IsLessonCreator(Guid lessonId, Guid teacherId);
+
+        public Task<QueryModel<LessonViewModel>> GetAllAdmin(QueryModel<LessonViewModel> query);
     }
 }
