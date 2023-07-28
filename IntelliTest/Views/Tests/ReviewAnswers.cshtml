@@ -8,7 +8,7 @@
         @{
             int closedQuestionIndex = 0;
             int openQuestionIndex = 0;
-            for (int i = 0; i < Model.QuestionOrder.Count; i++)
+            for (int i = 0; i < Model.OpenQuestions.Count + Model.ClosedQuestions.Count; i++)
             {
                 if (Model.QuestionOrder[i] == QuestionType.Closed)
                 {

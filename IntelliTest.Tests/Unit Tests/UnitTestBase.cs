@@ -69,6 +69,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 PhotoPath = ""
             };
             data.Users.Add(userStudent);
+            data.Users.Add(bonusUser);
             var teacher = new Teacher()
             {
                 User = userTeacher,

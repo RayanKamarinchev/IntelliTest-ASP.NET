@@ -32,33 +32,6 @@ namespace IntelliTest.Core.Hubs
                 return Context.User.Identity.Name;
             }
         }
-        public async Task SendPrivate(string receiverName, string message)
-        {
-            if (_ConnectionsMap.TryGetValue(receiverName, out string userId))
-            {
-                // Who is the sender;
-
-                var sender = _Connections.Where(u => u.UserName == IdentityName).First();
-
-                if (!string.IsNullOrEmpty(message.Trim()))
-                {
-                    // Build the message
-                    var messageViewModel = new MessageViewModel()
-                    {
-                        Content = Regex.Replace(message, @"<.*?>", string.Empty),
-                        FromUserName = sender.UserName,
-                        FromFullName = sender.FullName,
-                        Avatar = sender.Avatar,
-                        Room = "",
-                        Timestamp = DateTime.Now
-                    };
-
-                    // Send the message
-                    await Clients.Client(userId).SendAsync("newMessage", messageViewModel);
-                    await Clients.Caller.SendAsync("newMessage", messageViewModel);
-                }
-            }
-        }
 
         public async Task Join(string roomName)
         {

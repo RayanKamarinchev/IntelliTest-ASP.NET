@@ -23,6 +23,43 @@ namespace IntelliTest.Tests.Unit_Tests
             roomService = new RoomService(data, null);
 
         [Test]
+        public async Task GetChatsViewModel_Correct()
+        {
+            var result = await roomService.GetChatsViewModel("StudentUser");
+            ChatsViewModel expected = new ChatsViewModel()
+            {
+                Profile = new ProfileViewModel()
+                {
+                    Name = "Pesho Peshov",
+                    AvatarPhotoPath = ""
+                },
+                Rooms = new List<RoomViewModel>()
+                {
+                    new RoomViewModel()
+                    {
+                        Id = id,
+                        LastMessage = "Hello",
+                        Name = "Class room",
+                        TimeStamp = "05/21/2023"
+                    }
+                }
+            };
+
+            string json1 = JsonConvert.SerializeObject(expected, Formatting.Indented,
+                                                       new JsonSerializerSettings()
+                                                       {
+                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling
+                                                                                             .Ignore
+                                                       });
+            string json2 = JsonConvert.SerializeObject(result, Formatting.Indented,
+                                                       new JsonSerializerSettings()
+                                                       {
+                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                                                       });
+            Assert.AreEqual(json1, json2);
+        }
+
+        [Test]
         public async Task GetAll_Correct()
         {
             var firstRoom = (await roomService.GetAll("StudentUser")).FirstOrDefault();
