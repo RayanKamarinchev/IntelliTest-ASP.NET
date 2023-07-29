@@ -270,8 +270,9 @@ namespace IntelliTest.Core.Services
             return AddLessonCountProperty(lessons, userId);
         }
 
-        public Task<bool> ExistsById(Guid teacherId,Guid lessonId)
+        public Task<bool> ExistsById(Guid? teacherId,Guid lessonId)
         {
+
             return context.Lessons
                           .Where(l => !l.IsDeleted && (!l.IsPrivate || l.CreatorId == teacherId))
                           .AnyAsync(l => l.Id == lessonId);

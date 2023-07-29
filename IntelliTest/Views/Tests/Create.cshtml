@@ -3,6 +3,7 @@
 @model TestViewModel
 @{
     ViewBag.Title = "Creating test";
+    var classes = (string[])TempData.Peek("Classes");
 }
 <div class="row">
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
@@ -24,18 +25,17 @@
                 </div>
 
                 <ul class="list-items" style="position: absolute; width: calc(50% - 16px)">
-                    @for (int i = 0; i < ((List<string>)TempData.Peek("Classes")).Count(); i++)
+                    @for (int i = 0; i < classes.Count(); i++)
                     {
                         <li class="item">
                             <span class="checkbox">
                                 <i class="fa-solid fa-check check-icon"></i>
                                 <input type="checkbox" asp-for="Selected[i]" style="display: none"/>
                             </span>
-                            <span class="item-text">@(((List<string>)TempData.Peek("Classes"))[i])</span>
+                            <span class="item-text">@(classes[i])</span>
                         </li>
                     }
                 </ul>
-                <span asp-validation-for="Subject" class="small text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Title"></label>

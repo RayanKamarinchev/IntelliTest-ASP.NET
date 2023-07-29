@@ -50,7 +50,6 @@ function step() {
     setTimeout(step, Math.max(0, interval - dt));
 }
 document.addEventListener("visibilitychange", () => {
-    debugger;
     if (document.hidden && !submitted) {
         if (windowsChangedStartTime == null) {
             windowsChangedStartTime = Date.now();

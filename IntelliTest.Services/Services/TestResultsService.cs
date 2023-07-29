@@ -39,7 +39,7 @@ namespace IntelliTest.Core.Services
 
         private List<QuestionType> ProcessQuestionOrder(string questionOrderText)
         {
-            return questionOrderText.Split("|")
+            return questionOrderText.Split("|", StringSplitOptions.RemoveEmptyEntries)
                              .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
                              .ToList();
         }

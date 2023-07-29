@@ -14,7 +14,7 @@ namespace IntelliTest.Core.Contracts
         Task<QueryModel<LessonViewModel>> GetAll(Guid? teacherId, QueryModel<LessonViewModel> query, string userId);
         Task<LessonViewModel?>? GetById(Guid lessonId);
         Task<LessonViewModel?>? GetByName(string name);
-        Task<bool> ExistsById(Guid teacherId, Guid lessonId);
+        Task<bool> ExistsById(Guid? teacherId, Guid lessonId);
         Task Edit(Guid lessonId, EditLessonViewModel model);
         EditLessonViewModel ToEdit(LessonViewModel model);
         Task Create(EditLessonViewModel model, Guid teacherId);

@@ -52,11 +52,12 @@ namespace IntelliTest.Controllers
         [Route("Read/{Id}")]
         public async Task<IActionResult> Read(Guid id)
         {
-            if (TempData.Peek("TeacherId") is null && !User.IsAdmin())
+            Guid? teacherId = null;
+            if (TempData.Peek("TeacherId") is not null)
             {
-                return RedirectToAction("Logout", "User");
+                teacherId = (Guid)TempData.Peek("TeacherId");
             }
-            if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
+            if (!User.IsAdmin() && !await lessonService.ExistsById(teacherId, id))
             {
                 return BadRequest();
             }
@@ -81,7 +82,7 @@ namespace IntelliTest.Controllers
         [Route("Lessons/Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id, EditLessonViewModel model)
         {
-            if (!User.IsTeacher() && !User.IsAdmin())
+            if (!User.IsTeacher() || User.IsAdmin())
             {
                 return RedirectToAction("Read", new { id = id });
             }
@@ -92,12 +93,27 @@ namespace IntelliTest.Controllers
                 {
                     return RedirectToAction("Logout", "User");
                 }
-                if (!User.IsAdmin() && !await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))
+
+                bool isLessonCreator = await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId"));
+                if (!User.IsAdmin() && !(isLessonCreator || id == Guid.Empty))
                 {
                     return RedirectToAction("Read", new { id = id });
                 }
 
-                model = lessonService.ToEdit(await lessonService.GetById(id));
+                var lessonDb = await lessonService.GetById(id);
+                if (lessonDb is null)
+                {
+                    lessonDb = new LessonViewModel()
+                    {
+                        Content = "",
+                        Title = "",
+                        School = "",
+                        Grade = 0,
+                        Id = Guid.Empty,
+                        HtmlContent = ""
+                    };
+                }
+                model = lessonService.ToEdit(lessonDb);
             }
             return View(model);
         }
@@ -136,7 +152,7 @@ namespace IntelliTest.Controllers
             if (!User.IsAdmin() && !await lessonService.ExistsById((Guid)TempData.Peek("TeacherId"), id))
             {
                 await lessonService.Create(model, (Guid)TempData.Peek("TeacherId"));
-                return RedirectToAction("Index");
+                return Content("/Lessons/Index");
             }
 
             if (!User.IsAdmin() && !await lessonService.IsLessonCreator(id, (Guid)TempData.Peek("TeacherId")))

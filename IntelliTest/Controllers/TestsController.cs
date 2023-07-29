@@ -160,7 +160,7 @@ namespace IntelliTest.Controllers
         {
             TempData["Classes"] = (await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher()))
                                   .Select(c => c.Name)
-                                  .ToList();
+                                  .ToArray();
             return View("Create", new TestViewModel());
         }
 
@@ -178,21 +178,21 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            string[] allClasses = (string[])TempData["Classes"];
-            string[] classNames = allClasses.Where((c, i) => model.Selected[i]).ToArray();
+            string[] classNames = (string[])TempData.Peek("Classes");
+            string[] selectedClasses = classNames.Where((c, i) => model.Selected[i]).ToArray();
 
             if (TempData.Peek(TeacherId) is null)
             {
                 return RedirectToAction("Logout", "User");
             }
 
-            Guid id = await testService.Create(model, (Guid)TempData.Peek(TeacherId), classNames);
+            Guid id = await testService.Create(model, (Guid)TempData.Peek(TeacherId), selectedClasses);
             return RedirectToAction("Edit", new {id = id});
         }
 
         [HttpGet]
         [Authorize(Roles = "Student")]
-        [Route("Take/{testId}")]
+        [Route("Tests/Take/{testId}")]
         public async Task<IActionResult> Take(Guid testId)
         { 
             if (!await testService.ExistsbyId(testId))
@@ -215,7 +215,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpPost]
-        [Route("Take/{testId}")]
+        [Route("Tests/Take/{testId}")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> Take(TestSubmitViewModel model, Guid testId)
         {

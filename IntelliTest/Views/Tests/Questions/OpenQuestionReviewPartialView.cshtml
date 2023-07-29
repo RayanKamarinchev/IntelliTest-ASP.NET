@@ -1,4 +1,11 @@
 ﻿@model OpenQuestionReviewViewModel
+@{
+    string studentsAnswer = Model.Answer;
+    if (string.IsNullOrWhiteSpace(studentsAnswer) || string.IsNullOrEmpty(studentsAnswer))
+    {
+        studentsAnswer = "(няма отговор)";
+    }
+}
 <div class="questBox">
     <p class="questionScore">@($"{Model.Score:f2}")/@Model.MaxScore</p>
     <input value="@Model.Id" asp-for="Id" style="display: none"/>
@@ -25,7 +32,7 @@
                     </div>
                     <div class="icon-answer option">
                         <i class="fa-solid fa-square-xmark" style="color: #BF3100;"></i>
-                        <p>@Model.Answer</p>
+                        <p>studentsAnswer</p>
                     </div>
                 }
             }

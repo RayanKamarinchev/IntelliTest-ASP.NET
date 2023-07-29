@@ -33,8 +33,9 @@ namespace IntelliTest.Core.Models.Tests
         public decimal AverageScore { get; set; }
         public int MaxScore { get; set; }
         public int Students { get; set; }
-        public string QuestionOrder { get; set; }
+        public string? QuestionOrder { get; set; }
         [Required]
+        [Range(1, 600)]
         [Display(Name = "Време (в минути)")]
         public int Time { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -42,7 +43,7 @@ namespace IntelliTest.Core.Models.Tests
         public IList<ClosedQuestion>? ClosedQuestions { get; set; }
         public IList<bool> Selected { get; set; }
         public bool MultiSubmit { get; set; }
-        public string PhotoPath { get; set; }
+        public string? PhotoPath { get; set; }
         public bool IsOwner { get; set; }
         public bool IsTestTaken { get; set; }
     }

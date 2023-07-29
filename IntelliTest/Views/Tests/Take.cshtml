@@ -11,7 +11,7 @@
         <div class="timer">
             <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>
         </div>
-        <form method="post" name="test">
+        <form method="post" name="test" asp-action="Take">
             @{
                 int closedQuestionsIndex = 0;
                 int openQuestionsIndex = 0;
