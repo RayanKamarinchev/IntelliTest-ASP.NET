@@ -93,7 +93,7 @@ namespace IntelliTest.Core.Services
                                 .Select(x=>ToViewModel(x));
             var tests =await test.ToListAsync();
             foreach (var t in tests)
-             {
+            {
                  t.IsOwner = false;
                  if (teacherId is not null)
                      t.IsOwner = await IsTestCreator(t.Id, teacherId.Value);

@@ -61,9 +61,18 @@
         </li>
     </ul>
     <div class="tab-content pt-3">
+        @if (User.IsTeacher())
+        {
         <div class="tab-pane active" style="color: black !important" id="panels">
             <partial name="Panels/UserInfoPartialView"/>
         </div>
+        }
+        else if (User.IsStudent())
+        {
+        <div class="tab-pane active" style="color: black !important; display: flex" id="panels">
+            <partial name="Panels/UserInfoPartialView"/>
+        </div>
+        }
     </div>
 </div>
 <script>

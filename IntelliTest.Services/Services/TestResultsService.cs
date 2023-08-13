@@ -356,6 +356,7 @@ namespace IntelliTest.Core.Services
         public async Task<IEnumerable<TestResultsViewModel>> GetStudentsTestsResults(Guid studentId)
         {
             return await context.TestResults
+                                .Include(tr=>tr.Test)
                                 .Where(t => t.StudentId == studentId)
                                 .Select(t => ToResultsViewModel(t))
                                 .ToListAsync();

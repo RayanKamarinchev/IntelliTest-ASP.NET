@@ -82,7 +82,6 @@ namespace IntelliTest.Core.Hubs
                 }
 
                 string decodedText = tikToken.Decode(part.Take(i).ToList());
-                //string text = "Generate questions \"Q\" in bulgarian and answers \"A\" only on the text and only in bulgarian . " + decodedText;
                 string text =
                     "Generate questions \"Q\" and answers \"A\" only in Bulgarian, focusing exclusively on the content of the following text: '''" + decodedText + "'''.Ensure the questions and answers can be found in the text. Generate " + questionCount + " questions without enumerating them.";
                 chat.AppendUserInput(text);
