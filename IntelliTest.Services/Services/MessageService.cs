@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Hubs;
 using IntelliTest.Core.Models.Chat;

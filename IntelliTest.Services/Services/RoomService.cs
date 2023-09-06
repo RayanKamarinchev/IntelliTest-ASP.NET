@@ -1,13 +1,6 @@
-﻿using AutoMapper;
-using Google;
-using IntelliTest.Core.Hubs;
+﻿using IntelliTest.Core.Hubs;
 using IntelliTest.Data.Entities;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Chat;
