@@ -1,6 +1,5 @@
-﻿@using IntelliTest.Core.Models.Enums
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using System.Collections
+﻿@using IntelliTest.Core.Models.Questions.Closed
+@using IntelliTest.Core.Models.Enums
 @model TestEditViewModel
 @{
     ViewBag.Title = "Edit Test";
@@ -79,13 +78,13 @@
                         {
                             var question = closedQuestions.Dequeue();
                             Model.ClosedQuestions[i] = question;
-                            <partial name="Questions/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
+                            <partial name="../Questions/Closed/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
                         }
                         else if (Model.QuestionsOrder[i] == QuestionType.Open)
                         {
                             var question = openQuestions.Dequeue();
                             Model.OpenQuestions[i] = question;
-                            <partial name="Questions/OpenQuestionPartialView" for="OpenQuestions[i]"/>
+                            <partial name="../Questions/Open/OpenQuestionPartialView" for="OpenQuestions[i]" />
                         }
                     }
                 }

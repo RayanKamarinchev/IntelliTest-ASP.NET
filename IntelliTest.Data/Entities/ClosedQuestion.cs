@@ -24,5 +24,8 @@ namespace IntelliTest.Data.Entities
         public Guid? LessonId { get; set; }
         [ForeignKey(nameof(LessonId))]
         public Lesson? Lesson { get; set; }
+        [Required]
+        public bool IsEquation { get; set; }
+        public string ImagePath { get; set; }
     }
 }

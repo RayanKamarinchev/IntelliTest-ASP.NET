@@ -1,5 +1,6 @@
 ﻿using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using System.ComponentModel.DataAnnotations;
 
 namespace IntelliTest.Core.Models.Tests

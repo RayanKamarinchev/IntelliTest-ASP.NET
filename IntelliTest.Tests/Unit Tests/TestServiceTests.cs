@@ -17,6 +17,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json;
 using NUnit.Framework.Interfaces;
 using IntelliTest.Core.Models.Enums;
+using IntelliTest.Core.Models.Questions.Closed;
 
 namespace IntelliTest.Tests.Unit_Tests
 {

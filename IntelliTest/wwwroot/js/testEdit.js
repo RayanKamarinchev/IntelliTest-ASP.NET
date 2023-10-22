@@ -113,6 +113,54 @@ AddButtonsFunctionality();
 
 GenerateButtonsFunctionality();
 
+[...document.getElementsByClassName("textTypeCheckbox")].forEach(x=>x.addEventListener('change', (event) => {
+    if (event.currentTarget.checked) {
+        event.currentTarget.parentElement.parentElement.children[1].style.display = "none";
+        event.currentTarget.parentElement.parentElement.children[2].style.display = "block";
+        [...event.currentTarget.parentElement.parentElement.parentElement.parentElement.children[2].children].forEach(x=>{
+            console.log(x)
+            x.children[1].style.display = "none"
+            x.children[2].style.display = "block"
+        });
+    } else {
+        event.currentTarget.parentElement.parentElement.children[2].style.display = "none"
+        event.currentTarget.parentElement.parentElement.children[1].style.display = "block"
+        textAreaAdjust(event.currentTarget.parentElement.parentElement.children[1]);
+        [...event.currentTarget.parentElement.parentElement.parentElement.parentElement.children[2].children].forEach(x=>{
+            console.log(x)
+            x.children[1].style.display = "block"
+            textAreaAdjust(x.children[1]);
+            x.children[2].style.display = "none"
+        });
+    }
+}));
+let mathFields = {
+    open: [],
+    openAnswer: [],
+    closed: [],
+    closedAnswer: []
+};
+function GetMathTyperParentIndex(element){
+    return element.parentElement.children[1].name.match(/\d+/g)[0]
+}
+
+[...document.getElementsByClassName("math-field")].forEach(mathFieldSpan=>{
+    let MQ = MathQuill.getInterface(2); // for backcompat
+    let mathField = MQ.MathField(mathFieldSpan, {
+        spaceBehavesLikeTab: true,
+    });
+    if (mathFieldSpan.classList[1] === "closedAnswer"){
+        let index = GetMathTyperParentIndex(mathFieldSpan)
+        console.log(mathFields);
+        while (mathFields["closedAnswer"].length <= index){
+            mathFields["closedAnswer"].push([])
+        }
+        mathFields["closedAnswer"][index].push(mathField)
+    }
+    else
+        mathFields[mathFieldSpan.classList[1]].push(mathField);
+})
+
 function GetByDictKey(allowed, value) {
     return Object.keys(value)
         .filter(key => key.includes(allowed))
@@ -125,31 +173,32 @@ function GetByDictKey(allowed, value) {
 
 function handleSubmit(event) {
     event.preventDefault();
-
     const data = new FormData(event.target);
 
     let value = Object.fromEntries(data.entries());
-    console.log(value);
+    console.log(value)
     let res = {
         OpenQuestions: [],
         ClosedQuestions: [],
         QuestionsOrder: []
     };
     let i = 0;
+    let openQuestions = 0
     while (true) {
         let question = GetByDictKey(`OpenQuestions[${i}]`, value);
         if (isQuestionEmpty(question)) {
             question = GetByDictKey(`ClosedQuestions[${i}]`, value);
         } else {
-            res["OpenQuestions"].push(createOpenQuestion(question, i));
+            res["OpenQuestions"].push(createOpenQuestion(question, i, openQuestions));
             res["QuestionsOrder"].push(0);
+            openQuestions++;
             i++;
             continue;
         }
         if (isQuestionEmpty(question)) {
             break;
         } else {
-            res["ClosedQuestions"].push(createClosedQuestion(question, i));
+            res["ClosedQuestions"].push(createClosedQuestion(question, i, i-openQuestions));
             res["QuestionsOrder"].push(1);
         }
         i++;
@@ -159,7 +208,8 @@ function handleSubmit(event) {
     res["description"] = document.getElementById("desc").value;
     res["time"] = parseInt(document.getElementById("time").value);
     res["grade"] = parseInt(document.getElementById("grade").value);
-    
+
+    console.log(res)
     $.ajax({
         url: "/Tests/Edit/" + id,
         method: 'POST',
@@ -175,14 +225,6 @@ function handleSubmit(event) {
 }
 function isQuestionEmpty(question) {
     return Object.keys(question).length === 0;
-}
-function GetParameter(questionParams, questionIndex, parameter, isMultiple = false) {
-    let foundValues = Object.values(GetByDictKey(questionIndex + "." + parameter, questionParams));
-    if (isMultiple) {
-        return foundValues;
-    } else {
-        return foundValues[0];
-    }
 }
 function GetAnswerIndexes(questionParams, questionIndex) {
     let foundKeys = Object.keys(GetByDictKey(questionIndex + ".AnswerIndexes", questionParams));
@@ -203,21 +245,53 @@ function GetAnswerIndexes(questionParams, questionIndex) {
     return indexes;
 }
 
-function createOpenQuestion(questionParams, index) {
-    let questionIndex = `OpenQuestions[${index}]`;
-    return{
-        text: GetParameter(questionParams, questionIndex, "Text"),
-        answer: GetParameter(questionParams, questionIndex, "Answer"),
-        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
+function GetParameter(questionParams, questionIndex, parameter, isMultiple = false) {
+    let foundValues = Object.values(GetByDictKey(questionIndex + "." + parameter, questionParams));
+    if (isMultiple) {
+        return foundValues;
+    } else {
+        return foundValues[0];
     }
 }
-function createClosedQuestion(questionParams, index) {
+
+function createOpenQuestion(questionParams, index, openQuestions) {
+    let questionIndex = `OpenQuestions[${index}]`;
+    let isEquation = GetParameter(questionParams, questionIndex, "IsEquation") === "true"
+    let text = GetParameter(questionParams, questionIndex, "Text")
+    if (isEquation) {
+        text = mathFields["open"][openQuestions].latex()
+    }
+    let answer = GetParameter(questionParams, questionIndex, "Answer")
+    if (isEquation) {
+        answer = mathFields["openAnswer"][openQuestions].latex()
+    }
+    return{
+        text: text,
+        answer: answer,
+        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore")),
+        isEquation: isEquation,
+        imagePath: ""
+    }
+}
+function createClosedQuestion(questionParams, index, closedQuestion) {
     let questionIndex = `ClosedQuestions[${index}]`;
+    let isEquation = GetParameter(questionParams, questionIndex, "IsEquation") === 'true'
+    let text = GetParameter(questionParams, questionIndex, "Text")
+    let answers = GetParameter(questionParams, questionIndex, "Answers", true)
+    if (isEquation) {
+        text = mathFields["closed"][closedQuestion].latex()
+        answers = []
+        for (let i = 0; i < mathFields["closedAnswer"].length; i++) {
+            answers.push(mathFields["closedAnswer"][index][i].latex())
+        }
+    }
     return {
-        text: GetParameter(questionParams, questionIndex, "Text"),
-        answers: GetParameter(questionParams, questionIndex, "Answers", true),
+        text: text,
+        answers: answers,
         answerIndexes: GetAnswerIndexes(questionParams, questionIndex, "AnswerIndexes"), 
-        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore"))
+        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore")),
+        isEquation: isEquation,
+        imagePath: ""
     }
 }
 

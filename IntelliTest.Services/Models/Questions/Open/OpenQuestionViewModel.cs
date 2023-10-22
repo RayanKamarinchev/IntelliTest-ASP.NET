@@ -10,5 +10,7 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string Answer { get; set; }
         public int MaxScore { get; set; }
+        public string ImagePath { get; set; }
+        public bool IsEquation { get; set; }
     }
 }

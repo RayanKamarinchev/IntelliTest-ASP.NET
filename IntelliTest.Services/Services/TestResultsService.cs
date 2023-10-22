@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -144,7 +145,9 @@ namespace IntelliTest.Core.Services
                                          Answer = q.Answer,
                                          IsDeleted = false,
                                          Text = q.Text,
-                                         MaxScore = q.MaxScore
+                                         MaxScore = q.MaxScore,
+                                         IsEquation = q.IsEquation,
+                                         ImagePath = q.ImagePath
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
@@ -155,7 +158,9 @@ namespace IntelliTest.Core.Services
                                            AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
                                            IsDeleted = false,
                                            Text = q.Text,
-                                           MaxScore = q.MaxScore
+                                           MaxScore = q.MaxScore,
+                                           IsEquation = q.IsEquation,
+                                           ImagePath = q.ImagePath
                                        })
                                        .ToList(),
                 Time = model.Time,

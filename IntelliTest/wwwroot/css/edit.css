@@ -112,6 +112,7 @@ a { text-decoration: none; }
 .questBoxHover:hover { background-position: 0em 0em; }
 
 .questBox {
+    padding-left: 4.5rem !important;
     position: relative;
     width: 100%;
     margin-bottom: 50px;
@@ -198,7 +199,7 @@ a { text-decoration: none; }
 
 .questTextBox input[type="text"]:focus ~ .underline { width: 100%; }
 
-.questTextBox .underline {
+.questTextBox .underline .math-field {
     content: '';
     display: block;
     position: absolute;
@@ -208,6 +209,70 @@ a { text-decoration: none; }
     height: 2px;
     background: #444;
     transition: all 300ms ease-out;
+    padding: 10px;
+}
+
+.mq-focused{
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+.math-field{
+    border: none !important;
+    border-bottom: 1px #999 solid !important;
+    font-size: 1.8rem !important;
+    width: 100%;
+    text-align: left;
+}
+.checkbox_wrap{
+    position: absolute;
+    left: calc(-4rem + 10px);
+    top: 5px;
+    height: 20px;
+    width: 20px;
+}
+
+.checkbox_wrap .checkbox_mark{
+    background: #f0f0f0;
+    width: 50px;
+    height: 24px;
+    padding: 2px;
+}
+
+.checkbox_wrap .checkbox_mark:before{
+    top: 1px;
+    left: 1px;
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.checkbox_wrap .checkbox_inp:checked ~ .checkbox_mark{
+    background: #34bfa3;
+}
+
+.checkbox_wrap .checkbox_inp:checked ~ .checkbox_mark:before{
+    left: 27px;
+}
+.checkbox_wrap .checkbox_inp{
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: 1;
+}
+
+.checkbox_wrap .checkbox_mark{
+    display: inline-block;
+    position: relative;
+    border-radius: 25px;
+}
+
+.checkbox_wrap .checkbox_mark:before,
+.checkbox_wrap .checkbox_mark:after{
+    content: "";
+    position: absolute;
+    transition: all 0.5s ease;
 }
 
 #addAddMoreDiv {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntelliTest.Core.Models.Questions
+namespace IntelliTest.Core.Models.Questions.Closed
 {
     public class ClosedQuestionReviewViewModel : ClosedQuestionAnswerViewModel
     {

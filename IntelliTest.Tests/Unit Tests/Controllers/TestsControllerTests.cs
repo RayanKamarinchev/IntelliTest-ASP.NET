@@ -8,6 +8,7 @@ using IntelliTest.Controllers;
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Enums;
 using IntelliTest.Tests.Mocks;

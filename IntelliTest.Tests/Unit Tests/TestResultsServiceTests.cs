@@ -1,5 +1,6 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
 using IntelliTest.Data.Enums;

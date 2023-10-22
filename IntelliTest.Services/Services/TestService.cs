@@ -9,6 +9,7 @@ using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
 using Microsoft.Extensions.Configuration;
 using IntelliTest.Core.Models.Enums;
+using IntelliTest.Core.Models.Questions.Closed;
 
 namespace IntelliTest.Core.Services
 {
@@ -237,7 +238,9 @@ namespace IntelliTest.Core.Services
                                                  {
                                                      Text = q.Text,
                                                      Answer = q.Answer,
-                                                     MaxScore = q.MaxScore
+                                                     MaxScore = q.MaxScore,
+                                                     ImagePath = q.ImagePath,
+                                                     IsEquation = q.IsEquation
                                                  }))
                                      .ToList();
             
@@ -254,7 +257,9 @@ namespace IntelliTest.Core.Services
                                                                                        .Select(q => q.indx)),
                                                      Answers = string.Join(
                                                          "&", q.Answers.Where(a => !string.IsNullOrEmpty(a))),
-                                                     MaxScore = q.MaxScore
+                                                     MaxScore = q.MaxScore,
+                                                     ImagePath = q.ImagePath,
+                                                     IsEquation = q.IsEquation
                                                  }))
                                      .ToList();
 
@@ -298,6 +303,8 @@ namespace IntelliTest.Core.Services
             question.Text = testQuestion.Text;
             question.Answer = testQuestion.Answer;
             question.MaxScore = testQuestion.MaxScore;
+            question.ImagePath = testQuestion.ImagePath;
+            question.IsEquation = testQuestion.IsEquation;
             return question;
         };
         private Func<List<ClosedQuestionViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
@@ -320,6 +327,8 @@ namespace IntelliTest.Core.Services
                                                                    .Where(q => q.val)
                                                                    .Select(q => q.indx));
             question.MaxScore = modelQuestion.MaxScore;
+            question.ImagePath = modelQuestion.ImagePath;
+            question.IsEquation = modelQuestion.IsEquation;
             return question;
         };
 

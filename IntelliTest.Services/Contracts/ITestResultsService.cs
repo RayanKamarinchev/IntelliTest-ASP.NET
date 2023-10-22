@@ -1,4 +1,5 @@
 ﻿using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
 
 namespace IntelliTest.Core.Contracts

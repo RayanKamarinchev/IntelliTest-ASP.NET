@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using static IntelliTest.Infrastructure.Constraints;
 using Org.BouncyCastle.Ocsp;
 using IntelliTest.Core.Models.Enums;
+using IntelliTest.Core.Models.Questions.Closed;
 
 namespace IntelliTest.Controllers
 {
