@@ -209,7 +209,6 @@ function handleSubmit(event) {
     res["time"] = parseInt(document.getElementById("time").value);
     res["grade"] = parseInt(document.getElementById("grade").value);
 
-    console.log(res)
     $.ajax({
         url: "/Tests/Edit/" + id,
         method: 'POST',

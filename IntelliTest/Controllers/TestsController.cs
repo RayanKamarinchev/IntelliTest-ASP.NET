@@ -14,6 +14,7 @@ using static IntelliTest.Infrastructure.Constraints;
 using Org.BouncyCastle.Ocsp;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Data.Entities;
 
 namespace IntelliTest.Controllers
 {
@@ -195,7 +196,7 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Student")]
         [Route("Tests/Take/{testId}")]
         public async Task<IActionResult> Take(Guid testId)
-        { 
+        {
             if (!await testService.ExistsbyId(testId))
             {
                 return NotFound();
@@ -212,13 +213,16 @@ namespace IntelliTest.Controllers
             }
 
             var test = testService.ToSubmit(await testService.GetById(testId));
+            TempData["OpenQuestionIds"] = test.OpenQuestions.Select(q => q.Id.ToString()).ToArray();
+            TempData["ClosedQuestionIds"] = test.ClosedQuestions.Select(q => q.Id.ToString()).ToArray();
             return View(test);
         }
 
         [HttpPost]
         [Route("Tests/Take/{testId}")]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> Take(TestSubmitViewModel model, Guid testId)
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Take([FromBody]TestSubmitViewModel model, Guid testId)
         {
             if (!await testService.ExistsbyId(testId))
             {
@@ -236,11 +240,21 @@ namespace IntelliTest.Controllers
                 return RedirectToAction("ReviewAnswers", new {testId = testId, studentId = studentId});
             }
 
+            var openQuestionIds = (string[])TempData["OpenQuestionIds"];
+            for (int i = 0; i < openQuestionIds.Length; i++)
+            {
+                model.OpenQuestions[i].Id = new Guid(openQuestionIds[i]);
+            }
+            var closedQuestionIds = (string[])TempData["ClosedQuestionIds"];
+            for (int i = 0; i < closedQuestionIds.Length; i++)
+            {
+                model.ClosedQuestions[i].Id = new Guid(closedQuestionIds[i]);
+            }
             await testResultsService.AddTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, testId);
 
             TempData["message"] = "Успешно предаде теста!";
             TempData.Remove("TestStarted");
-            return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
+            return Ok("redirect");
         }
 
         [HttpGet]

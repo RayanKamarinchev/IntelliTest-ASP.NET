@@ -11,7 +11,7 @@
         <div class="timer">
             <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>
         </div>
-        <form method="post" name="test" asp-action="Take">
+        <form>
             @{
                 int closedQuestionsIndex = 0;
                 int openQuestionsIndex = 0;
@@ -19,12 +19,14 @@
                 {
                     if (Model.QuestionOrder[i] == QuestionType.Closed)
                     {
-                        <partial name="Questions/ClosedQuestionTakePartialView" for="ClosedQuestions[closedQuestionsIndex]" />
+                        Model.ClosedQuestions[closedQuestionsIndex].Index = closedQuestionsIndex;
+                        <partial name="../Questions/Closed/ClosedQuestionTakePartialView" for="ClosedQuestions[closedQuestionsIndex]" />
                         closedQuestionsIndex++;
                     }
                     else
                     {
-                        <partial name="Questions/OpenQuestionTakePartialView" for="OpenQuestions[openQuestionsIndex]" />
+                        Model.OpenQuestions[openQuestionsIndex].Index = openQuestionsIndex;
+                        <partial name="../Questions/Open/OpenQuestionTakePartialView" for="OpenQuestions[openQuestionsIndex]" />
                         openQuestionsIndex++;
                     }
                 }
@@ -40,8 +42,11 @@
     <script>
             let min = @mins;
             let sec = @sec;
+        let id = "@Model.Id";
+        let studentId = "@TempData["StudentId"]";
     </script>
     <script src="~/js/testTake.js" asp-append-version="true"></script>
+    <script src="~/js/test.js" asp-append-version="true"></script>
 }
 @{
     var id = Context.GetRouteData().Values["testId"];
@@ -59,7 +64,7 @@
         else
         {
             <script>
-                    document.location.href = "/Take/@sessionId"
+                    document.location.href = "/Tests/Take/@sessionId"
             </script>
         }
     }

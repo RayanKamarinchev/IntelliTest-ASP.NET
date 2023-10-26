@@ -12,7 +12,5 @@ namespace IntelliTest.Core.Models.Questions.Closed
         public string[] Answers { get; set; }
         public bool[] AnswerIndexes { get; set; }
         public int MaxScore { get; set; }
-        public string ImagePath { get; set; }
-        public bool IsEquation { get; set; }
     }
 }

@@ -13,5 +13,10 @@ namespace IntelliTest.Core.Models.Questions
         public string Text { get; set; }
         public bool IsDeleted { get; set; }
         public Guid Id { get; set; }
+        [Required]
+        public bool IsEquation { get; set; }
+        public string ImagePath { get; set; }
+
+        public int Index { get; set; }
     }
 }

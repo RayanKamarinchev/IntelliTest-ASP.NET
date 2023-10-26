@@ -47,13 +47,10 @@ namespace IntelliTest.Core.Services
             var api = new OpenAI_API.OpenAIAPI(apiKey);
             var chat = api.Chat.CreateConversation();
 
-            string translatedCorrectAnswer = Translate(RightAnswer);
-            string translatedAnswer = Translate(Answer);
-
             TikToken tikToken = TikToken.EncodingForModel("gpt-3.5-turbo");
-            var encodedCorrect = tikToken.Encode(translatedCorrectAnswer);
+            var encodedCorrect = tikToken.Encode(RightAnswer);
             var partOfCorrect = encodedCorrect.Take(2000).ToList();
-            var encodedAnswer = tikToken.Encode(translatedAnswer);
+            var encodedAnswer = tikToken.Encode(Answer);
             var partOfAnswer = encodedAnswer.Take(2000).ToList();
             string prompt = "Correct answer \"" + tikToken.Decode(partOfCorrect) + "\" Given answer \"" + tikToken.Decode(partOfAnswer) + $"\" Answer with json containing score out of {MaxScore*2} and message in bulgarian";
             chat.AppendUserInput(prompt);

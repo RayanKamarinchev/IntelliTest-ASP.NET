@@ -203,7 +203,9 @@ namespace IntelliTest.Core.Services
                                      {
                                          Text = q.Text,
                                          Id = q.Id,
-                                         MaxScore = q.MaxScore
+                                         MaxScore = q.MaxScore,
+                                         ImagePath = q.ImagePath,
+                                         IsEquation = q.IsEquation
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
@@ -214,12 +216,16 @@ namespace IntelliTest.Core.Services
                                            IsDeleted = false,
                                            Text = q.Text,
                                            Id = q.Id,
-                                           MaxScore = q.MaxScore
+                                           MaxScore = q.MaxScore,
+                                           ImagePath = q.ImagePath,
+                                           IsEquation = q.IsEquation,
+                                           Answers = new bool[q.Answers.Length]
                                        })
                                        .ToList(),
                 Time = model.Time,
                 Title = model.Title,
-                QuestionOrder = ProcessQuestionOrder(model.QuestionOrder)
+                QuestionOrder = ProcessQuestionOrder(model.QuestionOrder),
+                Id = model.Id
             };
             return t;
         }
@@ -245,7 +251,7 @@ namespace IntelliTest.Core.Services
                                      .ToList();
             
             test.ClosedQuestions = test.ClosedQuestions.Select(q => EditClosedQuestion(model.ClosedQuestions, q))
-                                     .Where(q => q.Text != "")
+                                     .Where(q => !string.IsNullOrEmpty(q.Text))
                                      .Union(model.ClosedQuestions
                                                  .Select(q => new ClosedQuestion()
                                                  {

@@ -13,5 +13,6 @@ namespace IntelliTest.Core.Models.Tests
         [Display(Name = "Заглавие: ")]
         public string Title { get; set; }
         public int Time { get; set; }
+        public Guid Id { get; set; }
     }
 }

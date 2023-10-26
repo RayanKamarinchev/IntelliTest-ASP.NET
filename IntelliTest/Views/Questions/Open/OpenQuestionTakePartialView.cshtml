@@ -1,14 +1,27 @@
 ﻿@model OpenQuestionAnswerViewModel
 <div class="questBox">
-    <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">
-            <p>@Model.Text</p>
+            @if (Model.IsEquation)
+            {
+                <p class="math-field text">@Model.Text</p>
+            }
+            else
+            {
+                <p>@Model.Text</p>
+            }
         </div>
     </div>
     <div class="questTextBox questAnswer">
         <div>
-            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
+            @if (Model.IsEquation)
+            {
+                <p class="math-field answer" onfocus="onFocus(this)" onblur=onFocusOut(this) name="OpenQuestions[@Model.Index].Answer"> @Model.Answer </p>
+            }
+            else
+            {
+                <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
+            }
             <span class="underline"></span>
         </div>
     </div>
