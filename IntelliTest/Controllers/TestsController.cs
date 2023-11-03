@@ -123,34 +123,34 @@ namespace IntelliTest.Controllers
         [HttpPost]
         [Route("Tests/Edit/{Id}")]
         [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [FromBody]TestEditViewModel model)
+        public async Task<IActionResult> Edit(Guid id, [FromForm] TestEditViewModel model)
         {
             if (!User.IsTeacher())
             {
                 return Unauthorized();
             }
             
-            if (!await testService.ExistsbyId(id))
-            {
-                return NotFound();
-            }
+            //if (!await testService.ExistsbyId(id))
+            //{
+            //    return NotFound();
+            //}
 
-            if (!ModelState.IsValid ||
-                model.ClosedQuestions is null || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
-                TempData.Peek("PublicityLevel") is null)
-            {
-                return View("Edit", model);
-            }
+            //if (!ModelState.IsValid ||
+            //    model.ClosedQuestions is null || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
+            //    TempData.Peek("PublicityLevel") is null)
+            //{
+            //    return View("Edit", model);
+            //}
 
-            model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
+            //model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
 
-            await testService.Edit(id, model, (Guid)TempData.Peek(TeacherId));
+            //await testService.Edit(id, model, (Guid)TempData.Peek(TeacherId));
 
             TempData["message"] = "Успешно редактира тест!";
             return Content("redirect");
         }
 
-        private bool AllQuestionsHaveAnswerIndexes(List<ClosedQuestionViewModel> closedQuestions)
+        private bool AllQuestionsHaveAnswerIndexes(List<ClosedQuestionEditViewModel> closedQuestions)
         {
             return closedQuestions.All(c => c.AnswerIndexes.Any(ai => ai));
         }

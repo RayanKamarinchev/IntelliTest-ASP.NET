@@ -313,7 +313,7 @@ namespace IntelliTest.Core.Services
             question.IsEquation = testQuestion.IsEquation;
             return question;
         };
-        private Func<List<ClosedQuestionViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
+        private Func<List<ClosedQuestionEditViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
         {
             var modelQuestion = allQuestions
                                      .FirstOrDefault(q => CheckForSameAnswers(q, question.Answers) || q.Text == question.Text);
@@ -338,7 +338,7 @@ namespace IntelliTest.Core.Services
             return question;
         };
 
-        private static bool CheckForSameAnswers(ClosedQuestionViewModel questionViewModel, string savedQuestionAnswers)
+        private static bool CheckForSameAnswers(ClosedQuestionEditViewModel questionViewModel, string savedQuestionAnswers)
         {
             return string.Join("&", questionViewModel.Answers.Where(a => !string.IsNullOrEmpty(a))) == savedQuestionAnswers;
         }

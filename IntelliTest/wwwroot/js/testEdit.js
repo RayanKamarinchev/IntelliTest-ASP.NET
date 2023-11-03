@@ -208,20 +208,35 @@ function handleSubmit(event) {
     res["description"] = document.getElementById("desc").value;
     res["time"] = parseInt(document.getElementById("time").value);
     res["grade"] = parseInt(document.getElementById("grade").value);
-
-    $.ajax({
-        url: "/Tests/Edit/" + id,
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(res),
-        success: function (response) {
-            if (response === "redirect") {
-                window.location.href = "/Tests";
-            }
-            $(body).html(response);
+    i=0;
+    for (const question of res["OpenQuestions"]) {
+        res[`OpenQuestions[${i}]`]
+        i++;
+    }
+    let f = new FormData();
+    console.log(res)
+    for (var prop in res) {
+        if (Object.prototype.hasOwnProperty.call(res, prop)) {
+            f.append(prop, JSON.stringify(res[prop]));
         }
-    });
+    }
+    return;
+    fetch("/Tests/Edit/" + id, {method: "POST", body: f})
+    // $.ajax({
+    //     url: "/Tests/Edit/" + id,
+    //     method: 'POST',
+    //     data: f,
+    //     success: function (response) {
+    //         if (response === "redirect") {
+    //             window.location.href = "/Tests";
+    //         }
+    //         $(body).html(response);
+    //     }
+    // });
 }
+
+
+
 function isQuestionEmpty(question) {
     return Object.keys(question).length === 0;
 }
@@ -269,7 +284,8 @@ function createOpenQuestion(questionParams, index, openQuestions) {
         answer: answer,
         maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore")),
         isEquation: isEquation,
-        imagePath: ""
+        imagePath: "",
+        image: GetParameter(questionParams, questionIndex, "Image")
     }
 }
 function createClosedQuestion(questionParams, index, closedQuestion) {
@@ -338,29 +354,38 @@ function GenerateButtonsFunctionality() {
 function openQuestionPartialView(question, answer, order, maxScore) {
     return `
                     <div class="questBox">
-                    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
-                        <span>Points:</span>
-                            <input type="text" value="${maxScore}" name="OpenQuestions[${order
-        }].MaxScore" class="body_size" style="width: 20px; margin-right: 30px;"/>
-                                <button class="circle delete" type="button">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                    <div class="customRow">
-                        <div class="questTextBox" style="width: calc(100% - 250px);">
-                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this)  placeholder="Въпрос" type="text" name="OpenQuestions[${
+    <div class="questionScore questTextBox" style="width: 200px; height: 45px">
+        <span>Точки:</span>
+        <input type="text" value="${maxScore}" name="OpenQuestions[${order
+    }].MaxScore" class="body_size" style="width: 20px; margin-right: 30px;"/>
+        <button class="circle delete" type="button">
+        <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+    <div class="customRow">
+        <div class="questTextBox" style="width: calc(100% - 250px);">
+            <label class="checkbox_wrap">
+            <span>Урав   нение</span>
+            <input type="checkbox" name="OpenQuestions[${
+        order}].IsEquation" class="checkbox_inp textTypeCheckbox">
+            <span class="checkbox_mark"></span>
+            </label>
+            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" name="OpenQuestions[${
         order}].Text">${question}</textarea>
-                            <span class="underline"></span>
-                        </div>
-                    </div>
-                    <div class="questTextBox questAnswer">
-                        <div>
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" name="OpenQuestions[${
+            <span class="math-field open" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>${question}</span>
+            <span class="underline"></span>
+        </div>
+    </div>
+    <div class="questTextBox questAnswer">
+        <div>
+        <span></span>
+    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" name="OpenQuestions[${
         order}].Answer">${answer}</textarea>
-                            <span class="underline"></span>
-                        </div>
-                    </div>
-                </div>
+    <span class="math-field openAnswer" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>${answer}</span>
+<span class="underline"></span>
+        </div>
+    </div>
+</div>
         `
 }
 
@@ -371,9 +396,8 @@ function answerPartialView(answer, order, questionOrder) {
                                     <input type="checkbox" name="ClosedQuestions[${questionOrder}].AnswerIndexes[${
         order}]"/>
                             </div>
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Опция ${order + 1
-        }" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]">${answer}</textarea>
-
+                            <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" placeholder="Опция @(i + 1)" type="text" name="ClosedQuestions[${questionOrder}].Answers[${order}]">${answer}</textarea>
+<span class="math-field closedAnswer" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>${answer}</span>
                                 <span class="underline"></span>
                         </div>
             `
@@ -383,7 +407,7 @@ function closedQuestionPartialView(question, answers, order, maxScore) {
     return `
                 <div class="questBox" name="ClosedQuestions${order}">
                     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
-                        <span>Points:</span>
+                        <span>Точки:</span>
                                 <input type="text" value="${maxScore}" class="body_size" name="ClosedQuestions[${order
         }].MaxScore" style="width: 20px;margin-right: 30px"/>
                         <button class="circle delete" type="button">
@@ -391,10 +415,16 @@ function closedQuestionPartialView(question, answers, order, maxScore) {
                         </button>
                     </div>
                     <div class="customRow">
-                        <div class="questTextBox" style="width: calc(100% - 250px);">
-<textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" name="ClosedQuestions[${
-        order}].Text">${question}</textarea>
-                            <span class="underline"></span>
+                    <label class="checkbox_wrap">
+    <span>Урав   нение</span>
+    <input type="checkbox" name="ClosedQuestions[${
+            order}].IsEquation" class="checkbox_inp textTypeCheckbox">
+    <span class="checkbox_mark"></span>
+</label>
+    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text"name="ClosedQuestions[${
+            order}].Text">${question}</textarea>
+    <span class="math-field closed" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>${question}</span>
+<span class="underline"></span>
                         </div>
                     </div>
                     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">` +

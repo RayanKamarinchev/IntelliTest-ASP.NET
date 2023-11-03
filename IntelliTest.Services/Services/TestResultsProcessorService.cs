@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using TiktokenSharp;
-using static IntelliTest.Core.Objects.Translator;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace IntelliTest.Core.Services

@@ -152,7 +152,7 @@ namespace IntelliTest.Core.Services
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
                                        .Where(q => !q.IsDeleted)
-                                       .Select(q => new ClosedQuestionViewModel()
+                                       .Select(q => new ClosedQuestionEditViewModel()
                                        {
                                            Answers = q.Answers.Split("&"),
                                            AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),

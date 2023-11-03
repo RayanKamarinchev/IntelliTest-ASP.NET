@@ -62,3 +62,17 @@ function ekUpload(){
   }
 }
 ekUpload();
+
+function showImageUpload(e) {
+  let element = e.target.parentElement.children[0]
+  console.log(element)
+  if (element.style.display === "none")
+    element.style.display = "block"
+  else
+    element.style.display = "none"
+}
+
+let btns = [...document.getElementsByClassName("addImageToQuestionBtn")];
+for (const btn of btns) {
+  btn.addEventListener("click", showImageUpload)
+}

@@ -15,7 +15,7 @@ namespace IntelliTest.Core.Models.Tests
     {
         public PublicityLevel PublicityLevel { get; set; }
         public List<OpenQuestionViewModel>? OpenQuestions { get; set; }
-        public List<ClosedQuestionViewModel>? ClosedQuestions { get; set; }
+        public List<ClosedQuestionEditViewModel>? ClosedQuestions { get; set; }
         public List<QuestionType>? QuestionsOrder { get; set; }
         [Display(Name = "Заглавие: ")]
         public string Title { get; set; }

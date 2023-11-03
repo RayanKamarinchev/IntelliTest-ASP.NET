@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Core.Models.Questions.Closed
 {
-    public class ClosedQuestionViewModel : QuestionViewModel
+    public class ClosedQuestionEditViewModel : QuestionViewModel
     {
         public string[] Answers { get; set; }
         public bool[] AnswerIndexes { get; set; }
         public int MaxScore { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }
