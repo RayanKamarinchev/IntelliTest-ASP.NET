@@ -1,8 +1,6 @@
 ﻿// File Upload
 // 
 function ekUpload(){
-    console.log("Upload Initialised");
-
     var fileSelect    = document.getElementById('file-upload'),
         fileDrag      = document.getElementById('file-drag'),
         submitButton  = document.getElementById('submit-button');
@@ -37,8 +35,6 @@ function ekUpload(){
   }
 
   function parseFile(file) {
-
-    console.log(file.name);
     // var fileType = file.type;
     // console.log(fileType);
     var imageName = file.name;
@@ -65,7 +61,6 @@ ekUpload();
 
 function showImageUpload(e) {
   let element = e.target.parentElement.children[0]
-  console.log(element)
   if (element.style.display === "none")
     element.style.display = "block"
   else

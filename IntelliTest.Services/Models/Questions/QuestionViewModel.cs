@@ -15,6 +15,7 @@ namespace IntelliTest.Core.Models.Questions
         public Guid Id { get; set; }
         [Required]
         public bool IsEquation { get; set; }
+        [DisplayFormat(ConvertEmptyStringToNull = false)]
         public string ImagePath { get; set; }
 
         public int Index { get; set; }

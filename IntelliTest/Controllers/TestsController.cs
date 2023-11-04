@@ -15,6 +15,7 @@ using Org.BouncyCastle.Ocsp;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Data.Entities;
+using Microsoft.AspNetCore.Hosting;
 
 namespace IntelliTest.Controllers
 {
@@ -26,15 +27,17 @@ namespace IntelliTest.Controllers
         private readonly IMemoryCache cache;
         private readonly IStudentService studentService;
         private readonly IClassService classService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
-                               IClassService _classService, ITestResultsService testResultsService)
+                               IClassService _classService, ITestResultsService testResultsService, IWebHostEnvironment webHostEnvironment)
         {
             testService = _testService;
             cache = _cache;
             studentService = _studentService;
             classService = _classService;
             this.testResultsService = testResultsService;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -129,22 +132,34 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
-            
-            //if (!await testService.ExistsbyId(id))
-            //{
-            //    return NotFound();
-            //}
 
-            //if (!ModelState.IsValid ||
-            //    model.ClosedQuestions is null || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
-            //    TempData.Peek("PublicityLevel") is null)
-            //{
-            //    return View("Edit", model);
-            //}
+            if (!await testService.ExistsbyId(id))
+            {
+                return NotFound();
+            }
 
-            //model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
+            if (!ModelState.IsValid || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
+                TempData.Peek("PublicityLevel") is null)
+            {
+                return View("Edit", model);
+            }
 
-            //await testService.Edit(id, model, (Guid)TempData.Peek(TeacherId));
+            foreach (var question in model.OpenQuestions)
+            {
+                if (question.Image != null && question.Image.ContentType.StartsWith("image") 
+                                           && !(question.ImagePath.StartsWith("imgs/") || question.ImagePath!=""))
+                {
+                    string folder = "imgs/";
+                    folder += Guid.NewGuid() + "_" + question.Image.FileName;
+                    question.ImagePath = folder;
+                    string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
+                    await question.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                }
+            }
+
+            model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
+
+            await testService.Edit(id, model, (Guid)TempData.Peek(TeacherId));
 
             TempData["message"] = "Успешно редактира тест!";
             return Content("redirect");
@@ -152,6 +167,10 @@ namespace IntelliTest.Controllers
 
         private bool AllQuestionsHaveAnswerIndexes(List<ClosedQuestionEditViewModel> closedQuestions)
         {
+            if (closedQuestions is null)
+            {
+                return true;
+            }
             return closedQuestions.All(c => c.AnswerIndexes.Any(ai => ai));
         }
 

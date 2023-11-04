@@ -20,6 +20,7 @@ namespace IntelliTest.Core.Models.Tests
         [Display(Name = "Заглавие: ")]
         public string Title { get; set; }
         [Display(Name = "Описание: ")]
+        [DisplayFormat(ConvertEmptyStringToNull = false)]
         public string Description { get; set; }
         [Display(Name = "Клас: ")]
         public int Grade { get; set; }

@@ -171,17 +171,17 @@ function GetByDictKey(allowed, value) {
             {});
 }
 
+function getImagePath(index){
+    return document.getElementsByClassName("questBox")[index].children[0].children[1].children[0].src;
+}
+
 function handleSubmit(event) {
     event.preventDefault();
     const data = new FormData(event.target);
 
     let value = Object.fromEntries(data.entries());
     console.log(value)
-    let res = {
-        OpenQuestions: [],
-        ClosedQuestions: [],
-        QuestionsOrder: []
-    };
+    value["QuestionsOrder"] = []
     let i = 0;
     let openQuestions = 0
     while (true) {
@@ -189,8 +189,13 @@ function handleSubmit(event) {
         if (isQuestionEmpty(question)) {
             question = GetByDictKey(`ClosedQuestions[${i}]`, value);
         } else {
-            res["OpenQuestions"].push(createOpenQuestion(question, i, openQuestions));
-            res["QuestionsOrder"].push(0);
+            let isEquation = GetByDictKey(`OpenQuestions[${i}].IsEquation`, value) === "true";
+            if (isEquation) {
+                value[`OpenQuestions[${i}].Text`] = mathFields["open"][openQuestions].latex()
+                value[`OpenQuestions[${i}].Answer`] = mathFields["openAnswer"][openQuestions].latex()
+            }
+            value[`OpenQuestions[${i}].ImagePath`] = getImagePath(i);
+            value["QuestionsOrder"].push(0);
             openQuestions++;
             i++;
             continue;
@@ -198,41 +203,36 @@ function handleSubmit(event) {
         if (isQuestionEmpty(question)) {
             break;
         } else {
-            res["ClosedQuestions"].push(createClosedQuestion(question, i, i-openQuestions));
-            res["QuestionsOrder"].push(1);
+            let isEquation = GetByDictKey(`ClosedQuestions[${i}].IsEquation`, value) === "true";
+            if (isEquation) {
+                value[`ClosedQuestions[${i}].Text`] = mathFields["closed"][i-openQuestions].latex()
+                for (let answerIndex = 0; answerIndex < mathFields["closedAnswer"].length; answerIndex++) {
+                    value[`ClosedQuestions[${i}].AnswerIndexes[${answerIndex}]`] = mathFields["closedAnswer"][answerIndex][i].latex()
+                }
+            }
+            value[`ClosedQuestions[${i}].ImagePath`] = getImagePath(i);
+            value["QuestionsOrder"].push(1);
         }
         i++;
     }
-    res["id"] = id;
-    res["title"] = document.getElementById("title").value;
-    res["description"] = document.getElementById("desc").value;
-    res["time"] = parseInt(document.getElementById("time").value);
-    res["grade"] = parseInt(document.getElementById("grade").value);
-    i=0;
-    for (const question of res["OpenQuestions"]) {
-        res[`OpenQuestions[${i}]`]
-        i++;
-    }
+    value["id"] = id;
+    value["title"] = document.getElementById("title").value;
+    value["Description"] = document.getElementById("desc").value;
+    value["time"] = parseInt(document.getElementById("time").value);
+    value["grade"] = parseInt(document.getElementById("grade").value);
     let f = new FormData();
-    console.log(res)
-    for (var prop in res) {
-        if (Object.prototype.hasOwnProperty.call(res, prop)) {
-            f.append(prop, JSON.stringify(res[prop]));
-        }
+    for ( var key in value ) {
+        f.append(key, value[key]);
     }
-    return;
     fetch("/Tests/Edit/" + id, {method: "POST", body: f})
-    // $.ajax({
-    //     url: "/Tests/Edit/" + id,
-    //     method: 'POST',
-    //     data: f,
-    //     success: function (response) {
-    //         if (response === "redirect") {
-    //             window.location.href = "/Tests";
-    //         }
-    //         $(body).html(response);
-    //     }
-    // });
+        .then(x=>x.text())
+        .then((response) => {
+            console.log(response)
+            if (response === "redirect") {
+                window.location.href = "/Tests";
+            }
+            $("body").html(response);
+        })
 }
 
 
@@ -265,48 +265,6 @@ function GetParameter(questionParams, questionIndex, parameter, isMultiple = fal
         return foundValues;
     } else {
         return foundValues[0];
-    }
-}
-
-function createOpenQuestion(questionParams, index, openQuestions) {
-    let questionIndex = `OpenQuestions[${index}]`;
-    let isEquation = GetParameter(questionParams, questionIndex, "IsEquation") === "true"
-    let text = GetParameter(questionParams, questionIndex, "Text")
-    if (isEquation) {
-        text = mathFields["open"][openQuestions].latex()
-    }
-    let answer = GetParameter(questionParams, questionIndex, "Answer")
-    if (isEquation) {
-        answer = mathFields["openAnswer"][openQuestions].latex()
-    }
-    return{
-        text: text,
-        answer: answer,
-        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore")),
-        isEquation: isEquation,
-        imagePath: "",
-        image: GetParameter(questionParams, questionIndex, "Image")
-    }
-}
-function createClosedQuestion(questionParams, index, closedQuestion) {
-    let questionIndex = `ClosedQuestions[${index}]`;
-    let isEquation = GetParameter(questionParams, questionIndex, "IsEquation") === 'true'
-    let text = GetParameter(questionParams, questionIndex, "Text")
-    let answers = GetParameter(questionParams, questionIndex, "Answers", true)
-    if (isEquation) {
-        text = mathFields["closed"][closedQuestion].latex()
-        answers = []
-        for (let i = 0; i < mathFields["closedAnswer"].length; i++) {
-            answers.push(mathFields["closedAnswer"][index][i].latex())
-        }
-    }
-    return {
-        text: text,
-        answers: answers,
-        answerIndexes: GetAnswerIndexes(questionParams, questionIndex, "AnswerIndexes"), 
-        maxScore: parseInt(GetParameter(questionParams, questionIndex, "MaxScore")),
-        isEquation: isEquation,
-        imagePath: ""
     }
 }
 

@@ -232,6 +232,9 @@ namespace IntelliTest.Core.Services
 
         public async Task Edit(Guid id, TestEditViewModel model, Guid teacherId)
         {
+            model.OpenQuestions ??= new List<OpenQuestionViewModel>();
+            model.ClosedQuestions ??= new List<ClosedQuestionEditViewModel>();
+
             var test = await context.Tests
                                     .Include(t=>t.OpenQuestions)
                                     .Include(t=>t.ClosedQuestions)
