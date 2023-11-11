@@ -1,18 +1,18 @@
 ﻿@model OpenQuestionViewModel
 <div class="questBox">
     <div class="form-group uploader" style="display: none">
-        <input id="file-upload" type="file" accept="image/*" asp-for="Image"/>
+        <input class="file-upload" type="file" accept="image/*" asp-for="Image" />
 
-        <label for="file-upload" id="file-drag" style="float:none">
-            <img id="file-image" src="@("/" + Model.ImagePath)" alt="Preview" class="hidden" style="max-width: 100%">
-            <div id="start">
+        <label asp-for="Image" class="file-drag" style="float:none">
+            <img src="@("/" + Model.ImagePath)" alt="Preview" class="hidden file-image" style="max-width: 100%">
+            <div class="start">
                 <i class="fa fa-download" aria-hIdden="true"></i>
                 <div>Select a file or drag here</div>
-                <div id="notimage" class="hidden">Please select an image</div>
-                <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+                <div class="hidden notimage">Please select an image</div>
+                <span class="btn btn-primary file-upload-btn">Select a file</span>
             </div>
-            <div id="response" class="hidden">
-                <div id="messages"></div>
+            <div class="hidden response">
+                <div class="messages"></div>
             </div>
         </label>
     </div>

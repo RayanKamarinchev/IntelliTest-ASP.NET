@@ -199,7 +199,7 @@ namespace IntelliTest.Core.Services
             {
                 OpenQuestions = model.OpenQuestions
                                      .Where(q => !q.IsDeleted)
-                                     .Select(q => new OpenQuestionAnswerViewModel()
+                                     .Select(q => new OpenQuestionViewModel()
                                      {
                                          Text = q.Text,
                                          Id = q.Id,
@@ -210,16 +210,16 @@ namespace IntelliTest.Core.Services
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
                                        .Where(q => !q.IsDeleted)
-                                       .Select(q => new ClosedQuestionAnswerViewModel()
+                                       .Select(q => new ClosedQuestionViewModel()
                                        {
-                                           PossibleAnswers = q.Answers.Split("&"),
+                                           Answers = q.Answers.Split("&"),
                                            IsDeleted = false,
                                            Text = q.Text,
                                            Id = q.Id,
                                            MaxScore = q.MaxScore,
                                            ImagePath = q.ImagePath,
                                            IsEquation = q.IsEquation,
-                                           Answers = new bool[q.Answers.Length]
+                                           AnswerIndexes = new bool[q.Answers.Length]
                                        })
                                        .ToList(),
                 Time = model.Time,
@@ -232,9 +232,6 @@ namespace IntelliTest.Core.Services
 
         public async Task Edit(Guid id, TestEditViewModel model, Guid teacherId)
         {
-            model.OpenQuestions ??= new List<OpenQuestionViewModel>();
-            model.ClosedQuestions ??= new List<ClosedQuestionEditViewModel>();
-
             var test = await context.Tests
                                     .Include(t=>t.OpenQuestions)
                                     .Include(t=>t.ClosedQuestions)
@@ -316,7 +313,7 @@ namespace IntelliTest.Core.Services
             question.IsEquation = testQuestion.IsEquation;
             return question;
         };
-        private Func<List<ClosedQuestionEditViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
+        private Func<List<ClosedQuestionViewModel>, ClosedQuestion, ClosedQuestion> EditClosedQuestion = (allQuestions, question) =>
         {
             var modelQuestion = allQuestions
                                      .FirstOrDefault(q => CheckForSameAnswers(q, question.Answers) || q.Text == question.Text);
@@ -341,7 +338,7 @@ namespace IntelliTest.Core.Services
             return question;
         };
 
-        private static bool CheckForSameAnswers(ClosedQuestionEditViewModel questionViewModel, string savedQuestionAnswers)
+        private static bool CheckForSameAnswers(ClosedQuestionViewModel questionViewModel, string savedQuestionAnswers)
         {
             return string.Join("&", questionViewModel.Answers.Where(a => !string.IsNullOrEmpty(a))) == savedQuestionAnswers;
         }

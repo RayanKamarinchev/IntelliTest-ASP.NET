@@ -421,42 +421,42 @@ img.profile-photo-lg {
             box-shadow: inset 0 0 0 6px #eee;
         }
 
-            .uploader label.hover #start i.fa {
+            .uploader label.hover .start i.fa {
                 transform: scale(0.8);
                 opacity: 0.3;
             }
 
-    .uploader #start {
+    .uploader .start {
         float: left;
         clear: both;
         width: 100%;
     }
 
-        .uploader #start.hidden {
+        .uploader .start.hidden {
             display: none;
         }
 
-        .uploader #start i.fa {
+        .uploader .start i.fa {
             font-size: 50px;
             margin-bottom: 1rem;
             transition: all 0.2s ease-in-out;
         }
 
-    .uploader #response {
+    .uploader .response {
         float: left;
         clear: both;
         width: 100%;
     }
 
-        .uploader #response.hidden {
+        .uploader .response.hidden {
             display: none;
         }
 
-        .uploader #response #messages {
+        .uploader .response #messages {
             margin-bottom: 0.5rem;
         }
 
-    .uploader #file-image {
+    .uploader .file-image {
         display: inline;
         margin: 0 auto 0.5rem auto;
         width: auto;
@@ -464,18 +464,18 @@ img.profile-photo-lg {
         max-width: 180px;
     }
 
-        .uploader #file-image.hidden {
+        .uploader .file-image.hidden {
             display: none;
         }
 
-    .uploader #notimage {
+    .uploader .notimage {
         display: block;
         float: left;
         clear: both;
         width: 100%;
     }
 
-        .uploader #notimage.hidden {
+        .uploader .notimage.hidden {
             display: none;
         }
 

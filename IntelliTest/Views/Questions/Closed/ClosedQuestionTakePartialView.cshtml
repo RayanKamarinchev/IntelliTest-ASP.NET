@@ -1,4 +1,4 @@
-﻿@model IntelliTest.Core.Models.Questions.Closed.ClosedQuestionAnswerViewModel
+﻿@model IntelliTest.Core.Models.Questions.Closed.ClosedQuestionViewModel
 
 <div class="questBox">
     <div class="customRow">
@@ -14,19 +14,19 @@
         </div>
     </div>
     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
-        @for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
+        @for (int i = 0; i < Model.Answers.Count(); i++)
         {
             <div class="questTextBox option">
                 <div>
-                    <input type="checkbox" asp-for="@Model.Answers[i]" value="@Model.Answers[i]"/>
+                    <input type="checkbox" asp-for="@Model.AnswerIndexes[i]" value="@Model.AnswerIndexes[i]" />
                 </div>
                 @if (Model.IsEquation)
                 {
-                    <p class="math-field text">@Model.PossibleAnswers[i]</p>
+                    <p class="math-field text">@Model.Answers[i]</p>
                 }
                 else
                 {
-                    <p>@Model.PossibleAnswers[i]</p>
+                    <p>@Model.Answers[i]</p>
                 }
             </div>
         }

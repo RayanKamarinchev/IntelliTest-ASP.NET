@@ -7,6 +7,5 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string Answer { get; set; }
         public int MaxScore { get; set; }
-        public IFormFile? Image { get; set; }
     }
 }

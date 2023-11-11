@@ -413,7 +413,6 @@ textarea {
 .questionScore {
     position: absolute;
     right: 20px;
-    top: 20px;
     border: none;
     font-size: 30px;
 }

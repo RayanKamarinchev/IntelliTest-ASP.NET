@@ -7,8 +7,8 @@ namespace IntelliTest.Core.Contracts
     public interface ITestResultsService
     {
         //Answer processing
-        Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
-                           List<ClosedQuestionAnswerViewModel> closedQuestions,
+        Task AddTestAnswer(List<OpenQuestionViewModel> openQuestions,
+                           List<ClosedQuestionViewModel> closedQuestions,
                            Guid studentId,
                            Guid testId);
         decimal CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, int MaxScore);

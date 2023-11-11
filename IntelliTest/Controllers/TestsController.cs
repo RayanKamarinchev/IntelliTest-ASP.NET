@@ -34,7 +34,7 @@ namespace IntelliTest.Controllers
         {
             testService = _testService;
             cache = _cache;
-            studentService = _studentService;
+            studentService = _studentService; 
             classService = _classService;
             this.testResultsService = testResultsService;
             this.webHostEnvironment = webHostEnvironment;
@@ -122,12 +122,28 @@ namespace IntelliTest.Controllers
             return View("Edit", testToEdit);
         }
 
+        private async Task SaveImage(QuestionViewModel question)
+        {
+            if (question.Image != null && question.Image.ContentType.StartsWith("image")
+                                       && !(question.ImagePath.StartsWith("imgs/") || question.ImagePath != ""))
+            {
+                string folder = "imgs/";
+                folder += Guid.NewGuid() + "_" + question.Image.FileName;
+                question.ImagePath = folder;
+                string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
+                await question.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+            }
+        }
 
         [HttpPost]
         [Route("Tests/Edit/{Id}")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Edit(Guid id, [FromForm] TestEditViewModel model)
         {
+            //TODO Image no reset
+            model.OpenQuestions ??= new List<OpenQuestionViewModel>();
+            model.ClosedQuestions ??= new List<ClosedQuestionViewModel>();
+
             if (!User.IsTeacher())
             {
                 return Unauthorized();
@@ -146,15 +162,11 @@ namespace IntelliTest.Controllers
 
             foreach (var question in model.OpenQuestions)
             {
-                if (question.Image != null && question.Image.ContentType.StartsWith("image") 
-                                           && !(question.ImagePath.StartsWith("imgs/") || question.ImagePath!=""))
-                {
-                    string folder = "imgs/";
-                    folder += Guid.NewGuid() + "_" + question.Image.FileName;
-                    question.ImagePath = folder;
-                    string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
-                    await question.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
-                }
+                await SaveImage(question);
+            }
+            foreach (var question in model.ClosedQuestions)
+            {
+                await SaveImage(question);
             }
 
             model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
@@ -165,7 +177,7 @@ namespace IntelliTest.Controllers
             return Content("redirect");
         }
 
-        private bool AllQuestionsHaveAnswerIndexes(List<ClosedQuestionEditViewModel> closedQuestions)
+        private bool AllQuestionsHaveAnswerIndexes(List<ClosedQuestionViewModel> closedQuestions)
         {
             if (closedQuestions is null)
             {

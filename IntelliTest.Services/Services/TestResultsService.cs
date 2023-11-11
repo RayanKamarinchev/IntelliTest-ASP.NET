@@ -46,8 +46,8 @@ namespace IntelliTest.Core.Services
         }
 
 
-        public async Task AddTestAnswer(List<OpenQuestionAnswerViewModel> openQuestions,
-                                        List<ClosedQuestionAnswerViewModel> closedQuestions, Guid studentId, Guid testId)
+        public async Task AddTestAnswer(List<OpenQuestionViewModel> openQuestions,
+                                        List<ClosedQuestionViewModel> closedQuestions, Guid studentId, Guid testId)
         {
             if (context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId))
             {
@@ -61,7 +61,7 @@ namespace IntelliTest.Core.Services
             });
             var closed = closedQuestions?.Select(q => new ClosedQuestionAnswer()
             {
-                AnswerIndexes = string.Join("&", q.Answers
+                AnswerIndexes = string.Join("&", q.AnswerIndexes
                                                   .Select((val, indx) => new { val, indx })
                                                   .Where(q => q.val)
                                                   .Select(q => q.indx)),
@@ -152,7 +152,7 @@ namespace IntelliTest.Core.Services
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
                                        .Where(q => !q.IsDeleted)
-                                       .Select(q => new ClosedQuestionEditViewModel()
+                                       .Select(q => new ClosedQuestionViewModel()
                                        {
                                            Answers = q.Answers.Split("&"),
                                            AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
@@ -214,7 +214,7 @@ namespace IntelliTest.Core.Services
                     answers.Add(new List<int>());
                     for (int i = 0; i < q.Answers.Length; ++i)
                     {
-                        if (q.Answers[i])
+                        if (q.AnswerIndexes[i])
                         {
                             answers.Last().Add(i);
                         }
@@ -230,7 +230,7 @@ namespace IntelliTest.Core.Services
                     {
                         StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
                         Text = res[0].ClosedQuestions[i].Text,
-                        Answers = res[0].ClosedQuestions[i].PossibleAnswers
+                        Answers = res[0].ClosedQuestions[i].Answers
                     });
                 }
             }
@@ -304,7 +304,7 @@ namespace IntelliTest.Core.Services
                                                        {
                                                            Text = q.Question.Text,
                                                            Id = q.Id,
-                                                           RightAnswer = q.Question.Answer,
+                                                           CorrectAnswer = q.Question.Answer,
                                                            MaxScore = q.Question.MaxScore,
                                                            Answer = q.Answer,
                                                            Score = q.Points,
@@ -319,18 +319,18 @@ namespace IntelliTest.Core.Services
                 {
                     var closedQuestionModel = new ClosedQuestionReviewViewModel()
                     {
-                        PossibleAnswers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                        Answers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
                         IsDeleted = false,
                         Text = q.Question.Text,
                         Id = q.Id,
-                        Answers = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
-                                                        q.AnswerIndexes),
-                        RightAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
+                        AnswerIndexes = ProccessAnswerIndexes(q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                                                              q.AnswerIndexes),
+                        CorrectAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
                                         .ToArray(),
                         MaxScore = q.Question.MaxScore
                     };
-                    closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.Answers,
-                         closedQuestionModel.RightAnswers,
+                    closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.AnswerIndexes,
+                         closedQuestionModel.CorrectAnswers,
                          closedQuestionModel.MaxScore);
                     closedQuestions.Add(closedQuestionModel);
                 }

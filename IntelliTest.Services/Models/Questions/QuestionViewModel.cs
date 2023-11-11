@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace IntelliTest.Core.Models.Questions
         public string ImagePath { get; set; }
 
         public int Index { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

@@ -139,7 +139,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             {
                 Id = id,
                 OpenQuestions = new List<OpenQuestionViewModel>(),
-                ClosedQuestions = new List<ClosedQuestionEditViewModel>(),
+                ClosedQuestions = new List<ClosedQuestionViewModel>(),
                 Description = "Test",
                 Grade = 8,
                 PublicityLevel = PublicityLevel.Public,

@@ -9,13 +9,13 @@
         </div>
     </div>
     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
-        @for (int i = 0; i < Model.PossibleAnswers.Count(); i++)
+        @for (int i = 0; i < Model.Answers.Count(); i++)
         {
             <div class="questTextBox icon-answer option">
                 @{
-                    @if (Model.RightAnswers.Contains(i))
+                    @if (Model.CorrectAnswers.Contains(i))
                     {
-                        if (Model.Answers[i])
+                        if (Model.AnswerIndexes[i])
                         {
                             <i class="fa-solid fa-square-check" style="color: #358DF1;"></i>
                         }
@@ -24,7 +24,7 @@
                             <i class="fa-solid fa-square-check" style="color: #198754;"></i>
                         }
                     }
-                    else if (Model.Answers[i])
+                    else if (Model.AnswerIndexes[i])
                     {
                         <i class="fa-solid fa-square-xmark" style="color: #BF3100;"></i>
                     }
@@ -33,7 +33,7 @@
                         <i class="fa-regular fa-square"></i>
                     }
                 }
-                <p>@Model.PossibleAnswers[i]</p>
+                <p>@Model.Answers[i]</p>
             </div>
         }
     </div>

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace IntelliTest.Core.Models.Questions.Closed
 {
-    public class ClosedQuestionReviewViewModel : ClosedQuestionAnswerViewModel
+    public class ClosedQuestionReviewViewModel : ClosedQuestionViewModel
     {
-        public int[] RightAnswers { get; set; }
+        public int[] CorrectAnswers { get; set; }
         public decimal Score { get; set; }
     }
 }
