@@ -5,7 +5,6 @@
 }
 
 function fileSelectHandler(e) {
-  debugger;
   // Fetch FileList object
   var files = e.target.files || e.dataTransfer.files;
 
@@ -23,8 +22,6 @@ function parseFile(file, target) {
 
   let isGood = (/\.(?=gif|jpg|png|jpeg)/gi).test(imageName);
   let imageUploaderIndex =[...document.getElementsByClassName("file-upload")].indexOf(target);
-  console.log(imageUploaderIndex)
-  console.log(document.getElementsByClassName('start'))
   if (isGood) {
     document.getElementsByClassName('start')[imageUploaderIndex].classList.add("hidden");
     document.getElementsByClassName('response')[imageUploaderIndex].classList.remove("hidden");

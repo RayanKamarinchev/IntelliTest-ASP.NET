@@ -413,13 +413,17 @@ namespace IntelliTest.Controllers
 
         public void AddRoleIdsToTempData(string userId)
         {
-            if (!TempData.Keys.Contains("TeacherId"))
+            Guid? teacherId = teacherService.GetTeacherId(userId);
+            Guid? studentId = studentService.GetStudentId(userId);
+            TempData.Remove("StudentId");
+            TempData.Remove("TeacherId");
+            if (teacherId != null)
             {
-                TempData["TeacherId"] = teacherService.GetTeacherId(userId);
+                TempData["TeacherId"] = (Guid)teacherId;
             }
-            if (!TempData.Keys.Contains("StudentId"))
+            if (studentId != null)
             {
-                TempData["StudentId"] = studentService.GetStudentId(userId);
+                TempData["StudentId"] = (Guid)studentId;
             }
         }
     }

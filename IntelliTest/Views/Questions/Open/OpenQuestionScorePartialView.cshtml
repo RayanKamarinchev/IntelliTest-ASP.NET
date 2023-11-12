@@ -7,9 +7,13 @@
     }
 }
 <div class="questBox">
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="/@Model.ImagePath" style="max-width: 90%" />
+    }
     <div class="questionScore questTextBox" style="width: 200px; height: 45px">
         <span>Точки:</span>
-        <input type="text" value="@Model.Score" asp-for="Score" max="@Model.MaxScore" min="0" class="body_size scoreBox" style = "width: 30%;"/>
+        <input type="text" value="@Model.Score" asp-for="Score" max="@Model.MaxScore" min="0" class="body_size scoreBox" style="width: 30%;"/>
         <span>/ @Model.MaxScore</span>
     </div>
     <div class="customRow">

@@ -1,19 +1,21 @@
 ﻿@model IntelliTest.Core.Models.Questions.Closed.ClosedQuestionViewModel
-
+@{
+    bool presentImage = !string.IsNullOrEmpty(Model.ImagePath);
+}
 
 <div class="questBox">
     <div class="form-group uploader" style="display: none">
         <input class="file-upload" type="file" accept="image/*" asp-for="Image" />
 
         <label asp-for="Image" class="file-drag" style="float:none">
-            <img src="@("/" + Model.ImagePath)" alt="Preview" class="hidden file-image" style="max-width: 100%">
-            <div class="start">
+            <img src="@(presentImage ? "/" + Model.ImagePath : "")" alt="Preview" class="@(presentImage ? "":"hidden") file-image" style="max-width: 100%">
+            <div class="start @(presentImage ? "hidden" : "")">
                 <i class="fa fa-download" aria-hIdden="true"></i>
                 <div>Select a file or drag here</div>
-                <div class="hidden notimage">Please select an image</div>
+                <div class="@(presentImage ? "":"hidden") notimage">Please select an image</div>
                 <span class="btn btn-primary file-upload-btn">Select a file</span>
             </div>
-            <div class="hidden response">
+            <div class="@(presentImage ? "":"hidden") response">
                 <div class="messages"></div>
             </div>
         </label>
@@ -68,5 +70,5 @@
             }
         </div>
     </div>
-    <button class="addImageToQuestionBtn btn btn-secondary" type="button">Добави Изображение</button>
+    <button class="addImageToQuestionBtn btn btn-secondary" type="button">Покажи Изображение</button>
 </div>

@@ -43,7 +43,7 @@
             let min = @mins;
             let sec = @sec;
         let id = "@Model.Id";
-        let studentId = "@TempData["StudentId"]";
+        let studentId = "@(TempData.Peek("StudentId"))";
     </script>
     <script src="~/js/testTake.js" asp-append-version="true"></script>
     <script src="~/js/test.js" asp-append-version="true"></script>

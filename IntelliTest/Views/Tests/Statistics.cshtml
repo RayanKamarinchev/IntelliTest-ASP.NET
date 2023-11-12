@@ -47,6 +47,10 @@
                     }
 
                     <div class="questBox">
+                        @if (!string.IsNullOrEmpty(question.ImagePath))
+                        {
+                            <img src="@question.ImagePath" style="max-width: 90%" />
+                        }
                         <div class="customRow">
                             <div class="questTextBox">
                                 <p>@question.Text</p>
@@ -98,6 +102,10 @@
                     var question = Model.OpenQuestions[openQuestionsIndex];
                     openQuestionsIndex++;
                     <div class="questBox">
+                        @if (!string.IsNullOrEmpty(question.ImagePath))
+                        {
+                            <img src="@question.ImagePath" style="max-width: 90%" />
+                        }
                         <div class="customRow">
                             <div class="questTextBox">
                                 <p>@question.Text</p>

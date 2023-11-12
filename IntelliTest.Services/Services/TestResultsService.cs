@@ -95,16 +95,9 @@ namespace IntelliTest.Core.Services
             decimal score = 0;
             for (int i = 0; i < Answers.Length; i++)
             {
-                if (Answers[i])
+                if (Answers[i] && RightAnswers.Contains(i))
                 {
-                    if (RightAnswers.Contains(i))
-                    {
                         score++;
-                    }
-                    else
-                    {
-                        score--;
-                    }
                 }
             }
             score *= MaxScore * 1.0m / RightAnswers.Count();
@@ -230,7 +223,8 @@ namespace IntelliTest.Core.Services
                     {
                         StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
                         Text = res[0].ClosedQuestions[i].Text,
-                        Answers = res[0].ClosedQuestions[i].Answers
+                        Answers = res[0].ClosedQuestions[i].Answers,
+                        ImagePath = res[0].ClosedQuestions[i].ImagePath
                     });
                 }
             }
@@ -252,7 +246,8 @@ namespace IntelliTest.Core.Services
                     model.OpenQuestions.Add(new OpenQuestionStatsViewModel()
                     {
                         StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
-                        Text = res[0].OpenQuestions[i].Text
+                        Text = res[0].OpenQuestions[i].Text,
+                        ImagePath = res[0].OpenQuestions[i].ImagePath
                     });
                 }
             }
@@ -308,7 +303,8 @@ namespace IntelliTest.Core.Services
                                                            MaxScore = q.Question.MaxScore,
                                                            Answer = q.Answer,
                                                            Score = q.Points,
-                                                           Explanation = q.Explanation
+                                                           Explanation = q.Explanation,
+                                                           ImagePath = q.Question.ImagePath
                                                        })
                                                        .ToListAsync();
                 var closedQuestions = new List<ClosedQuestionReviewViewModel>();
@@ -327,7 +323,8 @@ namespace IntelliTest.Core.Services
                                                               q.AnswerIndexes),
                         CorrectAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None).Select(int.Parse)
                                         .ToArray(),
-                        MaxScore = q.Question.MaxScore
+                        MaxScore = q.Question.MaxScore,
+                        ImagePath = q.Question.ImagePath
                     };
                     closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.AnswerIndexes,
                          closedQuestionModel.CorrectAnswers,

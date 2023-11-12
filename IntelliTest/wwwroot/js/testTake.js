@@ -1,6 +1,10 @@
 ﻿let submitted = false;
 let windowsChangedStartTime = null;
 
+// const form = document.querySelector("form");
+// form.addEventListener("submit", handleSubmit);
+window.onsubmit = handleSubmit;
+
 checkboxes = []
 i = 0
 function RemoveHiddenCheckboxes() {
@@ -46,26 +50,25 @@ function step() {
         min--;
     }
     if ((min < 0 || sec <= 0) && !submitted) {
-        document.forms["test"].submit();
+        $("form").trigger('submit');
     }
     timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
     expected += interval;
     setTimeout(step, Math.max(0, interval - dt));
 }
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden && !submitted) {
+    if (!submitted) {
         if (windowsChangedStartTime == null) {
             windowsChangedStartTime = Date.now();
         }
         else if (Date.now() - windowsChangedStartTime > 3000) {
-            document.forms["test"].submit();
+            $("form").trigger('submit');
         }
     }
 });
 mathFields = [];
 
 [...document.getElementsByClassName("math-field")].forEach(mathFieldSpan=>{
-    console.log(mathFieldSpan.classList[1])
     let MQ = MathQuill.getInterface(2); // for backcompat
     if (mathFieldSpan.classList[1] === "answer"){
         let mathField = MQ.MathField(mathFieldSpan, {
@@ -77,10 +80,6 @@ mathFields = [];
         let fillInTheBlank = MQ.StaticMath(mathFieldSpan);
     }
 })
-
-const form = document.querySelector("form");
-form.addEventListener("submit", handleSubmit);
-
 function GetByDictKey(allowed, value) {
     return Object.keys(value)
         .filter(key => key.includes(allowed))
@@ -96,7 +95,7 @@ function isQuestionEmpty(question) {
 }
 
 function GetAnswerIndexes(questionParams, questionIndex) {
-    let selectedAnswers = Object.keys(GetByDictKey(questionIndex + ".Answers", questionParams));
+    let selectedAnswers = Object.keys(GetByDictKey(questionIndex + ".AnswerIndexes", questionParams));
     let indexes = checkboxes[questionIndex.match(/\d+/g)[0]]
     for (const selectedAnswer of selectedAnswers) {
         indexes[parseInt(selectedAnswer.match(/\d+/g)[1])] = true
@@ -126,7 +125,7 @@ function createOpenQuestion(questionParams, index) {
 function createClosedQuestion(questionParams, index) {
     let questionIndex = `ClosedQuestions[${index}]`;
     return {
-        answers: GetAnswerIndexes(questionParams, questionIndex, "AnswerIndexes"),
+        answerIndexes: GetAnswerIndexes(questionParams, questionIndex, "AnswerIndexes"),
         maxScore: 0,
         text: "",
         isEquation: false,
@@ -178,6 +177,7 @@ function handleSubmit(event) {
     res["Title"] = "";
     res["QuestionOreder"] = []
     res["Id"] = id
+    console.log(res);
     console.log(JSON.stringify(res))
     $.ajax({
         url: "/Tests/Take/" + id,

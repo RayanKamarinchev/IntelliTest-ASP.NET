@@ -230,7 +230,7 @@ function GetKeysContaining(searchWord, object) {
 }
 
 function getImagePath(index){
-    return document.getElementsByClassName("questBox")[index].children[0].children[1].children[0].src;
+    return document.getElementsByClassName("questBox")[index+2].children[0].children[1].children[0].getAttribute("src");
 }
 
 function GetAnswerIndexes(formValues, questionIndex) {
@@ -416,7 +416,7 @@ function imageUploaderPartialView(order, questionType){
     }].Image"/>
 
         <label for="file-upload${questionType}${order}" for="file-upload" class="file-drag" style="float:none">
-            <img alt="Preview" class="hidden file-image" style="max-width: 100%">
+            <img alt="Preview" src="" class="hidden file-image" style="max-width: 100%">
                 <div class="start">
                     <i class="fa fa-download" aria-hIdden="true"></i>
                     <div>Select a file or drag here</div>
@@ -467,7 +467,7 @@ function openQuestionPartialView(question, answer, order, maxScore) {
         </div>
     </div>
     </div>
-    <button class="addImageToQuestionBtn btn btn-secondary" onclick="showImageUpload(this)" type="button">Добави Изображение</button>
+    <button class="addImageToQuestionBtn btn btn-secondary" onclick="showImageUpload(this)" type="button">Покажи Изображение</button>
 </div>
         `
 }
@@ -518,6 +518,6 @@ function closedQuestionPartialView(question, answers, order, maxScore) {
         `
   </div>
 </div>
-<button class="addImageToQuestionBtn btn btn-secondary" onclick="showImageUpload(this)" type="button">Добави Изображение</button>
+<button class="addImageToQuestionBtn btn btn-secondary" onclick="showImageUpload(this)" type="button">Покажи Изображение</button>
             `
 }

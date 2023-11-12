@@ -124,23 +124,26 @@ namespace IntelliTest.Controllers
 
         private async Task SaveImage(QuestionViewModel question)
         {
-            if (question.Image != null && question.Image.ContentType.StartsWith("image")
-                                       && !(question.ImagePath.StartsWith("imgs/") || question.ImagePath != ""))
+            if (question.Image != null && question.Image.ContentType.StartsWith("image"))
             {
+                if (question.ImagePath.StartsWith("imgs/"))
+                {
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, question.ImagePath);
+                    System.IO.File.Delete(path);
+                }
                 string folder = "imgs/";
                 folder += Guid.NewGuid() + "_" + question.Image.FileName;
-                question.ImagePath = folder;
+                question.ImagePath = "/" + folder;
                 string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
                 await question.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
             }
         }
-
+        
         [HttpPost]
         [Route("Tests/Edit/{Id}")]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Edit(Guid id, [FromForm] TestEditViewModel model)
         {
-            //TODO Image no reset
             model.OpenQuestions ??= new List<OpenQuestionViewModel>();
             model.ClosedQuestions ??= new List<ClosedQuestionViewModel>();
 
@@ -154,12 +157,6 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
-                TempData.Peek("PublicityLevel") is null)
-            {
-                return View("Edit", model);
-            }
-
             foreach (var question in model.OpenQuestions)
             {
                 await SaveImage(question);
@@ -167,6 +164,12 @@ namespace IntelliTest.Controllers
             foreach (var question in model.ClosedQuestions)
             {
                 await SaveImage(question);
+            }
+
+            if (!ModelState.IsValid || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
+                TempData.Peek("PublicityLevel") is null)
+            {
+                return View("Edit", model);
             }
 
             model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
@@ -289,7 +292,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Review/{testId}/{studentId}")]
+        [Route("Tests/Review/{testId}/{studentId}")]
         public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
             var teacherId = (Guid?)TempData.Peek(TeacherId);

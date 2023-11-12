@@ -1,6 +1,10 @@
 ﻿@model IntelliTest.Core.Models.Questions.Closed.ClosedQuestionViewModel
 
 <div class="questBox">
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath" style="max-width: 90%" />
+    }
     <div class="customRow">
         <div class="questTextBox">
             @if (Model.IsEquation)
@@ -18,7 +22,7 @@
         {
             <div class="questTextBox option">
                 <div>
-                    <input type="checkbox" asp-for="@Model.AnswerIndexes[i]" value="@Model.AnswerIndexes[i]" />
+                    <input type="checkbox" asp-for="@Model.AnswerIndexes[i]" value="@Model.AnswerIndexes[i]"/>
                 </div>
                 @if (Model.IsEquation)
                 {

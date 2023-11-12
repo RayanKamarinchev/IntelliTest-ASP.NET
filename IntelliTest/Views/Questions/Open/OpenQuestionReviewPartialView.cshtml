@@ -7,8 +7,11 @@
     }
 }
 <div class="questBox">
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath" style="max-width: 90%" />
+    }
     <p class="questionScore">@($"{Model.Score:f2}")/@Model.MaxScore</p>
-    <input value="@Model.Id" asp-for="Id" style="display: none"/>
     <div class="customRow">
         <div class="questTextBox">
             <p>@Model.Text</p>
@@ -17,7 +20,7 @@
     <div class="questTextBox questAnswer">
         <div>
             @{
-                if (Model.Score!=0)
+                if (Model.Score != 0)
                 {
                     <div class="icon-answer option">
                         <i class="fa-solid fa-square-check" style="color: #358DF1;"></i>

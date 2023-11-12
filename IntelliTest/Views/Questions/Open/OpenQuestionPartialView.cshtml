@@ -1,17 +1,20 @@
 ﻿@model OpenQuestionViewModel
+@{
+    bool presentImage = !string.IsNullOrEmpty(Model.ImagePath);
+}
 <div class="questBox">
     <div class="form-group uploader" style="display: none">
         <input class="file-upload" type="file" accept="image/*" asp-for="Image" />
 
         <label asp-for="Image" class="file-drag" style="float:none">
-            <img src="@("/" + Model.ImagePath)" alt="Preview" class="hidden file-image" style="max-width: 100%">
-            <div class="start">
+            <img src="@(Model.ImagePath)" alt="Preview" class="@(presentImage ? "":"hidden") file-image" style="max-width: 100%">
+            <div class="start @(presentImage ? "hidden" : "")">
                 <i class="fa fa-download" aria-hIdden="true"></i>
                 <div>Select a file or drag here</div>
-                <div class="hidden notimage">Please select an image</div>
+                <div class="@(presentImage ? "":"hidden") notimage">Please select an image</div>
                 <span class="btn btn-primary file-upload-btn">Select a file</span>
             </div>
-            <div class="hidden response">
+            <div class="@(presentImage ? "":"hidden") response">
                 <div class="messages"></div>
             </div>
         </label>
@@ -33,12 +36,12 @@
                 </label>
                 @if (Model.IsEquation)
                 {
-                    <textarea onkeyup="textAreaAdjust(this)" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"></textarea>
+                    <textarea onkeyup="textAreaAdjust(this)" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" name="@Html.NameFor(m => m.Text)">@Model.Text</textarea>
                     <span class="math-field open" onfocus="onFocus(this)" onblur=onFocusOut(this)>@Model.Text</span>
                 }
                 else
                 {
-                    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" value="@Model.Text" asp-for="Text"></textarea>
+                    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Въпрос" type="text" name="@Html.NameFor(m => m.Text)">@Model.Text</textarea>
                     <span class="math-field open" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>@Model.Text</span>
                 }
                 <span class="underline"></span>
@@ -49,27 +52,17 @@
                 <span></span>
                 @if (Model.IsEquation)
                 {
-                    <textarea onkeyup="textAreaAdjust(this)" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
+                    <textarea onkeyup="textAreaAdjust(this)" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" name="@Html.NameFor(m => m.Answer)"></textarea>
                     <span class="math-field openAnswer" onfocus="onFocus(this)" onblur=onFocusOut(this)>@Model.Answer</span>
                 }
                 else
                 {
-                    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" value="@Model.Answer" asp-for="Answer"></textarea>
+                    <textarea onkeyup="textAreaAdjust(this)" onfocus="onFocus(this)" onblur=onFocusOut(this) placeholder="Отговор" type="text" name="@Html.NameFor(m => m.Answer)">@Model.Answer</textarea>
                     <span class="math-field openAnswer" style="display: none" onfocus="onFocus(this)" onblur=onFocusOut(this)>@Model.Answer</span>
                 }
                 <span class="underline"></span>
             </div>
         </div>
     </div>
-    <button class="addImageToQuestionBtn btn btn-secondary" type="button">Добави Изображение</button>
+    <button class="addImageToQuestionBtn btn btn-secondary" type="button">Покажи Изображение</button>
 </div>
-@if (Model.ImagePath != "")
-{
-    <script>
-        document.getElementById('start').classList.add("hidden");
-        document.getElementById('response').classList.remove("hidden");
-        document.getElementById('notimage').classList.add("hidden");
-        document.getElementById('file-image').classList.remove("hidden");
-        document.getElementById('file-image').src = URL.createObjectURL(file);
-    </script>
-}

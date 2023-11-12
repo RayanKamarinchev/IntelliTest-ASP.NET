@@ -1,5 +1,9 @@
 ﻿@model OpenQuestionViewModel
 <div class="questBox">
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath" style="max-width: 90%" />
+    }
     <div class="customRow">
         <div class="questTextBox">
             @if (Model.IsEquation)

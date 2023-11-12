@@ -12,12 +12,12 @@
             {
                 if (Model.QuestionOrder[i] == QuestionType.Closed)
                 {
-                    <partial name="Questions/ClosedQuestionReviewPartialView" for="ClosedQuestions[closedQuestionIndex]" />
+                    <partial name="../Questions/Closed/ClosedQuestionReviewPartialView" for="ClosedQuestions[closedQuestionIndex]" />
                     closedQuestionIndex++;
                 }
                 else
                 {
-                    <partial name="Questions/OpenQuestionReviewPartialView" for="OpenQuestions[openQuestionIndex]" />
+                    <partial name="../Questions/Open/OpenQuestionReviewPartialView" for="OpenQuestions[openQuestionIndex]" />
                     openQuestionIndex++;
                 }
             }

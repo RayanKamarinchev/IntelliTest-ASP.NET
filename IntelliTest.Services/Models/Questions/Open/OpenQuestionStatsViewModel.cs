@@ -10,5 +10,6 @@ namespace IntelliTest.Core.Models.Questions
     {
         public string Text { get; set; }
         public List<string> StudentAnswers { get; set; }
+        public string ImagePath { get; set; }
     }
 }
