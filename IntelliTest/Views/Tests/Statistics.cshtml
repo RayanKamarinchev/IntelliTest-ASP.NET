@@ -53,7 +53,7 @@
                         }
                         <div class="customRow">
                             <div class="questTextBox">
-                                <p>@question.Text</p>
+                                <p>Въпрос: @question.Text</p>
                             </div>
                         </div>
                         @if (all.Any(s => s != 0))
@@ -69,7 +69,7 @@
                                 const data = {
                                     labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
                                     datasets: [{
-                                        label: "Клас 8а",
+                                        label: "Ученици",
                                         data: @Html.Raw(JsonSerializer.Serialize(all)),
                                         fill: true,
                                         lineTension: 0.1,
@@ -108,7 +108,7 @@
                         }
                         <div class="customRow">
                             <div class="questTextBox">
-                                <p>@question.Text</p>
+                                <p>Въпрос: @question.Text</p>
                             </div>
                         </div>
                         <div class="answersView">

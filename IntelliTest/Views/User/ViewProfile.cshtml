@@ -26,7 +26,7 @@
                     <form method="post" name="img" enctype="multipart/form-data">
                         <label for="file-upload" class="btn btn-primary">
                             <i class="fa fa-fw fa-camera"></i>
-                            <span>Change Photo</span>
+                            <span>Промени снимката</span>
                         </label>
                         <input style="display: none" id="file-upload" type="file" accept="image/*"
                                onchange="document.forms['img'].submit(); " asp-for="Image"/>
@@ -37,7 +37,7 @@
     </div>
     <ul class="nav nav-tabs" id="tabs">
         <li class="nav-item">
-            <a class="active nav-link" onclick="Info()">Profile Info</a>
+            <a class="active nav-link" onclick="Info()">Потребителска информация</a>
         </li>
         @{
             if (User.IsTeacher())

@@ -100,7 +100,7 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher)
+        public async Task<bool?> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher)
         {
             if (isStudent)
             {
@@ -108,6 +108,10 @@ namespace IntelliTest.Core.Services
                                     .Include(c => c.Students)
                                     .ThenInclude(s=>s.Student)
                                     .FirstOrDefaultAsync(c => c.Id == classId);
+                if (clasDb == null)
+                {
+                    return null;
+                }
                 return clasDb.Students.Any(s => s.Student.UserId == userId);
             }
 
@@ -135,7 +139,9 @@ namespace IntelliTest.Core.Services
             {
                 return false;
             }
-            return clasDb.Students.Remove(student);
+            bool success = clasDb.Students.Remove(student);
+            await context.SaveChangesAsync();
+            return success;
         }
 
         public async Task<bool> AddStudent(Guid studentId, Guid id)
@@ -158,6 +164,7 @@ namespace IntelliTest.Core.Services
             {
                 StudentId = studentId
             });
+            await context.SaveChangesAsync();
             return true;
         }
         public async Task<List<StudentViewModel>> GetClassStudents(Guid id)
@@ -168,7 +175,7 @@ namespace IntelliTest.Core.Services
                                       .ThenInclude(s => s.User)
                                       .Include(s => s.Students)
                                       .ThenInclude(s => s.Student)
-                                      .ThenInclude(s => s.TestResults)
+                                      .ThenInclude(s => s.TestResults).Include(@class => @class.ClassTests)
                                       .FirstOrDefaultAsync(c => c.Id == id);
             return clasDb.Students.Select(s => new StudentViewModel()
             {
@@ -178,7 +185,7 @@ namespace IntelliTest.Core.Services
                                .Where(t => clasDb.ClassTests.Any(ct => ct.TestId == t.TestId))
                                .Select(t => t.Score)
                                .ToList(),
-                Id = id
+                Id = s.StudentId
             }).ToList();
         }
 

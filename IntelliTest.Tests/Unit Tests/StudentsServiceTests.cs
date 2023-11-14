@@ -93,7 +93,7 @@ namespace IntelliTest.Tests.Unit_Tests
                              Name = s.User.FirstName + " " + s.User.LastName,
                              Email = s.User.Email,
                              Id = s.Id,
-                             Picture = s.User.PhotoPath,
+                             ImagePath = s.User.PhotoPath,
                              TestResults = new List<decimal>(){0.0m}
                          })
                          .ToList();

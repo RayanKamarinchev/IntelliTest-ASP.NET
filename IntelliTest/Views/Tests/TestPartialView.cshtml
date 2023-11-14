@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using IntelliTest.Infrastructure
+﻿@using IntelliTest.Infrastructure
 @model TestViewModel
 <div class="card card-margin">
     <div class="card-header no-border">
@@ -25,7 +24,14 @@
                     <span>Време: <strong>@Model.Time мин</strong></span>
                 </li>
                 <li class="widget-49-meeting-item">
-                    <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
+                    @if (User.IsTeacher())
+                    {
+                        <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
+                    }
+                    else
+                    {
+                        <p>Изпитници: <strong>@Model.Students</strong></p>
+                    }
                 </li>
             </ol>
             <div class="widget-49-meeting-action d-flex justify-content-end">

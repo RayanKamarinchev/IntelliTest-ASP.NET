@@ -1,5 +1,4 @@
 ﻿@using IntelliTest.Infrastructure
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model EditUser
 <form method="post">
 <div class="row">
@@ -38,17 +37,14 @@
                                 if (!User.IsStudent() && !User.IsTeacher())
                                 {
                                     <input class="switch-button-checkbox" asp-for="IsTeacher" type="checkbox"></input>
-                                    <label class="switch-button-label" for="">
-                                        <span class="switch-button-label-span">Ученик</span>
-                                    </label>
                                 }
                                 else
                                 {
                                     <input class="switch-button-checkbox" asp-for="IsTeacher" type="checkbox" disabled></input>
-                                    <label class="switch-button-label" for="">
-                                        <span class="switch-button-label-span">Ученик</span>
-                                    </label>
                                 }
+                                <label class="switch-button-label">
+                                    <span class="switch-button-label-span">Ученик</span>
+                                </label>
                             }
                         </div>
                     </div>

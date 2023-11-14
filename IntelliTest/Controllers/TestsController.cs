@@ -11,11 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using static IntelliTest.Infrastructure.Constraints;
-using Org.BouncyCastle.Ocsp;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
-using IntelliTest.Data.Entities;
-using Microsoft.AspNetCore.Hosting;
 
 namespace IntelliTest.Controllers
 {
@@ -258,6 +255,7 @@ namespace IntelliTest.Controllers
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Take([FromBody]TestSubmitViewModel model, Guid testId)
         {
+            //TODO
             if (!await testService.ExistsbyId(testId))
             {
                 return NotFound();

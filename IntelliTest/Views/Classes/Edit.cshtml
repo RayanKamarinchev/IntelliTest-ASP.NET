@@ -3,6 +3,9 @@
 }
 @using IntelliTest.Data.Enums
 @model ClassViewModel
+@{
+    bool presentImage = !string.IsNullOrEmpty(Model.ImageUrl);
+}
 <div class="row">
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
         <form method="post"  enctype="multipart/form-data">
@@ -29,24 +32,24 @@
             </div>
             <label asp-for="Image"></label>
             <div class="form-group uploader">
-                <input id="file-upload" type="file" accept="image/*" asp-for="Image"/>
+                <input class="file-upload" type="file" accept="image/*" asp-for="Image" />
 
-                <label for="file-upload" id="file-drag">
-                    <img id="file-image" src="#" alt="Preview" class="hidden">
-                    <div id="start">
-                        <i class="fa fa-download" aria-hIdden="true"></i>
+                <label asp-for="Image" class="file-drag" style="float:none">
+                    <img src="@(presentImage ? "/" + Model.ImageUrl : "")" alt="Preview" class="@(presentImage ? "":"hidden") file-image">
+                    <div class="start @(presentImage ? "hidden" : "")">
+                        <i class="fa fa-download" aria-hIdden="true"></i> 
                         <div>Select a file or drag here</div>
-                        <div id="notimage" class="hidden">Please select an image</div>
-                        <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+                        <div class="@(presentImage ? "":"hidden") notimage">Please select an image</div>
+                        <span class="btn btn-primary file-upload-btn">Select a file</span>
                     </div>
-                    <div id="response" class="hidden">
-                        <div id="messages"></div>
+                    <div class="@(presentImage ? "":"hidden") response">
+                        <div class="messages"></div>
                     </div>
                 </label>
             </div>
             <br/>
             <div class="text-center" style="margin-bottom: 50px">
-                <button style="margin-top: 200px;" class="btn btn-primary" type="submit" value="Save">Продължи</button>
+                <button class="btn btn-primary" type="submit" value="Save">Продължи</button>
             </div>
         </form>
         <form asp-action="Delete" method="post">

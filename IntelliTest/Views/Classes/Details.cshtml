@@ -1,6 +1,7 @@
 ﻿@{
     ViewBag.Title = @Model.Name + " клас";
 }
+@using IntelliTest.Infrastructure
 @model ClassDetailsModel
 <div class="container">
     <div class="row">
@@ -36,32 +37,41 @@
                                 <th scope="col">Име</th>
                                 <th scope="col">Резултати</th>
                                 <th scope="col">Имейл</th>
-                                <th scope="col"></th>
+                                @if (User.IsTeacher())
+                                {
+                                    <th scope="col"></th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var student in Model.Students)
                             {
+                                string src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png";
+                                if (!string.IsNullOrEmpty(student.ImagePath))
+                                {
+                                    src = "/" + student.ImagePath;
+                                }
                                 <tr>
-                                    <td><img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="avatar-sm rounded-circle me-2"/><a href="#" class="text-body">Simon Ryles</a></td>
-                                    <td>@student.Name</td>
-                                                    <td>@string.Join(", ", student.TestResults) 34% 34% 34% 34% 34% 34% 34%</td>
+                                    <td><img src="@src" alt="" class="avatar-sm rounded-circle me-2" />@student.Name</td>
+                                    <td>@string.Join(", ", student.TestResults)</td>
                                     <td>@student.Email</td>
-                                    <td>
-                                        <ul class="list-inline mb-0">
-                                            <li class="list-inline-item">
-                                                <a class="btn btn-danger" asp-action="RemoveStudent" asp-route-studentId="@student.Id" asp-route-id="@Model.Id">Remove</a>
-                                            </li>
-                                        </ul>
-                                    </td>
+                                    @if (User.IsTeacher())
+                                    {
+                                        <td>
+                                            <ul class="list-inline mb-0">
+                                                <li class="list-inline-item">
+                                                    <a class="btn btn-danger" asp-action="RemoveStudent" asp-route-studentId="@student.Id" asp-route-id="@Model.Id">Remove</a>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    }
                                 </tr>
                             }
                         </tbody>
                     </table>
             </div>
             <div class="text-center" style="margin-bottom: 50px">
-                <p>Код за курса: @Model.Id</p>
-                <button class="btn btn-primary" asp-action="AddStudent">Добави</button>
+                <p>Код за курса: @Model.JoinCode</p>
             </div>
         </div>
     </div>

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace IntelliTest.Controllers
 {
@@ -26,6 +27,7 @@ namespace IntelliTest.Controllers
         private readonly ITestService testService;
         private readonly ITestResultsService testResultsService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IMemoryCache cache;
 
         public UserController(UserManager<User> _userManager,
                               SignInManager<User> _signInManager,
@@ -36,7 +38,8 @@ namespace IntelliTest.Controllers
                               IEmailService email_service,
                               ITestService testService,
                               IWebHostEnvironment webHostEnvironment,
-                              ITestResultsService testResultsService)
+                              ITestResultsService testResultsService,
+                              IMemoryCache _cache)
         {
             userManager = _userManager;
             signInManager = _signInManager;
@@ -48,6 +51,7 @@ namespace IntelliTest.Controllers
             this.testService = testService;
             this.webHostEnvironment = webHostEnvironment;
             this.testResultsService = testResultsService;
+            cache = _cache;
         }
 
         private string GetEmailTemplate(string link)
@@ -150,6 +154,9 @@ namespace IntelliTest.Controllers
         {
             await signInManager.SignOutAsync();
             TempData.Clear();
+            cache.Remove("tests");
+            cache.Remove("lessons");
+            cache.Remove("classes");
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]

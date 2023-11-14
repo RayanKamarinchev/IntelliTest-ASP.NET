@@ -16,7 +16,7 @@ namespace IntelliTest.Core.Contracts
         Task Create(ClassViewModel model);
         Task Edit(ClassViewModel model, Guid id);
         Task Delete(Guid id);
-        Task<bool> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher);
+        Task<bool?> IsInClass(Guid classId, string userId, bool isStudent, bool isTeacher);
         Task<bool> RemoveStudent(Guid studentId, Guid id);
         Task<bool> AddStudent(Guid studentId, Guid id);
         public Task<List<StudentViewModel>> GetClassStudents(Guid id);

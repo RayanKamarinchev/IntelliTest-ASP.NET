@@ -1,5 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using IntelliTest.Data.Entities
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
@@ -28,17 +27,17 @@
             <a type="submit" class="nav-link text-dark" asp-controller="User" asp-action="Logout"
                asp-route-Id="@UserManager.GetUserId(User)">
                 <i class="fa fa-sign-out"></i>
-                <span>Logout</span>
+                <span>Излез</span>
             </a>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="User" asp-action="Register">Register</a>
+            <a class="nav-link text-dark" asp-controller="User" asp-action="Register">Регистрирай се</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="User" asp-action="Login">Login</a>
+            <a class="nav-link text-dark" asp-controller="User" asp-action="Login">Вход</a>
         </li>
     }
 </ul>

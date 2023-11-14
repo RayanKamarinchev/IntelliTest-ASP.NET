@@ -8,7 +8,7 @@
     }
     <div class="customRow">
         <div class="questTextBox">
-            <p>@Model.Text</p>
+            <p>Въпрос: @Model.Text</p>
         </div>
     </div>
     <div class="choice" onFocus="onFocus(this)" onBlur="onFocusOut(this)">
@@ -20,16 +20,18 @@
                     {
                         if (Model.AnswerIndexes[i])
                         {
-                            <i class="fa-solid fa-square-check" style="color: #358DF1;"></i>
+                            <i class="fa-solid fa-square-check" style="color: #358DF1;"></i><p>Правилен отговор</p>
                         }
                         else
                         {
                             <i class="fa-solid fa-square-check" style="color: #198754;"></i>
+
+                            <p>Неизбран правилен отговор</p>
                         }
                     }
                     else if (Model.AnswerIndexes[i])
                     {
-                        <i class="fa-solid fa-square-xmark" style="color: #BF3100;"></i>
+                        <i class="fa-solid fa-square-xmark" style="color: #BF3100;"></i><p>Грешен отговор</p>
                     }
                     else
                     {

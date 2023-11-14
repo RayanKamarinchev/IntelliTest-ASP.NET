@@ -1,5 +1,6 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Classes;
+using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -137,6 +138,12 @@ namespace IntelliTest.Controllers
             if (model.Image != null && model.Image.ContentType.StartsWith("image"))
             {
                 string folder = (string)TempData["imagePath"];
+                if (folder == "")
+                {
+                    folder = "imgs/";
+                    folder += Guid.NewGuid() + "_" + model.Image.FileName;
+                }
+                model.ImageUrl = folder;
                 string serverFolder = Path.Combine(webHostEnvironment.WebRootPath, folder);
                 await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
             }
@@ -168,16 +175,13 @@ namespace IntelliTest.Controllers
         [Route("Details/{Id}")]
         public async Task<IActionResult> Details(Guid id)
         {
-            if (await classService.IsInClass(id, User.Id(), User.IsStudent(), User.IsTeacher()))
-            {
-                
-            }
-
-            var tests = await testResultsService.TestsTakenByClass(id);
-            if (tests == null)
+            bool? isClassMember = await classService.IsInClass(id, User.Id(), User.IsStudent(), User.IsTeacher());
+            if (isClassMember == null || !isClassMember.Value)
             {
                 return NotFound();
             }
+
+            var tests = await testResultsService.TestsTakenByClass(id) ?? new List<TestStatsViewModel>();
 
             var students = await classService.GetClassStudents(id);
             var classModel = await classService.GetById(id);
@@ -187,10 +191,11 @@ namespace IntelliTest.Controllers
                 Name = classModel.Name,
                 Students = students,
                 Tests = tests,
-                Id = id
+                Id = id,
+                JoinCode = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/Join/{id}"
             });
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> RemoveStudent(Guid id,Guid studentId)
         {
             if (User.IsStudent())
@@ -208,7 +213,7 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            return View("Details");
+            return RedirectToAction("Details", new {id=id});
         }
         [HttpPost]
         public async Task<IActionResult> AddStudent(Guid id, Guid studentId)
@@ -231,17 +236,8 @@ namespace IntelliTest.Controllers
             return View("Details");
         }
         [HttpGet]
-        public IActionResult Join()
-        {
-            if (User.IsTeacher())
-            {
-                return Unauthorized();
-            }
-            return View();
-        }
-        [HttpPost]
-        //[Route("Join/{Id}")]
-        public async Task<IActionResult> Join(JoinModel model)
+        [Route("Join/{Id}")]
+        public async Task<IActionResult> Join(Guid Id)
         {
             if (User.IsTeacher())
             {
@@ -252,15 +248,8 @@ namespace IntelliTest.Controllers
             {
                 return RedirectToAction("Logout", "User");
             }
-            bool success = await classService.AddStudent((Guid)TempData.Peek("StudentId"), model.Id);
-            if (!success)
-            {
-                ModelState.AddModelError("Id", "Курсът не е намерен");
-            }
-            return View( new JoinModel()
-            {
-                Id = model.Id
-            });
+            await classService.AddStudent((Guid)TempData.Peek("StudentId"), Id);
+            return RedirectToAction("Index");
         }
     }
 }

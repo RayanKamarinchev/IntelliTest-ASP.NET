@@ -22,7 +22,7 @@ namespace IntelliTest.Core.Services
                 Name = student.User.FirstName + " " + student.User.LastName,
                 Email = student.User.Email,
                 Id = student.Id,
-                Picture = student.User.PhotoPath
+                ImagePath = student.User.PhotoPath
             };
 
             if (classDb != null)
