@@ -27,7 +27,6 @@ namespace IntelliTest.Core.Models
             CurrentPage = currentPage;
         }
         public int ItemsPerPage { get; set; } = 6;
-        [Display(Name = "Search Term")]
         public int CurrentPage { get; set; } = 1;
         public int TotalItemsCount { get; set; }
         public Filter Filters { get; set; }

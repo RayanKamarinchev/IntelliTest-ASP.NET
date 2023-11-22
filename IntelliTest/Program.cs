@@ -12,6 +12,18 @@ using IntelliTest.Core.Hubs;
 using IntelliTest.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("all", opt =>
+    {
+        opt.AllowAnyOrigin();
+        opt.AllowAnyHeader();
+        opt.AllowAnyMethod();
+    });
+});
+
+
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<IntelliTestDbContext>(options =>
                                                             options.UseSqlServer(connectionString)
@@ -28,16 +40,6 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
        .AddEntityFrameworkStores<IntelliTestDbContext>()
        .AddDefaultTokenProviders();
-
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("all", opt =>
-//    {
-//        opt.AllowAnyOrigin();
-//        opt.AllowAnyMethod();
-//    });
-//});
-
 
 //External logins
 builder.Services.AddAuthentication()

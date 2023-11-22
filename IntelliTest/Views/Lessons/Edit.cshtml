@@ -3,6 +3,7 @@
 @model EditLessonViewModel
 @{
     ViewBag.Title = "Editing";
+    int i = 0;
 }
 <div class="editMain d-flex" style="flex-direction: row;align-items: start">
     <div class="propMenu" style="margin-bottom: 15px;">
@@ -18,7 +19,8 @@
                     @foreach (var subjectValue in Enum.GetValues(typeof(Subject)))
                     {
                         string name = Enum.GetName(typeof(Subject), subjectValue);
-                        <option value="@subjectValue">@name</option>
+                        <option value="@i">@name</option>
+                        i++;
                     }
                 </select>
             </div>
@@ -29,53 +31,24 @@
         </div>
     </div>
     <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-left: 10%;padding-left: 1.8rem; z-index: 0" class="questBox lessonBox">
-                    <div class="editor lessonEditor">
-                        <h1 data-placeholder="Напишете заглавието си">@Model.Title</h1>
-                        <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
-                    </div>
+        <div class="editor lessonEditor">
+            <h1 data-placeholder="Напишете заглавието си">@Model.Title</h1>
+            <p data-placeholder="Напишете или поставете съдържанието си тук.">@Model.Content</p>
+        </div>
         <br/>
-            <div id="validation" class="small text-danger">
+        <div id="validation" class="small text-danger">
                
-            </div>
-            <div class="button-container">
-                <button class="btn-hover color-2" onclick="Submit()">Готово</button>
-            </div>
+        </div>
+        <button onclick="Submit()" class="btn btn-secondary">Готово</button>
     </div>
 </div>
 
 @section Scripts
 {
     <script src="~/js/ckeditor.js" asp-append-version="true"></script>
-    <script>BalloonBlockEditor
-				.create( document.querySelector( '.editor' ), {
-                    licenseKey: '',
-				} )
-				.then( editor => {
-					window.editor = editor;
-                    editor.setData('@Html.Raw(Model.HtmlContent)');
-				} )
-                    let validationSpan = document.getElementById("validation");
-                    function Submit() {
-                        let titleText = document.querySelector(".lessonEditor h1").textContent;
-                        let htmlContentText = editor.getData();
-                        let contentText = [...document.querySelectorAll(".lessonEditor > p")].map(e=>e.textContent).join('. ');
-                        let schoolText = document.querySelector("#school").value;
-                        let subjectText = document.querySelector("#subject").value;
-                        let grade = document.querySelector("#grade").value;
-                        $.ajax({
-                        type: 'GET',
-                                url: `@Url.Action("SubmitEdit", "Lessons", new { id = Model.Id })?title=${titleText}&content=${contentText}&htmlContent=${encodeURIComponent(htmlContentText)}
-                        &school=${schoolText}&subject=${subjectText}&grade=${grade}`,
-                          success: function(res) {
-                            if (res.startsWith("/")) {
-                                window.location.href = res;
-                            }
-                              validationSpan.textContent = res;
-                          },
-                          error: function(er){
-                                window.location.href = "/Error/" + er.status;
-                            }
-                        });
-                    }
-		</script>
+    <script>
+        let title = '@Html.Raw(Model.HtmlContent)'
+        let id = '@Model.Id.ToString()'
+    </script>
+    <script src="~/js/lessonEdit.js" asp-append-version="true"></script>
 }

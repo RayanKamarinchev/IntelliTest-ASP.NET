@@ -23,6 +23,6 @@ namespace IntelliTest.Core.Models.Lessons
         public Subject Subject { get; set; }
         public string School { get; set; }
         public IEnumerable<OpenQuestion>? OpenQuestions { get; set; }
-        public IEnumerable<ClosedQuestion> ClosedQuestions { get; set; }
+        public IEnumerable<ClosedQuestion>? ClosedQuestions { get; set; }
     }
 }

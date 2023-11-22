@@ -29,7 +29,7 @@ namespace IntelliTest.Controllers
             {
                 return RedirectToAction("Index", "Lessons", new { area = "Admin" });
             }
-            if (cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model))
+            if (cache.TryGetValue("lessons", out QueryModel<LessonViewModel>? model) && false)
             {
             }
             else
@@ -118,21 +118,12 @@ namespace IntelliTest.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
         [Route("Lessons/SubmitEdit/{Id}")]
-        public async Task<IActionResult> SubmitEdit(Guid id, string title, string content, string htmlContent, string school, Subject subject, int grade)
+        public async Task<IActionResult> SubmitEdit(Guid id, [FromBody] EditLessonViewModel model)
         {
-            EditLessonViewModel model = new EditLessonViewModel()
-            {
-                Id = id,
-                Title = title,
-                Content = content,
-                HtmlContent = htmlContent,
-                School = school,
-                Subject = subject,
-                Grade = grade
-            };
-            if (grade < 1 || grade > 12)
+            if (model.Grade < 1 || model.Grade > 12)
             {
                 return Content("Класът трябва да е между 1 и 12");
             }

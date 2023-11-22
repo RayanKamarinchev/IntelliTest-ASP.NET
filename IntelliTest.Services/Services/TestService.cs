@@ -69,21 +69,21 @@ namespace IntelliTest.Core.Services
                                 EF.Functions.Like(t.Creator.School.ToLower(), query.Filters.SearchTerm) ||
                                 EF.Functions.Like(t.Description.ToLower(), query.Filters.SearchTerm));
             }
-            if (query.Filters.Sorting == Sorting.Likes)
+            //if (query.Filters.Sorting == Sorting.Likes)
+            //{
+            //    testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
+            //}
+            if (query.Filters.Sorting == Sorting.Examiners)
             {
-                testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
-            }
-            else if (query.Filters.Sorting == Sorting.Examiners)
-            {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Count());
+                testQuery = testQuery.OrderByDescending(t => t.TestResults.Count());
             }
             else if (query.Filters.Sorting == Sorting.Questions)
             {
-                testQuery = testQuery.OrderBy(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+                testQuery = testQuery.OrderByDescending(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r=>r.Score));
+                testQuery = testQuery.OrderByDescending(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r=>r.Score));
             }
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
@@ -127,22 +127,22 @@ namespace IntelliTest.Core.Services
                                 t.Creator.School.ToLower().Contains(query.Filters.SearchTerm) ||
                                 t.Description.ToLower().Contains(query.Filters.SearchTerm));
             }
-            if (query.Filters.Sorting == Sorting.Likes)
-            {
-                testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
+            //if (query.Filters.Sorting == Sorting.Likes)
+            //{
+            //    testQuery = testQuery.OrderBy(t => t.TestLikes.Count());
 
-            }
-            else if (query.Filters.Sorting == Sorting.Examiners)
+            //}
+            if (query.Filters.Sorting == Sorting.Examiners)
             {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Count());
+                testQuery = testQuery.OrderByDescending(t => t.TestResults.Count());
             }
             else if (query.Filters.Sorting == Sorting.Questions)
             {
-                testQuery = testQuery.OrderBy(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+                testQuery = testQuery.OrderByDescending(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
-                testQuery = testQuery.OrderBy(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score));
+                testQuery = testQuery.OrderByDescending(t => t.TestResults.Count() == 0 ? 0 : t.TestResults.Average(r => r.Score));
             }
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))

@@ -34,10 +34,11 @@
                         <label asp-for="Grade" style="font-size: 1.3rem"></label>
                         <select class="form-control form-control-lg bg-white"
                                 data-toggle="select" tabindex="-98" asp-for="Grade">
-                    @for (int i = 1; i <= 12; i++)
-                    {
-                                        <option>@i</option>
-                    }
+                            <option>Всички</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option>@i</option>
+                            }
                         </select>
                     </div>
                 </div>

@@ -247,6 +247,7 @@ namespace IntelliTest.Controllers
         [HttpPost]
         public async Task<IActionResult> ViewProfile(EditUser model)
         {
+            //TODO
             var user = await userManager.GetUserAsync(User);
             model.ImageUrl = (string)TempData.Peek("imagePath");
             if (model.Image != null && model.Image.ContentType.StartsWith("image"))

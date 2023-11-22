@@ -82,15 +82,15 @@ namespace IntelliTest.Core.Services
 
             if (query.Filters.Sorting == Sorting.Likes)
             {
-                lessonQuery = lessonQuery.OrderBy(l => l.LessonLikes.Count());
+                lessonQuery = lessonQuery.OrderByDescending(l => l.LessonLikes.Count());
             }
             else if (query.Filters.Sorting == Sorting.Readers)
             {
-                lessonQuery = lessonQuery.OrderBy(l => l.Reads.Count());
+                lessonQuery = lessonQuery.OrderByDescending(l => l.Reads.Count());
             }
             else if (query.Filters.Sorting == Sorting.ReadingTime)
             {
-                lessonQuery = lessonQuery.OrderBy(l => l.Content.Split().Length);
+                lessonQuery = lessonQuery.OrderByDescending(l => l.Content.Split().Length);
             }
 
             var lessonsDb = await lessonQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
