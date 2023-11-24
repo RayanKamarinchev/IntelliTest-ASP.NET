@@ -14,6 +14,8 @@
 }
 <div class="editMain">
     <div id="addAddMoreDiv" style="width: 60%">
+        @using (Html.BeginForm())
+        {
         <form>
             <div class="customRow" style="margin-top: 50px">
                 <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
@@ -44,7 +46,7 @@
                     <div class="widthMax" style="display: flex">
                         <label style="margin-right: 10px">Брой въпроси: </label>
                         <div class="smallInput">
-                            <input maxlength="2" value="0" class="fs-4" id="questionCount" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" style="text-align: center" />
+                            <input maxlength="2" value="0" class="fs-4" id="questionCount" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" style="text-align: center"/>
                         </div>
                     </div>
                     <div class="widthMax">
@@ -84,7 +86,7 @@
                         {
                             var question = openQuestions.Dequeue();
                             Model.OpenQuestions[i] = question;
-                            <partial name="../Questions/Open/OpenQuestionPartialView" for="OpenQuestions[i]" />
+                            <partial name="../Questions/Open/OpenQuestionPartialView" for="OpenQuestions[i]"/>
                         }
                     }
                 }
@@ -92,8 +94,10 @@
             <button type="button" id="openQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
             <button type="button" id="closedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
             <hr/>
-            <button class="btn blue btn-primary" type="submit">Готово</button>
+            @Html.AntiForgeryToken()
+            <button class="btn blue btn-primary" >Готово</button>
         </form>
+        }
     </div>
 </div>
 

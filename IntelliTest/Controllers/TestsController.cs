@@ -138,7 +138,6 @@ namespace IntelliTest.Controllers
         
         [HttpPost]
         [Route("Tests/Edit/{Id}")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Edit(Guid id, [FromForm] TestEditViewModel model)
         {
             model.OpenQuestions ??= new List<OpenQuestionViewModel>();
@@ -252,10 +251,8 @@ namespace IntelliTest.Controllers
         [HttpPost]
         [Route("Tests/Take/{testId}")]
         [Authorize(Roles = "Student")]
-        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Take([FromBody]TestSubmitViewModel model, Guid testId)
         {
-            //TODO
             if (!await testService.ExistsbyId(testId))
             {
                 return NotFound();

@@ -1,5 +1,4 @@
 ﻿@using IntelliTest.Data.Enums
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model EditLessonViewModel
 @{
     ViewBag.Title = "Editing";
@@ -39,6 +38,7 @@
         <div id="validation" class="small text-danger">
                
         </div>
+        @Html.AntiForgeryToken()
         <button onclick="Submit()" class="btn btn-secondary">Готово</button>
     </div>
 </div>

@@ -177,15 +177,16 @@ function handleSubmit(event) {
     res["Title"] = "";
     res["QuestionOreder"] = []
     res["Id"] = id
-    console.log(res);
-    console.log(JSON.stringify(res))
     $.ajax({
         url: "/Tests/Take/" + id,
+        headers: {
+            RequestVerificationToken:
+                document.getElementsByName("__RequestVerificationToken")[0].value
+        },
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(res),
         success: function (response) {
-            console.log(response)
             if (response === "redirect") {
                 window.location.href = `/Tests/Review/${id}/${studentId}`;
             }

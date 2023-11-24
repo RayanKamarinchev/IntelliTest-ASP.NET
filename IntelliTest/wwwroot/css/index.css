@@ -271,17 +271,18 @@ ul, il{
 }
 
 .logoCol1 {
-    font-family: "Quicksand";
     color: #4797f2;
     font-size: 40px;
     user-select: none;
+    font-weight: 600;
 }
 
 .logoCol2 {
-    font-family: "Quicksand";
     color: #ECA400;
     font-size: 40px;
     user-select: none;
+    font-weight: 600;
+
 }
 
 .heartIcon {

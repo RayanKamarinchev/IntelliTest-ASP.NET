@@ -342,16 +342,18 @@ function handleSubmit(event) {
         ...newQuestionsProperties,
         ...orderedFormValues
     }
-    console.log(orderedFormValues);
 
     let f = new FormData();
     for ( var key in orderedFormValues ) {
         f.append(key, orderedFormValues[key]);
     }
-    fetch("/Tests/Edit/" + id, {method: "POST", body: f})
+    fetch("/Tests/Edit/" + id, {
+        method: "POST", body: f, headers: {
+            RequestVerificationToken:
+                document.getElementsByName("__RequestVerificationToken")[0].value
+} })
         .then(x=>x.text())
         .then((response) => {
-            console.log(response)
             if (response === "redirect") {
                 window.location.href = "/Tests";
             }

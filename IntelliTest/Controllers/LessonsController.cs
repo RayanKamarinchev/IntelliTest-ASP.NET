@@ -119,7 +119,6 @@ namespace IntelliTest.Controllers
         }
 
         [HttpPost]
-        [IgnoreAntiforgeryToken]
         [Route("Lessons/SubmitEdit/{Id}")]
         public async Task<IActionResult> SubmitEdit(Guid id, [FromBody] EditLessonViewModel model)
         {

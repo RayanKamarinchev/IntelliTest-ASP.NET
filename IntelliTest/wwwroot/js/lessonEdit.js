@@ -17,8 +17,8 @@ function Submit() {
     let url = `/Lessons/SubmitEdit/${id}`;
     let model = {
         title: titleText,
-        htmlContent: htmlContentText.replaceAll("&", ''),
-        content: contentText.replaceAll("&", ''),
+        htmlContent: htmlContentText,
+        content: contentText,
         school: schoolText,
         subject: parseInt(subjectText),
         grade: parseInt(grade)
@@ -27,7 +27,9 @@ function Submit() {
         type: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'RequestVerificationToken':
+                document.getElementsByName("__RequestVerificationToken")[0].value
         },
         url: url,
         data: JSON.stringify(model),
