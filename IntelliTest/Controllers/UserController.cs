@@ -108,13 +108,13 @@ namespace IntelliTest.Controllers
             {
                 ModelState.AddModelError("", error.Description);
             }
-            
+
             return View(model);
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(bool hasError)
         {
             if (User?.Identity?.IsAuthenticated ?? false)
             {
@@ -122,6 +122,10 @@ namespace IntelliTest.Controllers
             }
             var model = new LoginViewModel();
             model.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            if (hasError)
+            {
+                ModelState.AddModelError("Password", "Невалиден имейл или парола");
+            }
             return View(model);
         }
 
@@ -131,7 +135,7 @@ namespace IntelliTest.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login", new { hasError = true });
             }
 
             var user = await userManager.FindByNameAsync(model.Username);
@@ -146,8 +150,7 @@ namespace IntelliTest.Controllers
                 }
             }
 
-            ModelState.AddModelError("", "Invalid Login");
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", new { hasError = true });
         }
 
         public async Task<IActionResult> Logout()
@@ -378,7 +381,7 @@ namespace IntelliTest.Controllers
                 TempData["ErrorMessage"] = "Error loading external login information.";
                 return RedirectToAction("Login");
             }
-            
+
             // Sign in the user with this external login provider if the user already has a login.
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)

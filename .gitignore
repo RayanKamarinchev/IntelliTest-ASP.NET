@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /IntelliTest/s2v_reddit_2015_md (1)
 /IntelliTest/wwwroot/imgs
+/IntelliTest.zip
+/IntelliTest/appsettings.json
+/IntelliTest/appsettings.Development.json

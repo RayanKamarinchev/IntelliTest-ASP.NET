@@ -5,15 +5,15 @@
 
 <h1 class="text-center">@ViewData["Title"]</h1>
 <div class="row">
-        <div class="container customRegister">
-            <div class="row d-flex justify-content-center">
-                <div class="col-lg-3 col-md-7">
-                    <div class="panel border bg-white">
-                        <form id="account" method="post">
+    <div class="container customRegister">
+        <div class="row d-flex justify-content-center">
+            <div class="col-lg-3 col-md-7">
+                <div class="panel border bg-white">
+                    <form id="account" method="post">
                         <div class="panel-body p-3">
                             <div class="form-group py-2">
                                 <div class="input-field">
-                                     <span class="far fa-user p-2"></span>
+                                    <span class="far fa-user p-2"></span>
                                     <input asp-for="Username" type="text" placeholder="Имейл" required>
                                 </div>
                             </div>
@@ -29,34 +29,35 @@
                                 <a asp-action="ForgotPassword" id="forgot" class="font-weight-bold">Забравена парола?</a>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
+                            <span asp-validation-for="Password" style="display: block;text-align: center;" class="form-inline text-danger"></span>
                             <div class="text-center pt-4 text-muted">Нямаш акаунт? <a asp-action="Register">Регистрирай се</a> </div>
                         </div>
-                        <input asp-for="ExternalLogins" value="@Model.ExternalLogins" style="display: none"/>
-                        </form>
-                        <div class="mx-3 my-2 py-2 bordert">
-                            <div class="text-center py-3">
-                                <form id="external-account" asp-action="ExternalLogin" method="post" class="form-horizontal">
-                                    <button type="submit"
-                                            target="_blank"
-                                            class="px-2 img-btn"
-                                            name="provIder"
-                                            value="@Model.ExternalLogins[0].Name"
-                                            title="Log in using your @Model.ExternalLogins[0].DisplayName account">
-                                        <img src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg" alt="">
-                                    </button>
-                                    <button type="submit"
-                                       target="_blank"
-                                       class="px-2 img-btn"
-                                       name="provIder"
-                                       value="@Model.ExternalLogins[1].Name"
-                                       title="Log in using your @Model.ExternalLogins[1].DisplayName account">
-                                        <img src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png" alt="">
-                                    </button>
-                                </form>
-                            </div>
+                        <input asp-for="ExternalLogins" value="@Model.ExternalLogins" style="display: none" />
+                    </form>
+                    <div class="mx-3 my-2 py-2 bordert">
+                        <div class="text-center py-3">
+                            <form id="external-account" asp-action="ExternalLogin" method="post" class="form-horizontal">
+                                <button type="submit"
+                                        target="_blank"
+                                        class="px-2 img-btn"
+                                        name="provIder"
+                                        value="@Model.ExternalLogins[0].Name"
+                                        title="Log in using your @Model.ExternalLogins[0].DisplayName account">
+                                    <img src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg" alt="">
+                                </button>
+                                <button type="submit"
+                                        target="_blank"
+                                        class="px-2 img-btn"
+                                        name="provIder"
+                                        value="@Model.ExternalLogins[1].Name"
+                                        title="Log in using your @Model.ExternalLogins[1].DisplayName account">
+                                    <img src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png" alt="">
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
