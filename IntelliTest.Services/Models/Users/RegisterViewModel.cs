@@ -10,7 +10,7 @@ namespace IntelliTest.Core.Models.Users
         [Display(Name = "Имейл")]
         public string Email { get; set; }
         [Required]
-        [StringLength(20, MinimumLength = 5)]
+        [StringLength(20, MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Парола")]
         public string Password { get; set; }

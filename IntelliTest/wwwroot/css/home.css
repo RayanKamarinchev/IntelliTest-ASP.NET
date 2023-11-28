@@ -275,7 +275,7 @@ a[target='_blank'] {
 }
 
     .bordert:after {
-        content: "or connect with";
+        content: "\418\43B\438\20\432\43B\435\437\20\441\44A\441";
         position: absolute;
         top: -13px;
         left: calc(50% - 80px);
