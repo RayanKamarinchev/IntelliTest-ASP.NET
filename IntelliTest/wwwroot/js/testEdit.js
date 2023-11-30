@@ -41,11 +41,11 @@ function RemoveHiddenCheckboxes() {
 }
 
 function GetQuestionTextarea(element) {
-    return element.children[1].children[0].children[0];
+    return element.children[1].children[1].children[0].children[1];
 }
 
 function GetAnswerTextarea(element) {
-    return element.children[2].children[0].children[0];
+    return element.children[1].children[2].children[0].children[1];
 }
 
 function createElementFromHTML(htmlString) {
@@ -67,7 +67,12 @@ function EstablishSignalRConnection() {
                 let element = createElementFromHTML(openQuestionHtml);
 
                 questions.prepend(element);
-                
+
+                makeDeleteAble(element.querySelector(".delete"));
+
+                ActivateNewQuestionsMathFields(element, true);
+                setUpLatestFileUpload(true);
+
                 textAreaAdjust(GetQuestionTextarea(element));
                 textAreaAdjust(GetAnswerTextarea(element));
                 questionCount++;
@@ -119,20 +124,22 @@ function makeDeleteAble(item) {
         });
 }
 
-function setUpLatestFileUpload(){
+function setUpLatestFileUpload(isPrepended = false){
     let fileSelects= document.getElementsByClassName('file-upload')
-    let fileDrags      = document.getElementsByClassName('file-drag');
-    fileSelects[fileSelects.length - 1].addEventListener('change', fileSelectHandler, false);
+    let fileDrags = document.getElementsByClassName('file-drag');
+    let index = isPrepended ? 0 : fileSelects.length - 1;
+    fileSelects[index].addEventListener('change', fileSelectHandler, false);
 
-    let fileDrag = fileDrags[fileDrags.length - 1];
+    let fileDrag = fileDrags[index];
     fileDrag.addEventListener('dragover', fileDragHover, false);
     fileDrag.addEventListener('dragleave', fileDragHover, false);
     fileDrag.addEventListener('drop', fileSelectHandler, false);
 }
 
-function ActivateNewQuestionsMathFields(question){
+function ActivateNewQuestionsMathFields(question, isPrepended = false) {
     let textTypeCheckboxes = document.getElementsByClassName("textTypeCheckbox");
-    let questionTextTypeCheckbox = textTypeCheckboxes[textTypeCheckboxes.length - 1];
+    let index = isPrepended ? 0 : textTypeCheckboxes.length - 1;
+    let questionTextTypeCheckbox = textTypeCheckboxes[index];
     questionTextTypeCheckbox.addEventListener('change', ToggleInputType)
 
 
@@ -145,8 +152,6 @@ function ActivateNewQuestionsMathFields(question){
     }else{
         newMathFieldsCount = 1 + questionChoices.children.length;
     }
-    console.log(questionChoices)
-    console.log([...question.children])
     for (let i = mathFields.length - newMathFieldsCount; i < mathFields.length; i++) {
         RegisterMathField(mathFields[i]);
     }
@@ -317,7 +322,6 @@ function handleSubmit(event) {
         if (orderedFormValues.hasOwnProperty(key)) {
             if (key.includes("ClosedQuestions")){
                 let closedQuestionObjectName = key.substring(0, key.indexOf('.'))
-                console.log(closedQuestionObjectName)
                 if (lastClosedQuestionObjectName != closedQuestionObjectName){
                     closedQuestionsIterated++;
                 }
