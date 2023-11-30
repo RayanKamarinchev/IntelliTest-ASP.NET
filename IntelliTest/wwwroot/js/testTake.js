@@ -9,6 +9,9 @@ checkboxes = []
 i = 0
 function RemoveHiddenCheckboxes() {
     document.querySelectorAll('input[type=hidden]').forEach(e => {
+        if (e.name.match(/\d+/g) == null) {
+            return;
+        }
         let newI = e.name.match(/\d+/g)[0]
         if (newI !== i) {
             i = newI
@@ -166,7 +169,7 @@ function handleSubmit(event) {
     i = 0;
     while (true){
         let question = GetByDictKey(`ClosedQuestions[${i}]`, value);
-        if (isQuestionEmpty(question)) {
+        if (checkboxes.length <= i) {
             break;
         } else {
             res["ClosedQuestions"].push(createClosedQuestion(question, i));
