@@ -41,11 +41,11 @@
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
                                 Статистика
                             </a>
+                            <a asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
+                               class="btn btn-sm btn-primary back-col">
+                                Редактирай
+                            </a>
                         }
-                        <a asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
-                           class="btn btn-sm btn-primary back-col">
-                            Редактирай
-                        </a>
                     }
                     else
                     {

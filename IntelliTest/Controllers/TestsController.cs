@@ -142,6 +142,7 @@ namespace IntelliTest.Controllers
         {
             model.OpenQuestions ??= new List<OpenQuestionViewModel>();
             model.ClosedQuestions ??= new List<ClosedQuestionViewModel>();
+            model.QuestionsOrder ??= new List<QuestionType>();
 
             if (!User.IsTeacher())
             {
@@ -190,19 +191,32 @@ namespace IntelliTest.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> Create()
         {
-            TempData["Classes"] = (await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher()))
-                                  .Select(c => c.Name)
-                                  .ToArray();
+            var classes = (await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher()))
+                          .Select(c => c.Name)
+                          .ToArray();
+            if (classes is null)
+            {
+                classes = new string[0];
+            }
+            TempData["Classes"] = classes;
             return View("Create", new TestViewModel());
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TestViewModel model)
         {
-            if (!ModelState.IsValid ||
-                TempData.Peek("Classes") is null)
+            if (!(ModelState.ErrorCount == 1 && model.Selected is null))
             {
-                return View(model);
+                if (!(ModelState.IsValid) ||
+                    TempData.Peek("Classes") is null)
+                {
+                    return View(model);
+                }
+            }
+            model.Selected = new List<bool>();
+            if (TempData.Peek("Classes") is null)
+            {
+                TempData["Classes"] = new string[0];
             }
 
             if (!User.IsTeacher())
@@ -270,11 +284,13 @@ namespace IntelliTest.Controllers
             }
 
             var openQuestionIds = (string[])TempData["OpenQuestionIds"];
+            openQuestionIds ??= new string[0];
             for (int i = 0; i < openQuestionIds.Length; i++)
             {
                 model.OpenQuestions[i].Id = new Guid(openQuestionIds[i]);
             }
             var closedQuestionIds = (string[])TempData["ClosedQuestionIds"];
+            closedQuestionIds ??= new string[0];
             for (int i = 0; i < closedQuestionIds.Length; i++)
             {
                 model.ClosedQuestions[i].Id = new Guid(closedQuestionIds[i]);
@@ -338,7 +354,7 @@ namespace IntelliTest.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [HttpGet]
         [Authorize(Roles = "Teacher")]
         [Route("Test/Delete/{Id}")]
         public async Task<IActionResult> Delete(Guid id)
