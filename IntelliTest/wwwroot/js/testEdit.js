@@ -37,7 +37,7 @@ function getWordsCount(str) {
 }
 
 function RemoveHiddenCheckboxes() {
-    document.querySelectorAll('input[type=hidden]:not(.textTypeCheckbox)').forEach(e => e.remove());
+    document.querySelectorAll('input[type=hidden]:not(.textTypeCheckbox):not(input[name = "__RequestVerificationToken"])').forEach(e => e.remove());
 }
 
 function GetQuestionTextarea(element) {
