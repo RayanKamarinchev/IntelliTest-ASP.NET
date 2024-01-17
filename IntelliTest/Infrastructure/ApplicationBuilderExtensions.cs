@@ -15,16 +15,14 @@ namespace IntelliTest.Infrastructure
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             Task.Run(async () =>
                 {
-                    if (await roleManager.RoleExistsAsync(adminRoleName))
+                    if (!(await roleManager.RoleExistsAsync(adminRoleName)))
                     {
-                        return;
+                        var role = new IdentityRole { Name = adminRoleName };
+                        await roleManager.CreateAsync(role);
                     }
-
-                    var role = new IdentityRole { Name = adminRoleName };
-                    await roleManager.CreateAsync(role);
                     var admin = await userManager.FindByNameAsync(adminEmail);
 
-                    await userManager.AddToRoleAsync(admin, role.Name);
+                    await userManager.AddToRoleAsync(admin, adminRoleName);
                 })
                 .GetAwaiter()
                 .GetResult();

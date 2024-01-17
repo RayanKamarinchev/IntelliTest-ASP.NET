@@ -230,7 +230,7 @@ namespace IntelliTest.Core.Services
             return t;
         }
 
-        public async Task Edit(Guid id, TestEditViewModel model, Guid teacherId)
+        public async Task Edit(Guid id, TestEditViewModel model, Guid? teacherId, bool isAdmin = false)
         {
             var test = await context.Tests
                                     .Include(t=>t.OpenQuestions)
@@ -269,7 +269,7 @@ namespace IntelliTest.Core.Services
                                                  }))
                                      .ToList();
 
-            if (test.CreatorId==teacherId)
+            if (isAdmin || test.CreatorId==teacherId)
             {
                 test.Title = model.Title;
                 test.Description = model.Description;
@@ -289,7 +289,7 @@ namespace IntelliTest.Core.Services
                     ClosedQuestions = test.ClosedQuestions,
                     OpenQuestions = test.OpenQuestions,
                     CreatedOn = DateTime.Now,
-                    CreatorId = teacherId,
+                    CreatorId = (Guid)teacherId,
                     PublicyLevel = model.PublicityLevel,
                     QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]))
                 };

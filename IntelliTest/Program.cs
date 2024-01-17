@@ -10,6 +10,7 @@ using IntelliTest.Core.Models.Mails;
 using System.Text.Json.Serialization;
 using IntelliTest.Core.Hubs;
 using IntelliTest.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +68,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddControllers()
        .AddJsonOptions(x => 
-                           x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+                           x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+       .AddRazorOptions(options =>
+       {
+           options.AreaViewLocationFormats.Add("/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+       });
 
 builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddTransient<IRoomService, RoomService>();

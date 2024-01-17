@@ -33,9 +33,9 @@
             </ol>
             <div class="widget-49-meeting-action d-flex justify-content-end">
                 @{
-                    if (User.IsTeacher())
+                    if (User.IsTeacher() || User.IsAdmin())
                     {
-                        if (Model.IsOwner)
+                        if (Model.IsOwner || User.IsAdmin())
                         {
                             <a asp-action="Statistics" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">

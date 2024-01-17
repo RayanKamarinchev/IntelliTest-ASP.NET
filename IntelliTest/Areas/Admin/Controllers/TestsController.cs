@@ -2,12 +2,11 @@
 using IntelliTest.Core.Models;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Tests;
-using IntelliTest.Core.Services;
-using IntelliTest.Data.Entities;
 using IntelliTest.Data.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using IntelliTest.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IntelliTest.Areas.Admin.Controllers
 {

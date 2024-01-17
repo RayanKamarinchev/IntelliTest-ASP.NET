@@ -9,7 +9,7 @@
 
 <div>
     <main class="cd-main-content">
-        @if (User.IsTeacher())
+        @if (User.IsTeacher() || User.IsAdmin())
         {
             <div class="floating-container">
                 <a class="floating-button" asp-action="Create">+</a>
@@ -28,7 +28,14 @@
             <ul style="width: 100%">
                 @foreach (var test in Model.Items)
                 {
-                    <partial name="TestPartialView" for="@test"/>
+                    if (User.IsAdmin())
+                    {
+                        <partial name="TestCreatorPartialView" for="@test" />
+                    }
+                    else
+                    {
+                        <partial name="TestPartialView" for="@test" />
+                    }
                 }
             </ul>
         </section>

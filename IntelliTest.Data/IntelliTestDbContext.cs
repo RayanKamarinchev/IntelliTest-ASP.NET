@@ -1,6 +1,4 @@
 ﻿using IntelliTest.Data.Entities;
-using IntelliTest.Data.Migrations;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
