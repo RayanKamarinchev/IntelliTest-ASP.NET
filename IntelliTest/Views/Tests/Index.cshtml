@@ -12,7 +12,7 @@
         @if (User.IsTeacher() || User.IsAdmin())
         {
             <div class="floating-container">
-                <a class="floating-button" asp-action="Create">+</a>
+                <a class="floating-button" asp-action="Create" asp-area="">+</a>
             </div>
         }
         <section class="cd-gallery">

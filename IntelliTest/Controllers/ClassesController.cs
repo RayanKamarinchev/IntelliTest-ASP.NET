@@ -5,6 +5,7 @@ using IntelliTest.Core.Models.Users;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using static IntelliTest.Infrastructure.Constraints;
 
 namespace IntelliTest.Controllers
 {
@@ -29,9 +30,9 @@ namespace IntelliTest.Controllers
         {
             if (User.IsAdmin())
             {
-                return RedirectToAction("Index", "Classes", new { area = "Admin" });
+                return RedirectToAction("Index", "Classes", new { area = AdminArea });
             }
-            if (cache.TryGetValue("classes", out IEnumerable<ClassViewModel>? model))
+            if (cache.TryGetValue(ClassesCacheKey, out IEnumerable<ClassViewModel>? model))
             {
             }
             else
@@ -39,7 +40,7 @@ namespace IntelliTest.Controllers
                 model = await classService.GetAll(User.Id(), User.IsStudent(), User.IsTeacher());
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-                cache.SetAsync("classes", model, cacheEntryOptions);
+                cache.SetAsync(ClassesCacheKey, model, cacheEntryOptions);
             }
             return View(model);
         }
@@ -53,13 +54,13 @@ namespace IntelliTest.Controllers
             var model = new ClassViewModel();
             model.Description = "";
             model.Name = "";
-            if (TempData.Peek("TeacherId") is null)
+            if (TempData.Peek(TeacherId) is null)
             {
                 return RedirectToAction("Logout", "User");
             }
             model.Teacher = new TeacherViewModel()
             {
-                Id = (Guid)TempData.Peek("TeacherId")
+                Id = (Guid)TempData.Peek(TeacherId)
             };
             return View("Create", model);
         }
@@ -85,16 +86,16 @@ namespace IntelliTest.Controllers
                 await model.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
             }
 
-            if (TempData.Peek("TeacherId") is null)
+            if (TempData.Peek(TeacherId) is null)
             {
                 return RedirectToAction("Logout", "User");
             }
             model.Teacher = new TeacherViewModel()
             {
-                Id = (Guid)TempData.Peek("TeacherId")
+                Id = (Guid)TempData.Peek(TeacherId)
             };
             await classService.Create(model);
-            TempData["message"] = "Успешно създаден клас";
+            TempData[Message] = ClassCreateMsg;
             return RedirectToAction("Index");
         }
 
@@ -149,7 +150,7 @@ namespace IntelliTest.Controllers
             }
 
             await classService.Edit(model, id);
-            TempData["message"] = "Успешно редактиран клас";
+            TempData[Message] = ClassEditMsg;
             return RedirectToAction("Index");
         }
         [HttpPost]
@@ -167,7 +168,7 @@ namespace IntelliTest.Controllers
             }
 
             await classService.Delete(id);
-            TempData["message"] = "Успешно изтрит клас";
+            TempData[Message] = ClassDeleteMsg;
             return RedirectToAction("Index");
         }
 
@@ -244,11 +245,11 @@ namespace IntelliTest.Controllers
                 return Unauthorized();
             }
 
-            if (TempData.Peek("StudentId") is null)
+            if (TempData.Peek(StudentId) is null)
             {
                 return RedirectToAction("Logout", "User");
             }
-            await classService.AddStudent((Guid)TempData.Peek("StudentId"), Id);
+            await classService.AddStudent((Guid)TempData.Peek(StudentId), Id);
             return RedirectToAction("Index");
         }
     }

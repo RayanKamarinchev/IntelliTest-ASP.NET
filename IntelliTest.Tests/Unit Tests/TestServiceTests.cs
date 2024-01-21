@@ -126,31 +126,36 @@ namespace IntelliTest.Tests.Unit_Tests
             var test = testService.ToSubmit(testDb);
             var real = new TestSubmitViewModel()
             {
+                Id = test.Id,
                 Time = 10,
                 Title = "The test",
-                OpenQuestions = new List<OpenQuestionAnswerViewModel>()
+                OpenQuestions = new List<OpenQuestionViewModel>()
                 {
-                    new OpenQuestionAnswerViewModel()
+                    new OpenQuestionViewModel()
                     {
                         MaxScore = 3,
                         Id = id,
                         Text = "Who are you",
+                        ImagePath = ""
                     },
-                    new OpenQuestionAnswerViewModel()
+                    new OpenQuestionViewModel()
                     {
                         Text = "How are you",
                         MaxScore = 1,
-                        Id = id2
+                        Id = id2,
+                        ImagePath = ""
                     }
                 },
-                ClosedQuestions = new List<ClosedQuestionAnswerViewModel>()
+                ClosedQuestions = new List<ClosedQuestionViewModel>()
                 {
-                    new ClosedQuestionAnswerViewModel()
+                    new ClosedQuestionViewModel()
                     {
-                        PossibleAnswers = new []{ "едно","две","три","четири" },
+                        Answers = new []{ "едно","две","три","четири" },
                         MaxScore = 2,
                         Text = "Избери",
-                        Id = id
+                        Id = id,
+                        ImagePath = "",
+                        AnswerIndexes = new bool[]{false, false, false, false}
                     }
                 },
                 QuestionOrder = new List<QuestionType>() { QuestionType.Open , QuestionType.Closed, QuestionType.Open}
@@ -299,9 +304,9 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpQuery();
             query.Filters.Sorting = Sorting.Examiners;
             var byExaminers = await testService.Filter(data.Tests, query, null, null);
-            Assert.AreEqual(id2, byExaminers.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id, byExaminers.Items.FirstOrDefault().Id);
             var byExaminersMine = await testService.FilterMine(testsDb, query);
-            Assert.AreEqual(id2, byExaminersMine.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id, byExaminersMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             query.Filters.Sorting = Sorting.Score;
@@ -313,9 +318,9 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpQuery();
             query.Filters.Sorting = Sorting.Questions;
             var byQuestions = await testService.Filter(data.Tests, query, null, null);
-            Assert.AreEqual(id2, byQuestions.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id, byQuestions.Items.FirstOrDefault().Id);
             var byQuestionsMine = await testService.FilterMine(testsDb, query);
-            Assert.AreEqual(id2, byQuestionsMine.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id, byQuestionsMine.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             SetUpBase();

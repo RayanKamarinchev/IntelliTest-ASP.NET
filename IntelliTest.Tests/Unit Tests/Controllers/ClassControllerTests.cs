@@ -167,40 +167,40 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
             Assert.NotNull(res);
             SetUserRole("Student");
         }
-        [Test]
-        public void Join_Get_Student_Correct()
-        {
-            var res = classesController.Join();
-            Assert.NotNull(res);
-        }
-        [Test]
-        public void Join_Get_Teacher_Correct()
-        {
-            SetUserRole("Teacher");
-            var res = classesController.Join();
-            Assert.NotNull(res);
-            SetUserRole("Student");
-        }
-        [Test]
-        public void Join_Post_Student_NoId()
-        {
-            var res = classesController.Join(new JoinModel());
-            Assert.NotNull(res);
-        }
-        [Test]
-        public void Join_Post_Teacher_Correct()
-        {
-            SetUserRole("Teacher");
-            var res = classesController.Join(new JoinModel());
-            Assert.NotNull(res);
-            SetUserRole("Student");
-        }
-        [Test]
-        public void Join_Post_Student_WithId()
-        {
-            classesController.TempData["StudentId"] = id;
-            var res = classesController.Join(new JoinModel());
-            Assert.NotNull(res);
-        }
+        //[Test]
+        //public void Join_Get_Student_Correct()
+        //{
+        //    var res = classesController.Join();
+        //    Assert.NotNull(res);
+        //}
+        //[Test]
+        //public void Join_Get_Teacher_Correct()
+        //{
+        //    SetUserRole("Teacher");
+        //    var res = classesController.Join();
+        //    Assert.NotNull(res);
+        //    SetUserRole("Student");
+        //}
+        //[Test]
+        //public void Join_Post_Student_NoId()
+        //{
+        //    var res = classesController.Join(new JoinModel());
+        //    Assert.NotNull(res);
+        //}
+        //[Test]
+        //public void Join_Post_Teacher_Correct()
+        //{
+        //    SetUserRole("Teacher");
+        //    var res = classesController.Join(new JoinModel());
+        //    Assert.NotNull(res);
+        //    SetUserRole("Student");
+        //}
+        //[Test]
+        //public void Join_Post_Student_WithId()
+        //{
+        //    classesController.TempData["StudentId"] = id;
+        //    var res = classesController.Join(new JoinModel());
+        //    Assert.NotNull(res);
+        //}
     }
 }

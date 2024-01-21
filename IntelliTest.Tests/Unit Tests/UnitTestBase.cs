@@ -125,7 +125,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     MaxScore = 2,
                     Test = test,
                     Text = "Избери",
-                    Id = id
+                    Id = id,
+                    ImagePath = ""
                 }
             };
             data.ClosedQuestions.AddRange(closedQuestions);
@@ -137,7 +138,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Its me, Mario",
                     Test = test,
                     MaxScore = 3,
-                    Id = id
+                    Id = id,
+                    ImagePath = ""
                 },
                 new OpenQuestion()
                 {
@@ -145,7 +147,8 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Fine",
                     Test = test,
                     MaxScore = 1,
-                    Id = id2
+                    Id = id2,
+                    ImagePath = ""
                 },
             };
             data.OpenQuestions.AddRange(openQuestionjs);

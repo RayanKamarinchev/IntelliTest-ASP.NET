@@ -54,16 +54,16 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task AddTestAnswer_Correct()
         {
-            var OpenQuestions = new List<OpenQuestionAnswerViewModel>()
+            var OpenQuestions = new List<OpenQuestionViewModel>()
             {
-                new OpenQuestionAnswerViewModel()
+                new OpenQuestionViewModel()
                 {
                     MaxScore = 3,
                     Id = id,
                     Text = "Who are you",
                     Answer = "Its me, Mario"
                 },
-                new OpenQuestionAnswerViewModel()
+                new OpenQuestionViewModel()
                 {
                     Text = "How are you",
                     MaxScore = 1,
@@ -71,15 +71,15 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answer = "Fine"
                 }
             };
-            var ClosedQuestions = new List<ClosedQuestionAnswerViewModel>()
+            var ClosedQuestions = new List<ClosedQuestionViewModel>()
             {
-                new ClosedQuestionAnswerViewModel()
+                new ClosedQuestionViewModel()
                 {
-                    PossibleAnswers = new[] { "едно", "две", "три", "четири" },
+                    Answers = new[] { "едно", "две", "три", "четири" },
                     MaxScore = 2,
                     Text = "Избери",
                     Id = id,
-                    Answers = new []{false, true, false, true}
+                    AnswerIndexes = new []{false, true, false, true}
                 }
             };
             data.ClosedQuestionAnswers.RemoveRange(data.ClosedQuestionAnswers);

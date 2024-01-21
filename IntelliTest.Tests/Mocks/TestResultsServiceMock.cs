@@ -1,12 +1,6 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Tests;
-using IntelliTest.Core.Models;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IntelliTest.Tests.Mocks
 {

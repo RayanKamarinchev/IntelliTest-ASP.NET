@@ -5,9 +5,7 @@ using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using IntelliTest.Core.Models;
-using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
-using Microsoft.Extensions.Configuration;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
 
@@ -219,7 +217,7 @@ namespace IntelliTest.Core.Services
                                            MaxScore = q.MaxScore,
                                            ImagePath = q.ImagePath,
                                            IsEquation = q.IsEquation,
-                                           AnswerIndexes = new bool[q.Answers.Length]
+                                           AnswerIndexes = new bool[q.Answers.Count(x => x == '&')+1]
                                        })
                                        .ToList(),
                 Time = model.Time,

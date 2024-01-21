@@ -7,10 +7,10 @@ using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Entities;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using static IntelliTest.Infrastructure.Constraints;
 
 namespace IntelliTest.Controllers
 {
@@ -157,9 +157,9 @@ namespace IntelliTest.Controllers
         {
             await signInManager.SignOutAsync();
             TempData.Clear();
-            cache.Remove("tests");
-            cache.Remove("lessons");
-            cache.Remove("classes");
+            cache.Remove(TestsCacheKey);
+            cache.Remove(LessonsCacheKey);
+            cache.Remove(ClassesCacheKey);
             return RedirectToAction("Index", "Home");
         }
         [AllowAnonymous]
@@ -181,11 +181,11 @@ namespace IntelliTest.Controllers
                 bool success = await emailService.SendAsync(message, new CancellationToken());
                 if (success)
                 {
-                    TempData["message"] = "Имейлът е изпратен";
+                    TempData[Constraints.Message] = EmailSentMsg;
                 }
                 else
                 {
-                    TempData["message"] = "Грешка! Нещо се обърка";
+                    TempData[Constraints.Message] = SomethingWrongMsg;
                 }
             }
 
@@ -220,11 +220,11 @@ namespace IntelliTest.Controllers
                     {
                         ModelState.AddModelError(resetPasswordError.Code, resetPasswordError.Description);
                     }
-                    TempData["message"] = "Нeщо се обърка!";
+                    TempData[Constraints.Message] = SomethingWrongMsg;
                 }
                 else
                 {
-                    TempData["message"] = "Паролата е сменена";
+                    TempData[Constraints.Message] = PasswordChangedMsg;
                 }
             }
 
@@ -315,7 +315,7 @@ namespace IntelliTest.Controllers
             switch (type)
             {
                 case "results":
-                    var results = await testResultsService.GetStudentsTestsResults((Guid)TempData.Peek("StudentId"));
+                    var results = await testResultsService.GetStudentsTestsResults((Guid)TempData.Peek(StudentId));
                     return PartialView("Panels/UserTestResultsPartialView", results);
                 case "read":
                     var read = await lessonService.ReadLessons(User.Id());
@@ -327,11 +327,11 @@ namespace IntelliTest.Controllers
                     QueryModel<TestViewModel> myTests = new QueryModel<TestViewModel>();
                     if (User.IsTeacher())
                     {
-                        myTests = await testService.GetMy((Guid)TempData.Peek("TeacherId"), null, new QueryModel<TestViewModel>());
+                        myTests = await testService.GetMy((Guid)TempData.Peek(TeacherId), null, new QueryModel<TestViewModel>());
                     }
                     else if (User.IsStudent())
                     {
-                        Guid studentOwnerId = (Guid)TempData.Peek("StudentId");
+                        Guid studentOwnerId = (Guid)TempData.Peek(StudentId);
                         myTests = await testService.TestsTakenByStudent(studentOwnerId, new QueryModel<TestViewModel>());
                     }
 
@@ -425,15 +425,15 @@ namespace IntelliTest.Controllers
         {
             Guid? teacherId = teacherService.GetTeacherId(userId);
             Guid? studentId = studentService.GetStudentId(userId);
-            TempData.Remove("StudentId");
-            TempData.Remove("TeacherId");
+            TempData.Remove(StudentId);
+            TempData.Remove(TeacherId);
             if (teacherId != null)
             {
-                TempData["TeacherId"] = (Guid)teacherId;
+                TempData[TeacherId] = (Guid)teacherId;
             }
             if (studentId != null)
             {
-                TempData["StudentId"] = (Guid)studentId;
+                TempData[StudentId] = (Guid)studentId;
             }
         }
     }

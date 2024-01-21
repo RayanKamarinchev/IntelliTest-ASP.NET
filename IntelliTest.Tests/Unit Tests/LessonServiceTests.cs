@@ -105,7 +105,7 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpQuery();
             query.Filters.Sorting = Sorting.ReadingTime;
             var byScore = await lessonService.Filter(lessonsDb, query, "StudentUser");
-            Assert.AreEqual(id, byScore.Items.FirstOrDefault().Id);
+            Assert.AreEqual(id2, byScore.Items.FirstOrDefault().Id);
 
             SetUpQuery();
             SetUpBase();

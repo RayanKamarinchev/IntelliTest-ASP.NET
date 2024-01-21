@@ -14,6 +14,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using IntelliTest.Core.Models.Enums;
+using IntelliTest.Core.Models.Lessons;
 
 namespace IntelliTest.Tests.Unit_Tests.Controllers
 {
@@ -23,6 +24,15 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         private LessonsController lessonsController;
         Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
         Guid id2 = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e88");
+        EditLessonViewModel editLessonModel = new EditLessonViewModel()
+        {
+            Title = "Title",
+            Content = "No Content",
+            HtmlContent = "No Content",
+            School = "PPMG",
+            Subject = Subject.Няма,
+            Grade = 9
+        };
 
         private void SetUserRole(string roleName)
         {
@@ -132,14 +142,14 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         [Test]
         public async Task SubmitEdit_Student_Correct()
         {
-            var res = await lessonsController.SubmitEdit(id, "Title", "No content", "No content", "PPMG", Subject.Няма, 9);
+            var res = await lessonsController.SubmitEdit(id, editLessonModel);
             Assert.NotNull(res);
         }
         [Test]
         public async Task SubmitEdit_Teacher_NoId_Student_Correct()
         {
             SetUserRole("Teacher");
-            var res = await lessonsController.SubmitEdit(id, "Title", "No content", "No content", "PPMG", Subject.Няма, 9);
+            var res = await lessonsController.SubmitEdit(id, editLessonModel);
             Assert.NotNull(res);
             SetUserRole("Student");
         }
@@ -148,7 +158,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         {
             SetUserRole("Teacher");
             lessonsController.TempData["TeacherId"] = id;
-            var res = await lessonsController.SubmitEdit(id, "Title", "No content", "No content", "PPMG", Subject.Няма, 9);
+            var res = await lessonsController.SubmitEdit(id, editLessonModel);
             Assert.NotNull(res);
             SetUserRole("Student");
         }
