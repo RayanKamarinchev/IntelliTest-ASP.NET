@@ -28,7 +28,14 @@
                     <span>Време: <strong>@Model.Time мин</strong></span>
                 </li>
                 <li class="widget-49-meeting-item">
-                    <span>Изпитници: <strong>@Model.Students</strong></span>
+                    @if (User.IsTeacher() || User.IsAdmin())
+                    {
+                        <a asp-area="" asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
+                    }
+                    else
+                    {
+                        <p>Изпитници: <strong>@Model.Students</strong></p>
+                    }
                 </li>
             </ol>
             <div class="widget-49-meeting-action d-flex justify-content-end">
@@ -37,7 +44,7 @@
                     {
                         if (Model.IsOwner || User.IsAdmin())
                         {
-                            <a asp-action="Statistics" asp-route-testId="@Model.Id"
+                            <a asp-area="" asp-controller="Tests" asp-action="Statistics" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
                                 Статистика
                             </a>
@@ -51,7 +58,7 @@
                     {
                         if (Model.IsTestTaken)
                         {
-                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@TempData.Peek("StudentId")" asp-route-testId="@Model.Id"
+                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@TempData.Peek(StudentId)" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                                 Резултати
                             </a>

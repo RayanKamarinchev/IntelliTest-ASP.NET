@@ -2,6 +2,7 @@
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions.Open;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Data;
 using IntelliTest.Data.Entities;
@@ -46,7 +47,7 @@ namespace IntelliTest.Core.Services
         }
 
 
-        public async Task AddTestAnswer(List<OpenQuestionViewModel> openQuestions,
+        public async Task AddTestAnswer(List<OpenQuestionSubmitViewModel> openQuestions,
                                         List<ClosedQuestionViewModel> closedQuestions, Guid studentId, Guid testId)
         {
             if (context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId))
@@ -57,7 +58,8 @@ namespace IntelliTest.Core.Services
             {
                 Answer = q.Answer,
                 QuestionId = q.Id,
-                StudentId = studentId
+                StudentId = studentId,
+                Points = q.CorrectAnswer == q.Answer ? q.MaxScore : 0
             });
             var closed = closedQuestions?.Select(q => new ClosedQuestionAnswer()
             {
@@ -170,14 +172,10 @@ namespace IntelliTest.Core.Services
 
         public Guid[] GetExaminersIds(Guid testId)
         {
-            return context.OpenQuestionAnswers
-                          .Where(q => q.Question.TestId == testId)
-                          .Select(t => t.StudentId)
-                          .Union(
-                              context.ClosedQuestionAnswers
-                                     .Where(q => q.Question.TestId == testId)
-                                     .Select(t => t.StudentId)
-                          ).ToArray();
+            return context.TestResults
+                .Where(tr => tr.TestId == testId)
+                .Select(x=>x.StudentId)
+                .ToArray();
         }
 
         public async Task<TestStatsViewModel> GetStatistics(Guid testId)

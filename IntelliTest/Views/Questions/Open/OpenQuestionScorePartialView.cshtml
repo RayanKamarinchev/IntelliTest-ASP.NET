@@ -1,6 +1,6 @@
 ﻿@model OpenQuestionReviewViewModel
 @{
-    string studentsAnswer = Model.Answer;
+    string studentsAnswer = @Model.Answer;
     if (string.IsNullOrWhiteSpace(studentsAnswer) || string.IsNullOrEmpty(studentsAnswer))
     {
         studentsAnswer = "(няма отговор)";

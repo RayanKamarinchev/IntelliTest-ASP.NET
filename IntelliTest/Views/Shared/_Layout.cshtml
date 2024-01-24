@@ -62,10 +62,10 @@
 </header>
 <div class="container-mother">
     <main role="main" style="margin-bottom: 50px" id="main">
-        @if (TempData["message"] != null && !Context.Request.Path.ToString().StartsWith("/Tests"))
+        @if (TempData[Message] != null && !Context.Request.Path.ToString().Contains("/Tests"))
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["message"]
+                @TempData[Message]
                 <button type="button" class="btn-close" data-bs-dismiss="alert", aria-label="Close">
                     <span aria-hIdden="true">&times;</span>
                 </button>

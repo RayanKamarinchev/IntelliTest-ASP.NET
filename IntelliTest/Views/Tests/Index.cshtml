@@ -16,10 +16,10 @@
             </div>
         }
         <section class="cd-gallery">
-            @if (TempData["message"] != null)
+            @if (TempData[Message] != null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["message"]
+                    @TempData[Message]
                     <button type="button" class="btn-close" data-bs-dismiss="alert", aria-label="Close">
                         <span aria-hIdden="true">&times;</span>
                     </button>

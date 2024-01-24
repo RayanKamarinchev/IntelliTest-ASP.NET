@@ -5,6 +5,9 @@
     ViewBag.Title = "Test Statistics";
 }
 <script>
+    let ctx;
+    let myBarGradeChart;
+    let data;
     const options = {
                     plugins: {
                         datalabels: {
@@ -18,6 +21,9 @@
                                 stepSize: 1,
                                 precision: 0
                             }
+                        }],
+                        xAxes: [{
+                            maxBarThickness: 200,
                         }]
                     },
                 };
@@ -58,15 +64,15 @@
                         </div>
                         @if (all.Any(s => s != 0))
                         {
-                            string chartId = "избери";
+                            string chartId = $"closedQuestion{i}";
                             <div class="chart">
                                 <canvas id="@chartId"></canvas>
                             </div>
                             <script>
-                                const ctx = document.getElementById('@Html.Raw(chartId)');
-                                let myBarGradeChart;
+                                ctx = document.getElementById('@Html.Raw(chartId)');
+                                myBarGradeChart;
 
-                                const data = {
+                                data = {
                                     labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
                                     datasets: [{
                                         label: "Ученици",

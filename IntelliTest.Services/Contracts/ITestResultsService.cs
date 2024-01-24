@@ -1,5 +1,6 @@
 ﻿using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions.Open;
 using IntelliTest.Core.Models.Tests;
 
 namespace IntelliTest.Core.Contracts
@@ -7,7 +8,7 @@ namespace IntelliTest.Core.Contracts
     public interface ITestResultsService
     {
         //Answer processing
-        Task AddTestAnswer(List<OpenQuestionViewModel> openQuestions,
+        Task AddTestAnswer(List<OpenQuestionSubmitViewModel> openQuestions,
                            List<ClosedQuestionViewModel> closedQuestions,
                            Guid studentId,
                            Guid testId);

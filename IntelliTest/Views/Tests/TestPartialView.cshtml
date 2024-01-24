@@ -24,7 +24,7 @@
                     <span>Време: <strong>@Model.Time мин</strong></span>
                 </li>
                 <li class="widget-49-meeting-item">
-                    @if (User.IsTeacher())
+                    @if (User.IsTeacher() || User.IsAdmin())
                     {
                         <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
                     }
@@ -54,7 +54,7 @@
                     {
                         if (Model.IsTestTaken)
                         {
-                            var studentId = TempData.Peek("StudentId");
+                            var studentId = TempData.Peek(StudentId);
                             <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@studentId" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-primary back-col left-btn">
                                 Резултати

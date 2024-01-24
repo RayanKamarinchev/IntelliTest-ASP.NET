@@ -71,7 +71,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = "Teacher,Admin")]
         public async Task<IActionResult> MyTests([FromQuery] QueryModel<TestViewModel> query)
         {
             Guid? teacherId = (Guid?)TempData.Peek(TeacherId);
@@ -210,7 +210,7 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
-            model.Selected = new List<bool>();
+            //model.Selected = new List<bool>();
             if (TempData.Peek(Classes) is null)
             {
                 TempData[Classes] = new string[0];
@@ -356,7 +356,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = "Teacher,Admin")]
         public IActionResult AddQuestion(OpenQuestionViewModel question)
         {
             if (TempData.Peek("editModel") is null)
@@ -372,7 +372,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = "Teacher,Admin")]
         [Route("Examiners/{testId}")]
         public async Task<IActionResult> ExaminersAll(Guid testId)
         {
@@ -381,7 +381,7 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = "Teacher,Admin")]
         [Route("Examiners/{testId}/{studentId}")]
         public async Task<IActionResult> TestGrading(Guid testId, Guid studentId)
         {
@@ -391,7 +391,7 @@ namespace IntelliTest.Controllers
             return View("TestGrading", testResult);
         }
         [HttpPost]
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = "Teacher,Admin")]
         [Route("Examiners/{testId}/{studentId}")]
         public async Task<IActionResult> TestGrading(Guid testId, Guid studentId, TestReviewViewModel scoredTest)
         {

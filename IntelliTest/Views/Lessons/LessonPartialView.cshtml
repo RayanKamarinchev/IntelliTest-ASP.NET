@@ -35,7 +35,7 @@
         <p style="color: rgba(0, 0, 0, 0.6)" class="fs90">училище: @Model.School</p>
         <a class="text-black body_size">#@Model.Subject</a>
         @{
-            if ((User.IsTeacher() && Model.CreatorId == (Guid)TempData.Peek("TeacherId")) || User.IsAdmin())
+            if ((User.IsTeacher() && Model.CreatorId == (Guid)TempData.Peek(TeacherId)) || User.IsAdmin())
             {
                 <a asp-action="Edit" asp-route-id="@Model.Id" style="color: white !important;position: absolute;right: 10px;bottom: 10px;" class="text-black body_size btn btn-primary">Редактирай</a>
             }

@@ -8,6 +8,7 @@ using IntelliTest.Core.Models;
 using IntelliTest.Data.Enums;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions.Open;
 
 namespace IntelliTest.Core.Services
 {
@@ -197,13 +198,14 @@ namespace IntelliTest.Core.Services
             {
                 OpenQuestions = model.OpenQuestions
                                      .Where(q => !q.IsDeleted)
-                                     .Select(q => new OpenQuestionViewModel()
+                                     .Select(q => new OpenQuestionSubmitViewModel()
                                      {
                                          Text = q.Text,
                                          Id = q.Id,
                                          MaxScore = q.MaxScore,
                                          ImagePath = q.ImagePath,
-                                         IsEquation = q.IsEquation
+                                         IsEquation = q.IsEquation,
+                                         CorrectAnswer = q.Answer
                                      })
                                      .ToList(),
                 ClosedQuestions = model.ClosedQuestions
