@@ -13,12 +13,12 @@ namespace IntelliTest.Data.Entities
         public string Answer { get; set; }
         public bool IsDeleted { get; set; }
         [Required]
-        public Guid TestId { get; set; }
-        [ForeignKey(nameof(TestId))]
-        public Test Test { get; set; }
+        public Guid GroupId { get; set; }
+        [ForeignKey(nameof(GroupId))]
+        public TestGroup TestGroup { get; set; }
 
         public IEnumerable<OpenQuestionAnswer> StudentAnswers { get; set; }
-        public int MaxScore { get; set; }
+        public float MaxScore { get; set; }
         public Guid? LessonId { get; set; }
         [ForeignKey(nameof(LessonId))]
         public Lesson? Lesson { get; set; }

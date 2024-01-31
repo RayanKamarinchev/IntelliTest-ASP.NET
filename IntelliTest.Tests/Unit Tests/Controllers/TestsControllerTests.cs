@@ -10,6 +10,7 @@ using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Tests.Groups;
 using IntelliTest.Data.Enums;
 using IntelliTest.Tests.Mocks;
 using Microsoft.AspNetCore.Hosting;
@@ -82,14 +83,14 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         [Test]
         public async Task Edit_Student_Get_Correct()
         {
-            var res = await testsController.Edit(id, new TestEditViewModel());
+            var res = await testsController.Edit(id, new GroupEditViewModel());
             Assert.NotNull(res);
         }
         [Test]
         public async Task Edit_PublicityLevelClassOnly_NoId_Get_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(id, new TestEditViewModel()
+            var res = await testsController.Edit(id, new GroupEditViewModel()
             {
                 PublicityLevel = PublicityLevel.ClassOnly
             });
@@ -101,7 +102,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         {
             SetUserRole("Teacher");
             testsController.TempData["TeacherId"] = id;
-            var res = await testsController.Edit(id, new TestEditViewModel()
+            var res = await testsController.Edit(id, new GroupEditViewModel()
             {
                 PublicityLevel = PublicityLevel.ClassOnly
             });
@@ -113,7 +114,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         {
             SetUserRole("Teacher");
             testsController.TempData["TeacherId"] = id2;
-            var res = await testsController.Edit(id, new TestEditViewModel()
+            var res = await testsController.Edit(id, new GroupEditViewModel()
             {
                 PublicityLevel = PublicityLevel.ClassOnly
             });
@@ -123,14 +124,14 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         [Test]
         public async Task Edit_Student_NoId_Post_Correct()
         {
-            var res = await testsController.Edit(new TestEditViewModel(), id);
+            var res = await testsController.Edit(new GroupEditViewModel(), id);
             Assert.NotNull(res);
         }
         [Test]
         public async Task Edit_Teacher_Invalid_Post_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(new TestEditViewModel()
+            var res = await testsController.Edit(new GroupEditViewModel()
             {
                 Id = id
             }, id);
@@ -141,7 +142,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         public async Task Edit_Teacher_Valid_Post_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(new TestEditViewModel()
+            var res = await testsController.Edit(new GroupEditViewModel()
             {
                 Id = id,
                 OpenQuestions = new List<OpenQuestionViewModel>(),
@@ -160,7 +161,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         public async Task Edit_Teacher_Get_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(id, new TestEditViewModel());
+            var res = await testsController.Edit(id, new GroupEditViewModel());
             Assert.NotNull(res);
             SetUserRole("Student");
         }
@@ -168,7 +169,7 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         public async Task Edit_Teacher_Post_Correct()
         {
             SetUserRole("Teacher");
-            var res = await testsController.Edit(new TestEditViewModel(), id);
+            var res = await testsController.Edit(new GroupEditViewModel(), id);
             Assert.NotNull(res);
             SetUserRole("Student");
         }
@@ -211,20 +212,20 @@ namespace IntelliTest.Tests.Unit_Tests.Controllers
         [Test]
         public async Task Take_Post_NoId_Correct()
         {
-            var res = await testsController.Take(new TestSubmitViewModel(), id);
+            var res = await testsController.Take(new TestGroupSubmitViewModel(), id);
             Assert.NotNull(res);
         }
         [Test]
         public async Task Take_Post_WithId_Correct()
         {
             testsController.TempData["StudentId"] = id;
-            var res = await testsController.Take(new TestSubmitViewModel(), id);
+            var res = await testsController.Take(new TestGroupSubmitViewModel(), id);
             Assert.NotNull(res);
         }
         [Test]
         public async Task ReviewAnswers_Get_Correct()
         {
-            var res = await testsController.ReviewAnswers(id, id);
+            var res = await testsController.ReviewAnswers(id, id, id);
             Assert.NotNull(res);
         }
         [Test]

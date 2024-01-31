@@ -83,7 +83,7 @@ namespace IntelliTest.Controllers
         [Route("Lessons/Edit/{Id}")]
         public async Task<IActionResult> Edit(Guid id, EditLessonViewModel model)
         {
-            if (!User.IsTeacher() || User.IsAdmin())
+            if (!User.IsTeacher() && !User.IsAdmin())
             {
                 return RedirectToAction("Read", new { id = id });
             }

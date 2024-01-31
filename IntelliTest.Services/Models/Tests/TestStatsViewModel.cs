@@ -1,20 +1,12 @@
-﻿using IntelliTest.Core.Models.Enums;
-using IntelliTest.Core.Models.Questions;
-using IntelliTest.Core.Models.Questions.Closed;
+﻿using IntelliTest.Core.Models.Tests.Groups;
 
 namespace IntelliTest.Core.Models.Tests
 {
     public class TestStatsViewModel
     {
-        public List<ClosedQuestionStatsViewModel> ClosedQuestions { get; set; } =
-            new List<ClosedQuestionStatsViewModel>();
-
-        public List<OpenQuestionStatsViewModel> OpenQuestions { get; set; } =
-            new List<OpenQuestionStatsViewModel>();
-
-        public List<QuestionType> QuestionOrder;
         public string Title { get; set; }
-        public decimal AverageScore { get; set; }
+        public float AverageScore { get; set; }
         public int Examiners { get; set; }
+        public List<TestGroupStatsViewModel> TestGroups { get; set; }
     }
 }

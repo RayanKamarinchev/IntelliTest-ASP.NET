@@ -18,7 +18,7 @@ namespace IntelliTest.Tests.Mocks
                                .ReturnsAsync(new TestViewModel());
                 testServiceMock.Setup(s => s.GetAll(id, id, new QueryModel<TestViewModel>()))
                                .ReturnsAsync(new QueryModel<TestViewModel>());
-                testServiceMock.Setup(s => s.ExistsbyId(id))
+                testServiceMock.Setup(s => s.TestExistsbyId(id))
                                .ReturnsAsync(true);
                 testServiceMock.Setup(s => s.IsTestCreator(id, id))
                                .ReturnsAsync(true);

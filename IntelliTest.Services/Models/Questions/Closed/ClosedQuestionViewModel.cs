@@ -4,6 +4,6 @@
     {
         public string[] Answers { get; set; }
         public bool[] AnswerIndexes { get; set; }
-        public int MaxScore { get; set; }
+        public float MaxScore { get; set; }
     }
 }

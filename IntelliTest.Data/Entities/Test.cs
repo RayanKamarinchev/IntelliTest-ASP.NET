@@ -25,8 +25,8 @@ namespace IntelliTest.Data.Entities
         [DataType(DataType.DateTime)]
         public DateTime CreatedOn { get; set; }
 
-        public IList<OpenQuestion> OpenQuestions { get; set; } = new List<OpenQuestion>();
-        public IList<ClosedQuestion> ClosedQuestions { get; set; } = new List<ClosedQuestion>();
+        [Required] public IEnumerable<TestGroup> Groups { get; set; }
+
         [Required]
         public bool IsDeleted { get; set; }
         [Required]
@@ -38,8 +38,6 @@ namespace IntelliTest.Data.Entities
         public List<ClassTest> ClassesWithAccess { get; set; }
         public PublicityLevel PublicyLevel { get; set; }
         public string PhotoPath { get; set; }
-        public string QuestionsOrder { get; set; }
-
         public IEnumerable<TestLike> TestLikes { get; set; }
         public IEnumerable<TestResult> TestResults { get; set; }
     }

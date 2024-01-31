@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using IntelliTest.Core.Models.Enums;
-using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions;
 using IntelliTest.Data.Enums;
 
-namespace IntelliTest.Core.Models.Tests
+namespace IntelliTest.Core.Models.Tests.Groups
 {
-    public class TestEditViewModel
+    public class GroupEditViewModel
     {
         public PublicityLevel PublicityLevel { get; set; }
+        public int Number { get; set; }
         public List<OpenQuestionViewModel>? OpenQuestions { get; set; }
         public List<ClosedQuestionViewModel>? ClosedQuestions { get; set; }
         public List<QuestionType>? QuestionsOrder { get; set; }

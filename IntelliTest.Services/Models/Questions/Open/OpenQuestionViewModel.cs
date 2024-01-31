@@ -6,6 +6,6 @@ namespace IntelliTest.Core.Models.Questions
     public class OpenQuestionViewModel : QuestionViewModel
     {
         public string Answer { get; set; }
-        public int MaxScore { get; set; }
+        public float MaxScore { get; set; }
     }
 }

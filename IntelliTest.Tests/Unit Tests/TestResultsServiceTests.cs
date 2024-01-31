@@ -28,7 +28,7 @@ namespace IntelliTest.Tests.Unit_Tests
         {
             var testDb = await testService.GetById(id);
             var test = testResultsService.ToEdit(testDb);
-            var real = new TestEditViewModel()
+            var real = new GroupEditViewModel()
             {
                 Description = "Test Test",
                 Grade = 8,
@@ -86,7 +86,7 @@ namespace IntelliTest.Tests.Unit_Tests
             data.OpenQuestionAnswers.RemoveRange(data.OpenQuestionAnswers);
             data.TestResults.RemoveRange(data.TestResults);
             await data.SaveChangesAsync();
-            await testResultsService.AddTestAnswer(OpenQuestions, ClosedQuestions, id, id);
+            await testResultsService.SaveStudentTestAnswer(OpenQuestions, ClosedQuestions, id, id);
             Assert.AreEqual(2, data.OpenQuestionAnswers.Count());
             Assert.AreEqual(1, data.ClosedQuestionAnswers.Count());
             SetUpBase();
@@ -108,12 +108,12 @@ namespace IntelliTest.Tests.Unit_Tests
         {
             var res = await testResultsService.GetStatistics(id);
             Assert.AreEqual("The test", res.Title);
-            Assert.AreEqual(1, res.ClosedQuestions.Count);
-            Assert.AreEqual(2, res.OpenQuestions.Count);
+            Assert.AreEqual(1, res.TestGroups[0].ClosedQuestions.Count);
+            Assert.AreEqual(2, res.TestGroups[0].OpenQuestions.Count);
             Assert.AreEqual(1, res.Examiners);
-            Assert.AreEqual(2, res.ClosedQuestions.FirstOrDefault().StudentAnswers[0][0]);
-            Assert.AreEqual("its me mario", res.OpenQuestions.FirstOrDefault().StudentAnswers[0]);
-            Assert.AreEqual("Bad", res.OpenQuestions.ToList()[1].StudentAnswers[0]);
+            Assert.AreEqual(2, res.TestGroups[0].ClosedQuestions.FirstOrDefault().StudentAnswers[0][0]);
+            Assert.AreEqual("its me mario", res.TestGroups[0].OpenQuestions.FirstOrDefault().StudentAnswers[0]);
+            Assert.AreEqual("Bad", res.TestGroups[0].OpenQuestions.ToList()[1].StudentAnswers[0]);
         }
     }
 }

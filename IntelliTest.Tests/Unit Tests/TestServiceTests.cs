@@ -124,7 +124,7 @@ namespace IntelliTest.Tests.Unit_Tests
         {
             var testDb = await testService.GetById(id);
             var test = testService.ToSubmit(testDb);
-            var real = new TestSubmitViewModel()
+            var real = new TestGroupSubmitViewModel()
             {
                 Id = test.Id,
                 Time = 10,
@@ -235,7 +235,7 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task ExistsbyId_Correct()
         {
-            Assert.IsTrue(await testService.ExistsbyId(id));
+            Assert.IsTrue(await testService.TestExistsbyId(id));
         }
 
         [Test]
@@ -248,7 +248,7 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task Delete_Correct()
         {
             await testService.DeleteTest(id);
-            Assert.IsFalse(await testService.ExistsbyId(id));
+            Assert.IsFalse(await testService.TestExistsbyId(id));
             SetUpBase();
             SetUp();
         }

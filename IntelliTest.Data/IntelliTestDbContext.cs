@@ -30,7 +30,7 @@ namespace IntelliTest.Data
             builder.Entity<Read>()
                    .HasKey(p => new { p.LessonId, p.UserId });
             builder.Entity<TestResult>()
-                   .HasKey(p => new { p.TestId, p.StudentId });
+                   .HasKey(p => new { p.GroupId, p.StudentId });
             builder.Entity<ClassTest>()
                    .HasKey(p => new { p.TestId, p.ClassId });
             builder.Entity<RoomUser>()
@@ -46,6 +46,7 @@ namespace IntelliTest.Data
         public DbSet<ClosedQuestionAnswer> ClosedQuestionAnswers { get; set; }
         public DbSet<OpenQuestionAnswer> OpenQuestionAnswers { get; set; }
         public DbSet<Test> Tests { get; set; }
+        public DbSet<TestGroup> TestGroups { get; set; }
         public DbSet<OpenQuestion> OpenQuestions { get; set; }
         public DbSet<ClosedQuestion> ClosedQuestions { get; set; }
         public DbSet<User> Users { get; set; }

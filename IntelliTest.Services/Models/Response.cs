@@ -3,6 +3,6 @@
     public class Response
     {
         public string message { get; set; }
-        public decimal score { get; set; }
+        public float score { get; set; }
     }
 }

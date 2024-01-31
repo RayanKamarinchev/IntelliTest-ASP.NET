@@ -28,11 +28,11 @@ namespace IntelliTest.Core.Services
             this.openQuestionAnswers = openQuestionAnswers;
         }
 
-        private async Task<Tuple<decimal, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, int MaxScore)
+        private async Task<Tuple<float, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, float MaxScore)
         {
             if (Answer is null)
             {
-                return new Tuple<decimal, string>(0, $"Правилният отговор е \"{RightAnswer}\"");
+                return new Tuple<float, string>(0, $"Правилният отговор е \"{RightAnswer}\"");
             }
             if (Regex.Matches(RightAnswer, @"\w+")
                      .Select(m => m.Value).Count() <= 4)
@@ -41,7 +41,7 @@ namespace IntelliTest.Core.Services
                                       .Select(m => m.Value)
                                       .SequenceEqual(Regex.Matches(RightAnswer, @"\w+")
                                                           .Select(m => m.Value));
-                return new Tuple<decimal, string>(isCorrect ? MaxScore : 0, $"Правилният отговор е \"{RightAnswer}\"");
+                return new Tuple<float, string>(isCorrect ? MaxScore : 0, $"Правилният отговор е \"{RightAnswer}\"");
             }
             var api = new OpenAI_API.OpenAIAPI(apiKey);
             var chat = api.Chat.CreateConversation();
@@ -55,9 +55,9 @@ namespace IntelliTest.Core.Services
             chat.AppendUserInput(prompt);
             var responseJson = await chat.GetResponseFromChatbotAsync();
             Response? response = JsonSerializer.Deserialize<Response>(responseJson);
-            decimal score = response.score / 2;
+            float score = response.score / 2;
             string message = response.message;
-            return new Tuple<decimal, string>(score, message);
+            return new Tuple<float, string>(score, message);
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {

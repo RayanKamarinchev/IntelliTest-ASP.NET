@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IntelliTest.Core.Models.Tests;
+﻿using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Models.Users;
 
 namespace IntelliTest.Core.Models.Classes

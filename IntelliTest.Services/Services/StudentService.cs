@@ -28,7 +28,7 @@ namespace IntelliTest.Core.Services
             if (classDb != null)
             {
                 viewModel.TestResults = student.TestResults
-                                               .Where(t => classDb.ClassTests.Any(ct => ct.TestId == t.TestId))
+                                               .Where(t => classDb.ClassTests.Any(ct => ct.TestId == t.Group.TestId))
                                                .Select(t => t.Score)
                                                .ToList();
             }
@@ -72,9 +72,9 @@ namespace IntelliTest.Core.Services
         {
             return await context.Students
                                 .Include(s=>s.ClosedAnswers)
-                                .ThenInclude(q => q.Question.Test)
+                                .ThenInclude(q => q.Question.TestGroup.Test)
                                 .Include(s=>s.OpenAnswers)
-                                .ThenInclude(q=>q.Question.Test)
+                                .ThenInclude(q=>q.Question.TestGroup.Test)
                                 .Include(s=>s.Classes)
                                 .ThenInclude(c=>c.Class)
                                 .ThenInclude(c=>c.Teacher)
@@ -103,7 +103,8 @@ namespace IntelliTest.Core.Services
                                 .ThenInclude(s=>s.User)
                                 .Include(t=>t.Student)
                                 .ThenInclude(s=>s.TestResults)
-                                .Where(t => t.TestId == testId)
+                                .ThenInclude(g=>g.Group)
+                                .Where(t => t.Group.TestId == testId)
                                 .Select(s => ToViewModel(s.Student))
                                 .ToListAsync();
         }

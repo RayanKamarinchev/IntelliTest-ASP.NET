@@ -175,14 +175,16 @@ namespace IntelliTest.Core.Services
                                       .ThenInclude(s => s.User)
                                       .Include(s => s.Students)
                                       .ThenInclude(s => s.Student)
-                                      .ThenInclude(s => s.TestResults).Include(@class => @class.ClassTests)
+                                      .ThenInclude(s => s.TestResults)
+                                      .ThenInclude(tr=>tr.Group)
+                                      .Include(@class => @class.ClassTests)
                                       .FirstOrDefaultAsync(c => c.Id == id);
             return clasDb.Students.Select(s => new StudentViewModel()
             {
                 Name = s.Student.User.FirstName + " " + s.Student.User.LastName,
                 Email = s.Student.User.Email,
                 TestResults = s.Student.TestResults
-                               .Where(t => clasDb.ClassTests.Any(ct => ct.TestId == t.TestId))
+                               .Where(t => clasDb.ClassTests.Any(ct => ct.TestId == t.Group.TestId))
                                .Select(t => t.Score)
                                .ToList(),
                 Id = s.StudentId

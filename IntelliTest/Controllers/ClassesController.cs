@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Classes;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Tests.Groups;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Mvc;

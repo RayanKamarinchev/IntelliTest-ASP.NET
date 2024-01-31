@@ -1,6 +1,7 @@
 ﻿@using IntelliTest.Core.Models.Questions.Closed
 @using IntelliTest.Core.Models.Enums
-@model TestEditViewModel
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IntelliTest.Core.Models.Tests.Groups.GroupEditViewModel
 @{
     ViewBag.Title = "Edit Test";
     if (Model.ClosedQuestions == null)

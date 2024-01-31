@@ -9,6 +9,8 @@ using IntelliTest.Data.Enums;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Questions.Open;
+using IntelliTest.Core.Models.Tests.Groups;
+using TestGroupSubmitViewModel = IntelliTest.Core.Models.Tests.Groups.TestGroupSubmitViewModel;
 
 namespace IntelliTest.Core.Services
 {
@@ -23,21 +25,37 @@ namespace IntelliTest.Core.Services
 
         private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
         {
-            AverageScore = Math.Round(!t.TestResults.Any() ? 0 : t.TestResults.Average(r => r.Score), 2),
-            ClosedQuestions = t.ClosedQuestions,
+            AverageScore = (float)Math.Round(!t.TestResults.Any() ? 0 : t.TestResults.Average(r => r.Score), 2),
+            Groups = t.Groups.Select(x => new TestGroup()
+            {
+                ClosedQuestions = x.ClosedQuestions,
+                //TODO: MaxScore
+                //MaxScore = x.ClosedQuestions.Sum(q => q.MaxScore) +
+                //           x.OpenQuestions.Sum(q => q.MaxScore),
+                OpenQuestions = x.OpenQuestions,
+                QuestionsOrder = x.QuestionsOrder
+            }).ToArray(),
             CreatedOn = t.CreatedOn,
             Description = t.Description,
             Grade = t.Grade,
             Id = t.Id,
-            MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
-                       t.OpenQuestions.Sum(q => q.MaxScore),
-            OpenQuestions = t.OpenQuestions,
             Time = t.Time,
             Title = t.Title,
             MultiSubmit = t.MultiSubmission,
             PublicityLevel = t.PublicyLevel,
-            Students = t.TestResults.Count(),
-            QuestionOrder = t.QuestionsOrder
+            Students = t.TestResults.Count()
+        };
+
+        private Func<TestGroup, RawTestGroupViewModel> ToRawViewModel = t => new RawTestGroupViewModel()
+        {
+            OpenQuestions = t.OpenQuestions.ToList(),
+            ClosedQuestions = t.ClosedQuestions.ToList(),
+            Id = t.Id,
+            Number = t.Number,
+            QuestionsOrder = t.QuestionsOrder,
+            TestId = t.TestId,
+            TestTitle = t.Test.Title,
+            Time = t.Test.Time
         };
 
         private List<QuestionType> ProcessQuestionOrder(string questionOrderText)
@@ -78,7 +96,7 @@ namespace IntelliTest.Core.Services
             }
             else if (query.Filters.Sorting == Sorting.Questions)
             {
-                testQuery = testQuery.OrderByDescending(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+                testQuery = testQuery.OrderByDescending(t => t.Groups.FirstOrDefault() == null ? 0 : (t.Groups.FirstOrDefault().ClosedQuestions.Count + t.Groups.FirstOrDefault().OpenQuestions.Count));
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
@@ -87,8 +105,10 @@ namespace IntelliTest.Core.Services
 
             var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
-                                .Include(t=>t.ClosedQuestions)
-                                .Include(t=>t.OpenQuestions)
+                                .Include(t=>t.Groups)
+                                .ThenInclude(t=>t.ClosedQuestions)
+                                .Include(t=>t.Groups)
+                                .ThenInclude(t=>t.OpenQuestions)
                                 .Include(t=>t.TestResults)
                                 .Select(x=>ToViewModel(x));
             var tests =await test.ToListAsync();
@@ -137,7 +157,7 @@ namespace IntelliTest.Core.Services
             }
             else if (query.Filters.Sorting == Sorting.Questions)
             {
-                testQuery = testQuery.OrderByDescending(t => t.ClosedQuestions.Count() + t.OpenQuestions.Count());
+                testQuery = testQuery.OrderByDescending(t => t.Groups.FirstOrDefault() == null ? 0 : (t.Groups.FirstOrDefault().ClosedQuestions.Count + t.Groups.FirstOrDefault().OpenQuestions.Count));
             }
             else if (query.Filters.Sorting == Sorting.Score)
             {
@@ -179,8 +199,10 @@ namespace IntelliTest.Core.Services
         {
             var t = await context.Tests
                                  .Where(t=>!t.IsDeleted)
-                                 .Include(t=>t.OpenQuestions)
-                                 .Include(t=>t.ClosedQuestions)
+                                 .Include(t=>t.Groups)
+                                 .ThenInclude(t=>t.OpenQuestions)
+                                 .Include(t=>t.Groups)
+                                 .ThenInclude(t=>t.ClosedQuestions)
                                  .Include(t=>t.TestResults)
                                  .Include(t => t.TestLikes)
                                  .FirstOrDefaultAsync(t=>t.Id == id);
@@ -192,65 +214,84 @@ namespace IntelliTest.Core.Services
             return ToViewModel(t);
         }
 
-        public TestSubmitViewModel ToSubmit(TestViewModel model)
+        public async Task<RawTestGroupViewModel> GetGroupById(Guid id)
         {
-            var t = new TestSubmitViewModel()
+            var g = await context.TestGroups
+                .Where(t => !t.IsDeleted)
+                .Include(t => t.OpenQuestions)
+                .Include(t => t.ClosedQuestions)
+                .Include(t=>t.Test)
+                .FirstOrDefaultAsync(t => t.Id == id);
+            if (g is null)
+            {
+                return null;
+            }
+
+            return ToRawViewModel(g);
+        }
+
+        public TestGroupSubmitViewModel ToSubmit(RawTestGroupViewModel model)
+        {
+            var t = new TestGroupSubmitViewModel()
             {
                 OpenQuestions = model.OpenQuestions
-                                     .Where(q => !q.IsDeleted)
-                                     .Select(q => new OpenQuestionSubmitViewModel()
-                                     {
-                                         Text = q.Text,
-                                         Id = q.Id,
-                                         MaxScore = q.MaxScore,
-                                         ImagePath = q.ImagePath,
-                                         IsEquation = q.IsEquation,
-                                         CorrectAnswer = q.Answer
-                                     })
-                                     .ToList(),
+                    .Where(q => !q.IsDeleted)
+                    .Select(q => new OpenQuestionSubmitViewModel()
+                    {
+                        Text = q.Text,
+                        Id = q.Id,
+                        MaxScore = q.MaxScore,
+                        ImagePath = q.ImagePath,
+                        IsEquation = q.IsEquation,
+                        CorrectAnswer = q.Answer
+                    })
+                    .ToList(),
                 ClosedQuestions = model.ClosedQuestions
-                                       .Where(q => !q.IsDeleted)
-                                       .Select(q => new ClosedQuestionViewModel()
-                                       {
-                                           Answers = q.Answers.Split("&"),
-                                           IsDeleted = false,
-                                           Text = q.Text,
-                                           Id = q.Id,
-                                           MaxScore = q.MaxScore,
-                                           ImagePath = q.ImagePath,
-                                           IsEquation = q.IsEquation,
-                                           AnswerIndexes = new bool[q.Answers.Count(x => x == '&')+1]
-                                       })
-                                       .ToList(),
+                    .Where(q => !q.IsDeleted)
+                    .Select(q => new ClosedQuestionViewModel()
+                    {
+                        Answers = q.Answers.Split("&"),
+                        IsDeleted = false,
+                        Text = q.Text,
+                        Id = q.Id,
+                        MaxScore = q.MaxScore,
+                        ImagePath = q.ImagePath,
+                        IsEquation = q.IsEquation,
+                        AnswerIndexes = new bool[q.Answers.Count(x => x == '&') + 1]
+                    })
+                    .ToList(),
+                QuestionOrder = ProcessQuestionOrder(model.QuestionsOrder),
                 Time = model.Time,
-                Title = model.Title,
-                QuestionOrder = ProcessQuestionOrder(model.QuestionOrder),
+                Title = model.TestTitle,
                 Id = model.Id
             };
             return t;
         }
 
-        public async Task Edit(Guid id, TestEditViewModel model, Guid? teacherId, bool isAdmin = false)
+        public async Task Edit(Guid id, GroupEditViewModel model, Guid? teacherId, bool isAdmin = false)
         {
             var test = await context.Tests
-                                    .Include(t=>t.OpenQuestions)
-                                    .Include(t=>t.ClosedQuestions)
+                                    .Include(t=>t.Groups)
+                                    .ThenInclude(t=>t.OpenQuestions)
+                                    .Include(t => t.Groups)
+                                    .ThenInclude(t=>t.ClosedQuestions)
                                     .FirstOrDefaultAsync(t=>t.Id==id);
 
-            test.OpenQuestions = test.OpenQuestions.Select(q => EditOpenQuestion(model.OpenQuestions, q))
-                                     .Where(q => !string.IsNullOrEmpty(q.Text))
-                                     .Union(model.OpenQuestions
-                                                 .Select(q => new OpenQuestion()
-                                                 {
-                                                     Text = q.Text,
-                                                     Answer = q.Answer,
-                                                     MaxScore = q.MaxScore,
-                                                     ImagePath = q.ImagePath,
-                                                     IsEquation = q.IsEquation
-                                                 }))
-                                     .ToList();
-            
-            test.ClosedQuestions = test.ClosedQuestions.Select(q => EditClosedQuestion(model.ClosedQuestions, q))
+            var dbGroup = test.Groups.First(g => g.Number == model.Number);
+            dbGroup.OpenQuestions = dbGroup.OpenQuestions.Select(q => EditOpenQuestion(model.OpenQuestions, q))
+                                 .Where(q => !string.IsNullOrEmpty(q.Text))
+                                 .Union(model.OpenQuestions
+                                             .Select(q => new OpenQuestion()
+                                             {
+                                                 Text = q.Text,
+                                                 Answer = q.Answer,
+                                                 MaxScore = q.MaxScore,
+                                                 ImagePath = q.ImagePath,
+                                                 IsEquation = q.IsEquation
+                                             }))
+                                 .ToList();
+
+            dbGroup.ClosedQuestions = dbGroup.ClosedQuestions.Select(q => EditClosedQuestion(model.ClosedQuestions, q))
                                      .Where(q => !string.IsNullOrEmpty(q.Text))
                                      .Union(model.ClosedQuestions
                                                  .Select(q => new ClosedQuestion()
@@ -268,33 +309,34 @@ namespace IntelliTest.Core.Services
                                                      IsEquation = q.IsEquation
                                                  }))
                                      .ToList();
+            dbGroup.QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]));
 
-            if (isAdmin || test.CreatorId==teacherId)
-            {
-                test.Title = model.Title;
-                test.Description = model.Description;
-                test.Grade = model.Grade;
-                test.Time = model.Time;
-                test.PublicyLevel = model.PublicityLevel;
-                test.QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]));
-            }
-            else
-            {
-                var newTest = new Test()
-                {
-                    Title = model.Title,
-                    Description = model.Description,
-                    Grade = model.Grade,
-                    Time = model.Time,
-                    ClosedQuestions = test.ClosedQuestions,
-                    OpenQuestions = test.OpenQuestions,
-                    CreatedOn = DateTime.Now,
-                    CreatorId = (Guid)teacherId,
-                    PublicyLevel = model.PublicityLevel,
-                    QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]))
-                };
-                context.Tests.Add(newTest);
-            }
+            test.Title = model.Title;
+            test.Description = model.Description;
+            test.Grade = model.Grade;
+            test.Time = model.Time;
+            test.PublicyLevel = model.PublicityLevel;
+            //TODO: code for making a copy of a test
+            //if (isAdmin || test.CreatorId==teacherId)
+            //{
+            //}
+            //else
+            //{
+            //    var newTest = new Test()
+            //    {
+            //        Title = model.Title,
+            //        Description = model.Description,
+            //        Grade = model.Grade,
+            //        Time = model.Time,
+            //        ClosedQuestions = test.ClosedQuestions,
+            //        OpenQuestions = test.OpenQuestions,
+            //        CreatedOn = DateTime.Now,
+            //        CreatorId = (Guid)teacherId,
+            //        PublicyLevel = model.PublicityLevel,
+            //        QuestionsOrder = string.Join('|', model.QuestionsOrder.Select(q => q.ToString()[0]))
+            //    };
+            //    context.Tests.Add(newTest);
+            //}
             await context.SaveChangesAsync();
         }
 
@@ -350,24 +392,25 @@ namespace IntelliTest.Core.Services
 
         public async Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId)
         {
-            return context.TestResults.Any(t => t.StudentId == studentId && t.TestId == testId);
+            return context.TestResults
+                .Include(t=>t.Group)
+                .Any(t => t.StudentId == studentId && t.Group.TestId == testId);
         }
 
 
         public async Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query)
         {
             var testsQuery = context.TestResults
-                                    .Include(t=>t.Test)
-                                    .ThenInclude(t=>t.TestResults)
-
-                                    .Include(t => t.Test)
-                                    .ThenInclude(t => t.TestLikes)
-
-                                    .Include(t => t.Test)
+                                    .Include(t=>t.Group)
+                                    .ThenInclude(g=>g.Test)
+                                    .Include(t => t.Group)
+                                    .ThenInclude(g => g.Test)
+                                    .ThenInclude(t=>t.TestLikes)
+                                    .Include(t => t.Group)
+                                    .ThenInclude(g => g.Test)
                                     .ThenInclude(t => t.TestResults)
-
                                     .Where(r => r.StudentId == studentId)
-                                    .Select(tr => tr.Test);
+                                    .Select(tr => tr.Group.Test);
             return await FilterMine(testsQuery, query);
         }
 
@@ -382,10 +425,16 @@ namespace IntelliTest.Core.Services
                 Grade = model.Grade,
                 CreatedOn = DateTime.Now,
                 CreatorId = teacherId,
-                OpenQuestions = new List<OpenQuestion>(),
-                ClosedQuestions = new List<ClosedQuestion>(),
-                PhotoPath = "",
-                QuestionsOrder = ""
+                Groups = new List<TestGroup>()
+                {
+                    new TestGroup()
+                    {
+                        OpenQuestions = new List<OpenQuestion>(),
+                        ClosedQuestions = new List<ClosedQuestion>(),
+                        QuestionsOrder = ""
+                    }
+                },
+                PhotoPath = ""
             };
             var classes = await context.Classes.Where(c => classNames.Contains(c.Name)).ToListAsync();
             var e = await context.Tests.AddAsync(test);
@@ -398,11 +447,17 @@ namespace IntelliTest.Core.Services
             return e.Entity.Id;
         }
 
-        public async Task<bool> ExistsbyId(Guid id)
+        public async Task<bool> TestExistsbyId(Guid id)
         {
             return await context.Tests
                                 .Where(c => !c.IsDeleted)
                                 .AnyAsync(t=>t.Id == id);
+        }
+        public async Task<bool> GroupExistsbyId(Guid id)
+        {
+            return await context.TestGroups
+                .Where(c => !c.IsDeleted)
+                .AnyAsync(t => t.Id == id);
         }
 
         public async Task<bool> StudentHasAccess(Guid testId, Guid studentId)

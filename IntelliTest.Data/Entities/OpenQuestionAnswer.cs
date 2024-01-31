@@ -21,7 +21,7 @@ namespace IntelliTest.Data.Entities
         [ForeignKey(nameof(Student))]
         public Guid StudentId { get; set; }
 
-        public decimal Points { get; set; }
+        public float Points { get; set; }
         public string? Explanation { get; set; }
     }
 }
