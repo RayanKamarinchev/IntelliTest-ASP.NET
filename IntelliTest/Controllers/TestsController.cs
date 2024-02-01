@@ -84,21 +84,51 @@ namespace IntelliTest.Controllers
             QueryModel<TestViewModel> model = await testService.GetMy(teacherId, studentId, query);
             return View("Index", model);
         }
-        
 
-        [Route("Tests/Edit/{testId}/{groupId}")]
+        //[Route("Tests/Edit/{testId}")]
+        //[HttpGet]
+        //[Authorize(Roles = "Teacher,Admin")]
+        //public async Task<IActionResult> GroupSelect(Guid testId)
+        //{
+        //    var test = await testService.GetById(testId);
+        //    PublicityLevel publicityLevel = test.PublicityLevel;
+        //    if (!await testService.TestExistsbyId(testId))
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (publicityLevel == PublicityLevel.ClassOnly || publicityLevel == PublicityLevel.Private)
+        //    {
+        //        if (TempData.Peek(TeacherId) is null)
+        //        {
+        //            return RedirectToAction("Logout", "User");
+        //        }
+
+        //        bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek(TeacherId));
+        //        if (!isCreator)
+        //        {
+        //            return NotFound();
+        //        }
+        //    }
+
+        //    var groups = testService.GetGroupsByTest(testId);
+        //    return View("GroupSelect", groups);
+        //}
+
+        [Route("Tests/Edit/{testId}")]
+        //[Route("Tests/Edit/{testId}/{groupId}")]
         [HttpGet]
         [Authorize(Roles = "Teacher,Admin")]
-        public async Task<IActionResult> Edit(GroupEditViewModel viewModel, Guid testId, Guid groupId)
+        public async Task<IActionResult> Edit(TestGroupEditViewModel viewModel, Guid testId, Guid? groupId)
         {
-            if (viewModel.PublicityLevel == PublicityLevel.Private
-                || !await testService.TestExistsbyId(testId)
+            //TODO admin edit not found
+            if (!await testService.TestExistsbyId(testId)
                 || !await testService.GroupExistsbyId(groupId))
             {
                 return NotFound();
             }
 
-            if (viewModel.PublicityLevel == PublicityLevel.ClassOnly)
+            if (viewModel.PublicityLevel == PublicityLevel.ClassOnly || viewModel.PublicityLevel == PublicityLevel.Private)
             {
                 //TODO potential bugs with TempData[testId]
                 if (TempData.Peek(TeacherId) is null)
@@ -109,13 +139,16 @@ namespace IntelliTest.Controllers
                 bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek(TeacherId));
                 if (!isCreator)
                 {
-                    return Unauthorized();
+                    return NotFound();
                 }
             }
 
             TestViewModel testModel = await testService.GetById(testId);
-            RawTestGroupViewModel groupModel = await testService.GetGroupById(groupId);
-            GroupEditViewModel testToEdit = testResultsService.ToEdit(testModel, groupModel);
+
+            groupId ??= testModel.Groups[0].Id;
+            RawTestGroupViewModel groupModel = await testService.GetGroupById((Guid)groupId);
+            TestGroupEditViewModel testToEdit = testResultsService.ToEdit(testModel, groupModel);
+
             TempData["PublicityLevel"] = testToEdit.PublicityLevel;
             return View("Edit", testToEdit);
         }
@@ -140,7 +173,7 @@ namespace IntelliTest.Controllers
         [HttpPost]
         [Route("Tests/Edit/{Id}/{groupId}")]
         [Authorize(Roles = "Teacher,Admin")]
-        public async Task<IActionResult> Edit(Guid id, [FromForm] GroupEditViewModel model)
+        public async Task<IActionResult> Edit(Guid id, [FromForm] TestGroupEditViewModel model)
         {
             model.OpenQuestions ??= new List<OpenQuestionViewModel>();
             model.ClosedQuestions ??= new List<ClosedQuestionViewModel>();
@@ -390,7 +423,7 @@ namespace IntelliTest.Controllers
                 return View("Edit");
             }
 
-            var model = JsonSerializer.Deserialize<GroupEditViewModel>(TempData.Peek("editModel").ToString());
+            var model = JsonSerializer.Deserialize<TestGroupEditViewModel>(TempData.Peek("editModel").ToString());
             model.OpenQuestions.Add(question);
             TempData["editModel"] = JsonSerializer.Serialize(model);
 

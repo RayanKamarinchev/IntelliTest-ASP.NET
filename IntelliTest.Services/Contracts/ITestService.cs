@@ -15,8 +15,8 @@ namespace IntelliTest.Core.Contracts
         Task<TestViewModel> GetById(Guid id);
         Task<RawTestGroupViewModel> GetGroupById(Guid id);
         Task<bool> TestExistsbyId(Guid id);
-        Task<bool> GroupExistsbyId(Guid id);
-        Task Edit(Guid id, GroupEditViewModel model, Guid? teacherId, bool isAdmin = false);
+        Task<bool> GroupExistsbyId(Guid? id);
+        Task Edit(Guid id, TestGroupEditViewModel model, Guid? teacherId, bool isAdmin = false);
         TestGroupSubmitViewModel ToSubmit(RawTestGroupViewModel model);
         Task<bool> IsTestTakenByStudentId(Guid testId, Guid studentId);
         Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId, QueryModel<TestViewModel> query);
@@ -29,5 +29,6 @@ namespace IntelliTest.Core.Contracts
         public Task<bool> IsTestCreator(Guid testId, Guid teacherId);
 
         Task<QueryModel<TestViewModel>> GetAllAdmin(QueryModel<TestViewModel> query);
+        List<TestGroupViewModel> GetGroupsByTest(Guid testId);
     }
 }

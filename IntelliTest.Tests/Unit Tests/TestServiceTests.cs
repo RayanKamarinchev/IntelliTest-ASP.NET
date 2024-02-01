@@ -71,7 +71,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 Title = t.Title,
                 MultiSubmit = t.MultiSubmission,
                 PublicityLevel = t.PublicyLevel,
-                Students = t.TestResults.Count(),
+                Examiners = t.TestResults.Count(),
                 IsTestTaken = t.TestResults.Any(t=>t.StudentId==id),
                 QuestionOrder = t.QuestionsOrder
             };

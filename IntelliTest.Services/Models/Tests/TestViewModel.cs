@@ -32,7 +32,7 @@ namespace IntelliTest.Core.Models.Tests
         [Display(Name = "Училище")]
         public string School { get; set; }
         public float AverageScore { get; set; }
-        public int Students { get; set; }
+        public int Examiners { get; set; }
         [Required]
         [Range(1, 600)]
         [Display(Name = "Време (в минути)")]

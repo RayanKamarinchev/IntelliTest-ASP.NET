@@ -16,5 +16,6 @@ namespace IntelliTest.Data.Entities
         public Guid TestId { get; set; }
         public Test Test { get; set; }
         public bool IsDeleted { get; set; }
+        public IEnumerable<TestResult> TestResults { get; set; }
     }
 }

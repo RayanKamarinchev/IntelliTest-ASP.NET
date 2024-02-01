@@ -139,10 +139,15 @@ namespace IntelliTest.Core.Services
             return list;
         }
 
-        public GroupEditViewModel ToEdit(TestViewModel test, RawTestGroupViewModel group)
+        public TestGroupEditViewModel ToEdit(TestViewModel test, RawTestGroupViewModel group)
         {
-            var t = new GroupEditViewModel()
+            var t = new TestGroupEditViewModel()
             {
+                Groups = test.Groups.Select(g=> new TestGroupViewModel()
+                                                {
+                                                    Number = g.Number,
+                                                    Id = g.Id
+                                                }).ToList(),
                 OpenQuestions = group.OpenQuestions
                     .Where(q => !q.IsDeleted)
                     .Select(q => new OpenQuestionViewModel()
@@ -174,7 +179,8 @@ namespace IntelliTest.Core.Services
                 Grade = test.Grade,
                 Title = test.Title,
                 Id = test.Id,
-                PublicityLevel = test.PublicityLevel
+                PublicityLevel = test.PublicityLevel,
+                GroupId = group.Id
             };
             return t;
         }
@@ -216,9 +222,9 @@ namespace IntelliTest.Core.Services
                 group = testResult.Group;
                 test = group.Test;
                 groupStats.AverageScore =
-                    (float)Math.Round(!test.TestResults.Any() ? 0 : test.TestResults.Average(r => r.Score), 2);
+                    (float)Math.Round(!group.TestResults.Any() ? 0 : group.TestResults.Average(r => r.Score), 2);
                 //groupStats.Title = test.Title;
-                groupStats.Examiners = test.TestResults.Count();
+                groupStats.Examiners = group.TestResults.Count();
                 groupStats.QuestionOrder = ProcessQuestionOrder(testResult.Group.QuestionsOrder);
                 groupStats.Number = group.Number;
 

@@ -48,6 +48,11 @@
     }
 }
 
+.groups-navbar{
+    position: sticky;
+    top: 0;
+}
+
 .floating-container {
     position: fixed;
     width: 100px;

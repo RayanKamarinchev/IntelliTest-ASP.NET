@@ -2,12 +2,15 @@
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Tests.Groups;
 using IntelliTest.Data.Enums;
 
-namespace IntelliTest.Core.Models.Tests.Groups
+namespace IntelliTest.Core.Models.Tests
 {
-    public class GroupEditViewModel
+    public class TestGroupEditViewModel
     {
+        public List<TestGroupViewModel> Groups { get; set; }
+        public Guid GroupId { get; set; }
         public PublicityLevel PublicityLevel { get; set; }
         public int Number { get; set; }
         public List<OpenQuestionViewModel>? OpenQuestions { get; set; }

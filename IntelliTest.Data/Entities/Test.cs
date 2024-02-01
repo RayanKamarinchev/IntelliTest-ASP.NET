@@ -39,6 +39,5 @@ namespace IntelliTest.Data.Entities
         public PublicityLevel PublicyLevel { get; set; }
         public string PhotoPath { get; set; }
         public IEnumerable<TestLike> TestLikes { get; set; }
-        public IEnumerable<TestResult> TestResults { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace IntelliTest.Core.Contracts
         float CalculateClosedQuestionScore(bool[] Answers, int[] RightAnswers, float MaxScore);
         bool[] ProccessAnswerIndexes(string[] answers, string answerIndexes);
 
-        GroupEditViewModel ToEdit(TestViewModel test, RawTestGroupViewModel group);
+        TestGroupEditViewModel ToEdit(TestViewModel test, RawTestGroupViewModel group);
         //Statistics and results
         Guid[] GetExaminersIds(Guid testId);
         Task<TestStatsViewModel> GetStatistics(Guid testId);

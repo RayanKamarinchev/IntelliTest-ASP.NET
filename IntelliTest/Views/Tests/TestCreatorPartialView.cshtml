@@ -30,11 +30,11 @@
                 <li class="widget-49-meeting-item">
                     @if (User.IsTeacher() || User.IsAdmin())
                     {
-                        <a asp-area="" asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Students</strong></a>
+                        <a asp-area="" asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Examiners</strong></a>
                     }
                     else
                     {
-                        <p>Изпитници: <strong>@Model.Students</strong></p>
+                        <p>Изпитници: <strong>@Model.Examiners</strong></p>
                     }
                 </li>
             </ol>

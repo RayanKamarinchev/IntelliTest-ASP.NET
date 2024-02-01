@@ -1,7 +1,7 @@
 ﻿@using IntelliTest.Core.Models.Questions.Closed
-@using IntelliTest.Core.Models.Enums
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model IntelliTest.Core.Models.Tests.Groups.GroupEditViewModel
+@using IntelliTest.Core.Models.Enums
+@model TestGroupEditViewModel
 @{
     ViewBag.Title = "Edit Test";
     if (Model.ClosedQuestions == null)
@@ -14,90 +14,108 @@
     }
 }
 <div class="editMain">
+    <nav class="groups-navbar navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1 justify-content-center">
+                    @foreach (var group in Model.Groups)
+                    {
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark @(group.Id == Model.GroupId ? "active" : "")" asp-controller="Tests" asp-action="Edit" asp-route-testId="@Model.Id" asp-route-groupId="@group.Id">Група @group.Number</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div id="addAddMoreDiv" style="width: 60%">
         @using (Html.BeginForm())
         {
-        <form>
-            <div class="customRow" style="margin-top: 50px">
-                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
-                    <div class="d-flex widthMax">
-                        <label asp-for="Title" style="margin-right: 10px"></label>
-                        <div style="flex-grow: 1">
-                            <input class="fs-5" onfocus="onFocus(this)" onblur=onFocusOut(this) id="title" type="text" value="@Model.Title"/>
+            <form>
+                <div class="customRow" style="margin-top: 50px">
+                    <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
+                        <div class="d-flex widthMax">
+                            <label asp-for="Title" style="margin-right: 10px"></label>
+                            <div style="flex-grow: 1">
+                                <input class="fs-5" onfocus="onFocus(this)" onblur=onFocusOut(this) id="title" type="text" value="@Model.Title"/>
+                            </div>
                         </div>
-                    </div>
-                    <div class="widthMax">
-                        <label asp-for="Description" style="display: flex"></label>
-                        <textarea type="text" value="@Model.Description" id="desc"></textarea>
-                    </div>
-                    <div class="d-flex">
-                        <label asp-for="Grade"></label>
-                        <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="grade" type="text" value="@Model.Grade" style="text-align: center"/>
+                        <div class="widthMax">
+                            <label asp-for="Description" style="display: flex"></label>
+                            <textarea type="text" value="@Model.Description" id="desc"></textarea>
                         </div>
-                        <label asp-for="Time"></label>
-                        <div class="smallInput">
-                            <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="time" type="text" value="@Model.Time" style="text-align: center"/>
+                        <div class="d-flex">
+                            <label asp-for="Grade"></label>
+                            <div class="smallInput">
+                                <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="grade" type="text" value="@Model.Grade" style="text-align: center"/>
+                            </div>
+                            <label asp-for="Time"></label>
+                            <div class="smallInput">
+                                <input class="fs-4" onfocus="onFocus(this)" onblur=onFocusOut(this) id="time" type="text" value="@Model.Time" style="text-align: center"/>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="customRow">
-                <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
-                    <div class="widthMax" style="display: flex">
-                        <label style="margin-right: 10px">Брой въпроси: </label>
-                        <div class="smallInput">
-                            <input maxlength="2" value="0" class="fs-4" id="questionCount" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" style="text-align: center"/>
+                <div class="customRow">
+                    <div class="questTextBox d-flex questBox align-items-start widthMax" style="flex-direction: column;">
+                        <div class="widthMax" style="display: flex">
+                            <label style="margin-right: 10px">Брой въпроси: </label>
+                            <div class="smallInput">
+                                <input maxlength="2" value="0" class="fs-4" id="questionCount" onfocus="onFocus(this)" onblur=onFocusOut(this) type="text" style="text-align: center"/>
+                            </div>
                         </div>
+                        <div class="widthMax">
+                            <label style="display: flex">Текст</label>
+                            <textarea onkeyup="textAreaAdjust(this)" name="text" id="prompt"class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
+                        </div>
+                        <br/>
+                        <button type="button" class="btn btn-secondary" id="gen">Генерирай</button>
+                        <br/>
+                        <div class="widthMax">
+                            <label style="display: flex">От линк(URL) или заглавие</label>
+                            <textarea onkeyup="textAreaAdjust(this)" id="lessonName" class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
+                        </div>
+                        <span class="text-danger" id="lessonError"></span>
+                        <br/>
+                        <button type="button" class="btn btn-secondary" id="genLesson" class="btn btn-secondary">Генерирай</button>
                     </div>
-                    <div class="widthMax">
-                        <label style="display: flex">Текст</label>
-                        <textarea onkeyup="textAreaAdjust(this)" name="text" id="prompt"class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
-                    </div>
-                    <br/>
-                    <button type="button" class="btn btn-secondary" id="gen">Генерирай</button>
-                    <br/>
-                    <div class="widthMax">
-                        <label style="display: flex">От линк(URL) или заглавие</label>
-                        <textarea onkeyup="textAreaAdjust(this)" id="lessonName" class="input-field widthMax" name="url" class="widthMax" style="color: black"></textarea>
-                    </div>
-                    <span class="text-danger" id="lessonError"></span>
-                    <br/>
-                    <button type="button" class="btn btn-secondary" id="genLesson" class="btn btn-secondary">Генерирай</button>
                 </div>
-            </div>
-            <div id="questions">
-                @{
-                    Queue<ClosedQuestionViewModel> closedQuestions = new Queue<ClosedQuestionViewModel>(Model.ClosedQuestions);
-                    Queue<OpenQuestionViewModel> openQuestions = new Queue<OpenQuestionViewModel>(Model.OpenQuestions);
+                <div id="questions">
+                    @{
+                        Queue<ClosedQuestionViewModel> closedQuestions = new Queue<ClosedQuestionViewModel>(Model.ClosedQuestions);
+                        Queue<OpenQuestionViewModel> openQuestions = new Queue<OpenQuestionViewModel>(Model.OpenQuestions);
 
-                    int closedQuestionCount = Model.ClosedQuestions.Count;
-                    Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(), Model.OpenQuestions.Count));
-                    Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(), closedQuestionCount));
+                        int closedQuestionCount = Model.ClosedQuestions.Count;
+                        Model.ClosedQuestions.AddRange(Enumerable.Repeat(new ClosedQuestionViewModel(), Model.OpenQuestions.Count));
+                        Model.OpenQuestions.AddRange(Enumerable.Repeat(new OpenQuestionViewModel(), closedQuestionCount));
 
-                    for (int i = 0; i < Model.QuestionsOrder.Count; i++)
-                    {
-                        if (Model.QuestionsOrder[i] == QuestionType.Closed)
+                        for (int i = 0; i < Model.QuestionsOrder.Count; i++)
                         {
-                            var question = closedQuestions.Dequeue();
-                            Model.ClosedQuestions[i] = question;
-                            <partial name="../Questions/Closed/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
-                        }
-                        else if (Model.QuestionsOrder[i] == QuestionType.Open)
-                        {
-                            var question = openQuestions.Dequeue();
-                            Model.OpenQuestions[i] = question;
-                            <partial name="../Questions/Open/OpenQuestionPartialView" for="OpenQuestions[i]"/>
+                            if (Model.QuestionsOrder[i] == QuestionType.Closed)
+                            {
+                                var question = closedQuestions.Dequeue();
+                                Model.ClosedQuestions[i] = question;
+                                <partial name="../Questions/Closed/ClosedQuestionPartialView" for="ClosedQuestions[i]"/>
+                            }
+                            else if (Model.QuestionsOrder[i] == QuestionType.Open)
+                            {
+                                var question = openQuestions.Dequeue();
+                                Model.OpenQuestions[i] = question;
+                                <partial name="../Questions/Open/OpenQuestionPartialView" for="OpenQuestions[i]"/>
+                            }
                         }
                     }
-                }
-            </div>
-            <button type="button" id="openQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
-            <button type="button" id="closedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
-            <hr/>
-            @Html.AntiForgeryToken()
-            <button class="btn blue btn-primary" >Готово</button>
-        </form>
+                </div>
+                <button type="button" id="openQuestionAdd" class="btn btn-secondary">Добави отворен въпрос</button>
+                <button type="button" id="closedQuestionAdd" class="btn btn-secondary">Добави затворен въпрос</button>
+                <hr/>
+                @Html.AntiForgeryToken()
+                <button class="btn blue btn-primary">Готово</button>
+            </form>
         }
     </div>
 </div>
