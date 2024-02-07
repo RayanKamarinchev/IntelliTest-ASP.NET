@@ -140,8 +140,8 @@
   color: #4797f2 !important;
 }
 
-.nav-item a:hover:not(.hover-black){
-  color: #4797f2 !important;
+.nav-item a:hover:not(.hover-black, .add-group) {
+    color: #4797f2 !important;
 }
 .nav-item a {
     font-size: 25px;

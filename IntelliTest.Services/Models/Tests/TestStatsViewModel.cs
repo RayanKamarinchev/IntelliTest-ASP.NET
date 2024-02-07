@@ -7,6 +7,6 @@ namespace IntelliTest.Core.Models.Tests
         public string Title { get; set; }
         public float AverageScore { get; set; }
         public int Examiners { get; set; }
-        public List<TestGroupStatsViewModel> TestGroups { get; set; }
+        public List<TestGroupStatsViewModel> TestGroups { get; set; } = new List<TestGroupStatsViewModel>();
     }
 }

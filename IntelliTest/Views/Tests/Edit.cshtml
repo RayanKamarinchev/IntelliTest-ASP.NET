@@ -25,9 +25,14 @@
                     @foreach (var group in Model.Groups)
                     {
                         <li class="nav-item align-items-center d-flex">
-                            <a class="nav-link text-dark @(group.Id == Model.GroupId ? "active" : "")" asp-controller="Tests" asp-action="Edit" asp-route-testId="@Model.Id" asp-route-groupId="@group.Id">Група @group.Number</a>
+                            <a class="nav-link text-dark @(group.Id == Model.GroupId ? "active" : "")" 
+                               asp-controller="Tests" asp-action="Edit" asp-route-testId="@Model.Id" asp-route-groupId="@group.Id">Група @group.Number</a>
                         </li>
                     }
+                    <li class="nav-item align-items-center d-flex">
+                        <a class="nav-link add-group text-dark" asp-controller="Tests" asp-action="AddGroup"
+                           asp-route-testId="@Model.Id" asp-route-groupNumber="@Model.Groups.Last().Number">Добави +</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -127,6 +132,7 @@
     <script>
         var questionCount = @Model.QuestionsOrder.Count;
         var id = "@Model.Id";
+        var groupId = "@Model.GroupId";
     </script>
     <script src="~/js/dragNdrop.js" asp-append-version="true"></script>
     <script src="~/js/testEdit.js" asp-append-version="true"></script>

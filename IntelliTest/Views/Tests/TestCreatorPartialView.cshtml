@@ -22,7 +22,7 @@
             </div>
             <ol class="widget-49-meeting-points">
                 <li class="widget-49-meeting-item">
-                    <span>Въпроси: <strong>@(Model.Groups[0].OpenQuestions.Count() + Model.Groups[0].ClosedQuestions.Count())</strong></span>
+                    <span>Въпроси: <strong>@(Model.Groups.Max(g => g.OpenQuestions.Count + g.ClosedQuestions.Count))</strong></span>
                 </li>
                 <li class="widget-49-meeting-item">
                     <span>Време: <strong>@Model.Time мин</strong></span>
@@ -48,7 +48,7 @@
                                class="btn btn-sm btn-primary back-col" style="margin-right: 30px">
                                 Статистика
                             </a>
-                            <a asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
+                            <a asp-area="" asp-controller="Tests" asp-action="Edit" asp-route-id="@Model.Id"
                                class="btn btn-sm btn-primary back-col">
                                 Редактирай
                             </a>
@@ -58,7 +58,7 @@
                     {
                         if (Model.IsTestTaken)
                         {
-                            <a asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@TempData.Peek(StudentId)" asp-route-testId="@Model.Id"
+                            <a asp-area="" asp-controller="Tests" asp-action="ReviewAnswers" asp-route-studentId="@TempData.Peek(StudentId)" asp-route-testId="@Model.Id"
                                class="btn btn-sm btn-secondary back-col" style="margin-right: 30px">
                                 Резултати
                             </a>

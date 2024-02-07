@@ -48,7 +48,15 @@
     }
 }
 
-.groups-navbar{
+.add-group:hover {
+    color: #d89600 !important;
+}
+
+.add-group:focus {
+    color: #d89600 !important;
+}
+
+.groups-navbar {
     position: sticky;
     top: 0;
 }
@@ -100,6 +108,7 @@
     flex-direction: column;
     align-items: center;
     min-height: calc(100vh - 160px);
+    position: relative;
 }
 
 .icon-1x { font-size: 24px !important; }
@@ -437,8 +446,23 @@ textarea { border-radius: 5px; }
     padding-left: 15px;
     padding-right: 15px;
 }
+.group-show {
+    z-index: 3;
+    position: fixed;
+    top: 70px;
+    left: 50px;
+    background-color: white;
+    border-radius: 5px;
+    text-align: center;
+    display: flex;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
 
-.icon-answer { display: flex; }
+.icon-answer {
+    display: flex;
+}
 
 .icon-answer svg { align-self: center; }
 

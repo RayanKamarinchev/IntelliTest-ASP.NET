@@ -1,21 +1,18 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models;
+using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions;
+using IntelliTest.Core.Models.Questions.Closed;
 using IntelliTest.Core.Models.Tests;
+using IntelliTest.Core.Models.Tests.Groups;
 using IntelliTest.Core.Models.Users;
 using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using IntelliTest.Core.Models.Enums;
-using IntelliTest.Core.Models.Questions.Closed;
 using static IntelliTest.Infrastructure.Constraints;
-using System.Collections.Generic;
-using System;
-using IntelliTest.Core.Models.Tests.Groups;
 using TestGroupSubmitViewModel = IntelliTest.Core.Models.Tests.Groups.TestGroupSubmitViewModel;
 
 namespace IntelliTest.Controllers
@@ -29,7 +26,7 @@ namespace IntelliTest.Controllers
         private readonly IStudentService studentService;
         private readonly IClassService classService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly Random random;
+        private readonly Random random = new Random();
 
         public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
                                IClassService _classService, ITestResultsService testResultsService, IWebHostEnvironment webHostEnvironment)
@@ -116,7 +113,7 @@ namespace IntelliTest.Controllers
         //}
 
         [Route("Tests/Edit/{testId}")]
-        //[Route("Tests/Edit/{testId}/{groupId}")]
+        [Route("Tests/Edit/{testId}/{groupId}")]
         [HttpGet]
         [Authorize(Roles = "Teacher,Admin")]
         public async Task<IActionResult> Edit(TestGroupEditViewModel viewModel, Guid testId, Guid? groupId)
@@ -145,11 +142,12 @@ namespace IntelliTest.Controllers
 
             TestViewModel testModel = await testService.GetById(testId);
 
-            groupId ??= testModel.Groups[0].Id;
+            groupId ??= testModel.Groups.Last().Id;
             RawTestGroupViewModel groupModel = await testService.GetGroupById((Guid)groupId);
             TestGroupEditViewModel testToEdit = testResultsService.ToEdit(testModel, groupModel);
 
             TempData["PublicityLevel"] = testToEdit.PublicityLevel;
+            TempData["TestGroups"] = JsonSerializer.Serialize(testToEdit.Groups);
             return View("Edit", testToEdit);
         }
 
@@ -169,17 +167,27 @@ namespace IntelliTest.Controllers
                 await question.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
             }
         }
+
+        [Route("Tests/Edit/AddGroup/{testId}")]
+        public async Task<IActionResult> AddGroup(Guid testId, int groupNumber)
+        {
+            Guid groupId = await testService.AddNewGroup(testId, groupNumber);
+            return RedirectToAction("Edit", new { testId = testId, groupId = groupId });
+        }
         
         [HttpPost]
-        [Route("Tests/Edit/{Id}/{groupId}")]
+        [Route("Tests/Edit/{testId}/{groupId}")]
         [Authorize(Roles = "Teacher,Admin")]
-        public async Task<IActionResult> Edit(Guid id, [FromForm] TestGroupEditViewModel model)
+        public async Task<IActionResult> Edit(Guid testId, Guid groupId, [FromForm] TestGroupEditViewModel model)
         {
             model.OpenQuestions ??= new List<OpenQuestionViewModel>();
             model.ClosedQuestions ??= new List<ClosedQuestionViewModel>();
             model.QuestionsOrder ??= new List<QuestionType>();
+            model.GroupId = groupId;
+            model.Groups =
+                JsonSerializer.Deserialize<List<TestGroupViewModel>>(TempData["TestGroups"].ToString());
 
-            if (!await testService.TestExistsbyId(id))
+            if (!await testService.TestExistsbyId(testId))
             {
                 return NotFound();
             }
@@ -193,15 +201,17 @@ namespace IntelliTest.Controllers
                 await SaveImage(question);
             }
 
-            if (!ModelState.IsValid || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
+            //test groups are counted as an error
+            //TODO find smarter way
+            if (ModelState.ErrorCount > 1 || !AllQuestionsHaveAnswerIndexes(model.ClosedQuestions) ||
                 TempData.Peek("PublicityLevel") is null)
             {
                 return View("Edit", model);
             }
 
             model.PublicityLevel = (PublicityLevel)TempData["PublicityLevel"];
-            await testService.Edit(id, model, (Guid?)TempData.Peek(TeacherId), User.IsAdmin());
-
+            await testService.Edit(testId, model, (Guid?)TempData.Peek(TeacherId), User.IsAdmin());
+            TempData.Remove("Groups");
             TempData[Message] = TestEditMsg;
             return Content("redirect");
         }
@@ -282,7 +292,9 @@ namespace IntelliTest.Controllers
             {
                 return BadRequest();
             }
-            var group = dbTest.Groups.ToArray()[random.Next(dbTest.Groups.Count)];
+
+            int index = random.Next(dbTest.Groups.Count);
+            var group = dbTest.Groups.ToArray()[index];
             RawTestGroupViewModel model = new RawTestGroupViewModel()
             {
                 ClosedQuestions = group.ClosedQuestions.ToList(),
@@ -339,10 +351,9 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        [Route("Tests/Review/{testId}/{groupId}/{studentId}")]
-        public async Task<IActionResult> ReviewAnswers(Guid testId, Guid groupId, Guid studentId)
+        [Route("Tests/Review/{testId}/{studentId}")]
+        public async Task<IActionResult> ReviewAnswers(Guid testId, Guid studentId)
         {
-            //TODO
             var teacherId = (Guid?)TempData.Peek(TeacherId);
             var student = await studentService.GetStudent(studentId);
             bool isStudentsTeacher = student.Classes
@@ -371,7 +382,7 @@ namespace IntelliTest.Controllers
                 }
             }
 
-            var test = await testResultsService.GetStudentTestResults(groupId, studentId);
+            var test = await testResultsService.GetStudentTestResults(testId, studentId);
             return View(test);
         }
 

@@ -15,5 +15,6 @@ namespace IntelliTest.Core.Models.Tests.Groups
         public int Time { get; set; }
         public Guid Id { get; set; }
         public Guid GroupId { get; set; }
+        public int GroupNumber { get; set; }
     }
 }

@@ -351,7 +351,7 @@ function handleSubmit(event) {
     for ( var key in orderedFormValues ) {
         f.append(key, orderedFormValues[key]);
     }
-    fetch("/Tests/Edit/" + id, {
+    fetch(`/Tests/Edit/${id}/${groupId}`, {
         method: "POST", body: f, headers: {
             RequestVerificationToken:
                 document.getElementsByName("__RequestVerificationToken")[0].value

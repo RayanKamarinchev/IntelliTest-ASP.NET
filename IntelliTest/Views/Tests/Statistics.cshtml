@@ -1,9 +1,10 @@
 ﻿@using System.Text.Json
 @using IntelliTest.Core.Models.Enums
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model IntelliTest.Core.Models.Tests.Groups.TestGroupStatsViewModel
+@model TestStatsViewModel
 @{
     ViewBag.Title = "Test Statistics";
+    int currecntGroupNumber = Model.TestGroups.First().Number;
 }
 <script>
     let ctx;
@@ -30,106 +31,135 @@
                 };
 </script>
 <div class="editMain">
-    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
-        @{
-            if (Model.ClosedQuestions.Count + Model.OpenQuestions.Count == 0)
-            {
-                <div class="cd-fail-message">Няма резултати</div>
-            }
-            int closedQuestionsIndex = 0;
-            int openQuestionsIndex = 0;
-            for (int i = 0; i < Model.ClosedQuestions.Count + Model.OpenQuestions.Count; i++)
-            {
-                if (Model.QuestionOrder[i] == QuestionType.Closed)
-                {
-                    var question = Model.ClosedQuestions[closedQuestionsIndex];
-                    closedQuestionsIndex++;
-                    int[] all = new int[question.Answers.Length];
-                    for (int j = 0; j < question.StudentAnswers.Count; j++)
+    <nav class="groups-navbar navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1 justify-content-center">
+                    @foreach (var group in Model.TestGroups)
                     {
-                        for (int k = 0; k < question.StudentAnswers[j].Count; k++)
-                        {
-                            all[question.StudentAnswers[j][k]]++;
-                        }
+                        <li class="nav-item align-items-center d-flex">
+                            <a class="nav-link text-dark group-toggle @(group.Number == currecntGroupNumber ? "active" : "")" data-group="@group.Number">
+                                Група @group.Number
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="addAddMoreDiv" style="width: 60%; margin-top: 50px; margin-bottom: 50px">
+        @foreach (var group in Model.TestGroups)
+        {
+            <div class="group-toggle-container" data-group="@(group.Number)" style="@(group.Number == currecntGroupNumber ? "display:block" : "display:none")">
+                @{
+                    if (group.ClosedQuestions.Count + group.OpenQuestions.Count == 0)
+                    {
+                        <div class="cd-fail-message">Няма резултати</div>
                     }
 
-                    <div class="questBox">
-                        @if (!string.IsNullOrEmpty(question.ImagePath))
+                    int closedQuestionsIndex = 0;
+                    int openQuestionsIndex = 0;
+                    for (int i = 0; i < group.ClosedQuestions.Count + group.OpenQuestions.Count; i++)
+                    {
+                        if (group.QuestionOrder[i] == QuestionType.Closed)
                         {
-                            <img src="@question.ImagePath" style="max-width: 90%" />
-                        }
-                        <div class="customRow">
-                            <div class="questTextBox">
-                                <p>Въпрос: @question.Text</p>
-                            </div>
-                        </div>
-                        @if (all.Any(s => s != 0))
-                        {
-                            string chartId = $"closedQuestion{i}";
-                            <div class="chart">
-                                <canvas id="@chartId"></canvas>
-                            </div>
-                            <script>
-                                ctx = document.getElementById('@Html.Raw(chartId)');
-                                myBarGradeChart;
+                            var question = group.ClosedQuestions[closedQuestionsIndex];
+                            closedQuestionsIndex++;
+                            int[] all = new int[question.Answers.Length];
+                            for (int j = 0; j < question.StudentAnswers.Count; j++)
+                            {
+                                for (int k = 0; k < question.StudentAnswers[j].Count; k++)
+                                {
+                                    all[question.StudentAnswers[j][k]]++;
+                                }
+                            }
 
-                                data = {
-                                    labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
-                                    datasets: [{
-                                        label: "Ученици",
-                                        data: @Html.Raw(JsonSerializer.Serialize(all)),
-                                        fill: true,
-                                        lineTension: 0.1,
-                                        borderCapStyle: 'square',
-                                        pointBorderColor: "white",
-                                        pointBorderWidth: 1,
-                                        pointHoverRadius: 8,
-                                        pointHoverBorderWidth: 2,
-                                        pointRadius: 4,
-                                        pointHitRadius: 10,
-                                        spanGaps: true,
-                                        backgroundColor: colors[0],
-                                    }]
-                                };
-                                new Chart(ctx, {
-                                    type: "bar",
-                                    data: data,
-                                    options: options
-                                });
-                            </script>
+                            <div class="questBox">
+                                @if (!string.IsNullOrEmpty(question.ImagePath))
+                                {
+                                    <img src="@question.ImagePath" style="max-width: 90%"/>
+                                }
+                                <div class="customRow">
+                                    <div class="questTextBox">
+                                        <p>Въпрос: @question.Text</p>
+                                    </div>
+                                </div>
+                                @if (all.Any(s => s != 0))
+                                {
+                                    string chartId = $"closedQuestion{i}";
+                                    <div class="chart">
+                                        <canvas id="@chartId"></canvas>
+                                    </div>
+                                    <script>
+                                        ctx = document.getElementById('@Html.Raw(chartId)');
+                                        myBarGradeChart;
+
+                                        data = {
+                                            labels: @Html.Raw(JsonSerializer.Serialize(question.Answers)),
+                                            datasets: [{
+                                                label: "Ученици",
+                                                data: @Html.Raw(JsonSerializer.Serialize(all)),
+                                                fill: true,
+                                                lineTension: 0.1,
+                                                borderCapStyle: 'square',
+                                                pointBorderColor: "white",
+                                                pointBorderWidth: 1,
+                                                pointHoverRadius: 8,
+                                                pointHoverBorderWidth: 2,
+                                                pointRadius: 4,
+                                                pointHitRadius: 10,
+                                                spanGaps: true,
+                                                backgroundColor: colors[0],
+                                            }]
+                                        };
+                                        new Chart(ctx, {
+                                            type: "bar",
+                                            data: data,
+                                            options: options
+                                        });
+                                    </script>
+                                }
+                                else
+                                {
+                                    <h5>No Answers...</h5>
+                                }
+                            </div>
                         }
                         else
                         {
-                            <h5>No Answers...</h5>
-                        }
-                    </div>
-                }
-                else
-                {
-                    var question = Model.OpenQuestions[openQuestionsIndex];
-                    openQuestionsIndex++;
-                    <div class="questBox">
-                        @if (!string.IsNullOrEmpty(question.ImagePath))
-                        {
-                            <img src="@question.ImagePath" style="max-width: 90%" />
-                        }
-                        <div class="customRow">
-                            <div class="questTextBox">
-                                <p>Въпрос: @question.Text</p>
+                            var question = group.OpenQuestions[openQuestionsIndex];
+                            openQuestionsIndex++;
+                            <div class="questBox">
+                                @if (!string.IsNullOrEmpty(question.ImagePath))
+                                {
+                                    <img src="@question.ImagePath" style="max-width: 90%"/>
+                                }
+                                <div class="customRow">
+                                    <div class="questTextBox">
+                                        <p>Въпрос: @question.Text</p>
+                                    </div>
+                                </div>
+                                <div class="answersView">
+                                    @foreach (var studentAnswer in question.StudentAnswers)
+                                    {
+                                        <p>@(string.IsNullOrEmpty(studentAnswer) ? "Няма отговор" : studentAnswer)</p>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                        <div class="answersView">
-                            @foreach (var studentAnswer in question.StudentAnswers)
-                            {
-                                <p>@(string.IsNullOrEmpty(studentAnswer) ? "Няма отговор" : studentAnswer)</p>
-                            }
-                        </div>
-                    </div>
+                        }
+                    }
                 }
-            }
+            </div>
         }
-        <hr/>
-        <a class="btn blue btn-primary" asp-action="Index">Готово</a>
+        <div style="position: absolute; bottom: 0; width: 60%">
+            <hr />
+            <a class="btn blue btn-primary" asp-action="Index">Готово</a>
+        </div>
+        
     </div>
 </div>
 
@@ -143,4 +173,5 @@
                     e.parentNode.parentNode.parentNode.style.backgroundPosition = "-0.4em 0em";
                 }
             </script>
+    <script src="~/js/groupToggle.js"></script>
 }

@@ -30,5 +30,6 @@ namespace IntelliTest.Core.Contracts
 
         Task<QueryModel<TestViewModel>> GetAllAdmin(QueryModel<TestViewModel> query);
         List<TestGroupViewModel> GetGroupsByTest(Guid testId);
+        Task<Guid> AddNewGroup(Guid testId, int lastGroupNumber);
     }
 }

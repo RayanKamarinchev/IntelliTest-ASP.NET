@@ -33,21 +33,21 @@ namespace IntelliTest.Core.Services
         }
 
         private Func<TestResult, TestResultsViewModel> ToResultsViewModel = t => new TestResultsViewModel()
-        {
-            TakenOn = t.TakenOn,
-            Title = t.Group.Test.Title,
-            Description = t.Group.Test.Description,
-            Grade = t.Group.Test.Grade,
-            Mark = t.Mark,
-            Score = t.Score,
-            TestId = t.Group.TestId
-        };
+            {
+                TakenOn = t.TakenOn,
+                Title = t.Group.Test.Title,
+                Description = t.Group.Test.Description,
+                Grade = t.Group.Test.Grade,
+                Mark = t.Mark,
+                Score = t.Score,
+                TestId = t.Group.TestId
+            };
 
         private List<QuestionType> ProcessQuestionOrder(string questionOrderText)
         {
             return questionOrderText.Split("|", StringSplitOptions.RemoveEmptyEntries)
-                .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
-                .ToList();
+                                    .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
+                                    .ToList();
         }
 
 
@@ -60,21 +60,21 @@ namespace IntelliTest.Core.Services
             }
 
             var open = openQuestions?.Select(q => new OpenQuestionAnswer()
-            {
-                Answer = q.Answer,
-                QuestionId = q.Id,
-                StudentId = studentId,
-                Points = q.CorrectAnswer == q.Answer ? q.MaxScore : 0
-            });
+                                                  {
+                                                      Answer = q.Answer,
+                                                      QuestionId = q.Id,
+                                                      StudentId = studentId,
+                                                      Points = q.CorrectAnswer == q.Answer ? q.MaxScore : 0
+                                                  });
             var closed = closedQuestions?.Select(q => new ClosedQuestionAnswer()
-            {
-                AnswerIndexes = string.Join("&", q.AnswerIndexes
-                    .Select((val, indx) => new { val, indx })
-                    .Where(q => q.val)
-                    .Select(q => q.indx)),
-                QuestionId = q.Id,
-                StudentId = studentId
-            });
+                                                      {
+                                                          AnswerIndexes = string.Join("&", q.AnswerIndexes
+                                                              .Select((val, indx) => new { val, indx })
+                                                              .Where(q => q.val)
+                                                              .Select(q => q.indx)),
+                                                          QuestionId = q.Id,
+                                                          StudentId = studentId
+                                                      });
 
             if (open != null)
             {
@@ -89,13 +89,13 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
 
             await context.TestResults.AddAsync(new TestResult()
-            {
-                Mark = Mark.Unmarked,
-                Score = 0,
-                StudentId = studentId,
-                GroupId = groupId,
-                TakenOn = DateTime.Now
-            });
+                                               {
+                                                   Mark = Mark.Unmarked,
+                                                   Score = 0,
+                                                   StudentId = studentId,
+                                                   GroupId = groupId,
+                                                   TakenOn = DateTime.Now
+                                               });
             await context.SaveChangesAsync();
         }
 
@@ -142,46 +142,49 @@ namespace IntelliTest.Core.Services
         public TestGroupEditViewModel ToEdit(TestViewModel test, RawTestGroupViewModel group)
         {
             var t = new TestGroupEditViewModel()
-            {
-                Groups = test.Groups.Select(g=> new TestGroupViewModel()
-                                                {
-                                                    Number = g.Number,
-                                                    Id = g.Id
-                                                }).ToList(),
-                OpenQuestions = group.OpenQuestions
-                    .Where(q => !q.IsDeleted)
-                    .Select(q => new OpenQuestionViewModel()
                     {
-                        Answer = q.Answer,
-                        IsDeleted = false,
-                        Text = q.Text,
-                        MaxScore = q.MaxScore,
-                        IsEquation = q.IsEquation,
-                        ImagePath = q.ImagePath
-                    })
-                    .ToList(),
-                ClosedQuestions = group.ClosedQuestions
-                    .Where(q => !q.IsDeleted)
-                    .Select(q => new ClosedQuestionViewModel()
-                    {
-                        Answers = q.Answers.Split("&"),
-                        AnswerIndexes = ProccessAnswerIndexes(q.Answers.Split("&"), q.AnswerIndexes),
-                        IsDeleted = false,
-                        Text = q.Text,
-                        MaxScore = q.MaxScore,
-                        IsEquation = q.IsEquation,
-                        ImagePath = q.ImagePath
-                    })
-                    .ToList(),
-                QuestionsOrder = ProcessQuestionOrder(group.QuestionsOrder),
-                Time = test.Time,
-                Description = test.Description,
-                Grade = test.Grade,
-                Title = test.Title,
-                Id = test.Id,
-                PublicityLevel = test.PublicityLevel,
-                GroupId = group.Id
-            };
+                        Groups = test.Groups.Select(g => new TestGroupViewModel()
+                                                         {
+                                                             Number = g.Number,
+                                                             Id = g.Id
+                                                         })
+                                     .OrderBy(g => g.Number).ToList(),
+                        OpenQuestions = group.OpenQuestions
+                                             .Where(q => !q.IsDeleted)
+                                             .Select(q => new OpenQuestionViewModel()
+                                                          {
+                                                              Answer = q.Answer,
+                                                              IsDeleted = false,
+                                                              Text = q.Text,
+                                                              MaxScore = q.MaxScore,
+                                                              IsEquation = q.IsEquation,
+                                                              ImagePath = q.ImagePath
+                                                          })
+                                             .ToList(),
+                        ClosedQuestions = group.ClosedQuestions
+                                               .Where(q => !q.IsDeleted)
+                                               .Select(q => new ClosedQuestionViewModel()
+                                                            {
+                                                                Answers = q.Answers.Split("&"),
+                                                                AnswerIndexes =
+                                                                    ProccessAnswerIndexes(q.Answers.Split("&"),
+                                                                        q.AnswerIndexes),
+                                                                IsDeleted = false,
+                                                                Text = q.Text,
+                                                                MaxScore = q.MaxScore,
+                                                                IsEquation = q.IsEquation,
+                                                                ImagePath = q.ImagePath
+                                                            })
+                                               .ToList(),
+                        QuestionsOrder = ProcessQuestionOrder(group.QuestionsOrder),
+                        Time = test.Time,
+                        Description = test.Description,
+                        Grade = test.Grade,
+                        Title = test.Title,
+                        Id = test.Id,
+                        PublicityLevel = test.PublicityLevel,
+                        GroupId = group.Id
+                    };
             return t;
         }
 
@@ -189,43 +192,53 @@ namespace IntelliTest.Core.Services
         public Guid[] GetExaminersIds(Guid groupId)
         {
             return context.TestResults
-                .Where(tr => tr.GroupId == groupId)
-                .Select(x => x.StudentId)
-                .ToArray();
+                          .Where(tr => tr.GroupId == groupId)
+                          .Select(x => x.StudentId)
+                          .ToArray();
         }
 
         public async Task<TestStatsViewModel> GetStatistics(Guid testId)
         {
             var groupIds = context.TestGroups
-                .Where(t => t.TestId == testId)
-                .Select(g=>g.Id);
+                                  .Where(t => t.TestId == testId)
+                                  .Select(g => g.Id);
             TestStatsViewModel testStatistics = new TestStatsViewModel();
 
             TestGroupStatsViewModel groupStats = new TestGroupStatsViewModel();
-            TestResult testResult = null;
             TestGroup group;
-            Test test = null;
+            string testTitle = "";
+            bool isFirstIteration = true;
             foreach (var groupId in groupIds)
             {
                 var studentIds = GetExaminersIds(groupId);
                 List<TestReviewViewModel> res = new List<TestReviewViewModel>();
                 foreach (var studentId in studentIds)
                 {
-                    res.Add(await GetStudentTestResults(groupId, studentId));
+                    res.Add(await GetStudentTestResults(testId, studentId));
                 }
 
                 groupStats = new TestGroupStatsViewModel();
-                testResult = await context.TestResults
-                    .Include(tr => tr.Group)
-                    .ThenInclude(g => g.Test)
-                    .FirstOrDefaultAsync(t => t.GroupId == groupId);
-                group = testResult.Group;
-                test = group.Test;
+                if (isFirstIteration)
+                {
+                    group = await context.TestGroups
+                                         .Include(g => g.TestResults)
+                                         .Include(g => g.Test)
+                                         .FirstOrDefaultAsync(g => g.Id == groupId);
+                    testTitle = group.Test.Title;
+                    isFirstIteration = false;
+                }
+                else
+                {
+                    group = await context.TestGroups
+                                         .Include(g => g.TestResults)
+                                         .FirstOrDefaultAsync(g => g.Id == groupId);
+                }
+
                 groupStats.AverageScore =
                     (float)Math.Round(!group.TestResults.Any() ? 0 : group.TestResults.Average(r => r.Score), 2);
                 //groupStats.Title = test.Title;
                 groupStats.Examiners = group.TestResults.Count();
-                groupStats.QuestionOrder = ProcessQuestionOrder(testResult.Group.QuestionsOrder);
+                groupStats.QuestionOrder = ProcessQuestionOrder(group.QuestionsOrder);
                 groupStats.Number = group.Number;
 
                 List<List<List<int>>> allClosedAnswers = new List<List<List<int>>>();
@@ -250,12 +263,12 @@ namespace IntelliTest.Core.Services
                     for (int i = 0; i < allClosedAnswers[0].Count; i++)
                     {
                         groupStats.ClosedQuestions.Add(new ClosedQuestionStatsViewModel()
-                        {
-                            StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
-                            Text = res[0].ClosedQuestions[i].Text,
-                            Answers = res[0].ClosedQuestions[i].Answers,
-                            ImagePath = res[0].ClosedQuestions[i].ImagePath
-                        });
+                                                       {
+                                                           StudentAnswers = allClosedAnswers.Select(a => a[i]).ToList(),
+                                                           Text = res[0].ClosedQuestions[i].Text,
+                                                           Answers = res[0].ClosedQuestions[i].Answers,
+                                                           ImagePath = res[0].ClosedQuestions[i].ImagePath
+                                                       });
                     }
                 }
 
@@ -271,18 +284,19 @@ namespace IntelliTest.Core.Services
                     for (int i = 0; i < allOpenAnswers[0].Count; i++)
                     {
                         groupStats.OpenQuestions.Add(new OpenQuestionStatsViewModel()
-                        {
-                            StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
-                            Text = res[0].OpenQuestions[i].Text,
-                            ImagePath = res[0].OpenQuestions[i].ImagePath
-                        });
+                                                     {
+                                                         StudentAnswers = allOpenAnswers.Select(a => a[i]).ToList(),
+                                                         Text = res[0].OpenQuestions[i].Text,
+                                                         ImagePath = res[0].OpenQuestions[i].ImagePath
+                                                     });
                     }
                 }
+
                 //TODO problems
                 testStatistics.TestGroups.Add(groupStats);
             }
 
-            testStatistics.Title = test.Title;
+            testStatistics.Title = testTitle;
             testStatistics.AverageScore = testStatistics.TestGroups.Average(t => t.AverageScore);
             testStatistics.Examiners = testStatistics.TestGroups.Sum(g => g.Examiners);
 
@@ -292,8 +306,8 @@ namespace IntelliTest.Core.Services
         public async Task<List<TestStatsViewModel>> TestsTakenByClass(Guid classId)
         {
             Class? classDb = await context.Classes
-                .Include(c => c.ClassTests)
-                .FirstOrDefaultAsync(c => c.Id == classId);
+                                          .Include(c => c.ClassTests)
+                                          .FirstOrDefaultAsync(c => c.Id == classId);
             if (classDb == null)
             {
                 return null;
@@ -310,17 +324,19 @@ namespace IntelliTest.Core.Services
             return model;
         }
 
-        public async Task<TestReviewViewModel> GetStudentTestResults(Guid groupId, Guid studentId)
+        public async Task<TestReviewViewModel> GetStudentTestResults(Guid testId, Guid studentId)
         {
+            var testResult = await context.TestResults.Include(r => r.Group)
+                                        .FirstOrDefaultAsync(r => r.StudentId == studentId && r.Group.TestId == testId);
+            Guid groupId = testResult.GroupId;
             var openQuestionAnswers = await context.OpenQuestionAnswers
-                .Include(q => q.Question)
-                .Where(q => q.StudentId == studentId
-                            && q.Question.GroupId == groupId
-                            && string.IsNullOrEmpty(q.Explanation))
-                .ToListAsync();
+                                                   .Include(q => q.Question)
+                                                   .Where(q => q.StudentId == studentId
+                                                               && q.Question.GroupId == groupId
+                                                               && string.IsNullOrEmpty(q.Explanation))
+                                                   .ToListAsync();
             if (testResultsProcessor is not null)
             {
-                //TODO
                 testResultsProcessor.setOpenQuesitons(openQuestionAnswers);
                 await testResultsProcessor.StartAsync(new CancellationToken());
             }
@@ -328,89 +344,91 @@ namespace IntelliTest.Core.Services
             try
             {
                 var openQuestionsViewModels = await context.OpenQuestionAnswers
-                    .Where(q => q.StudentId == studentId && q.Question.GroupId == groupId)
-                    .Include(q => q.Question)
-                    .Select(q => new OpenQuestionReviewViewModel()
-                    {
-                        Text = q.Question.Text,
-                        Id = q.Id,
-                        CorrectAnswer = q.Question.Answer,
-                        MaxScore = q.Question.MaxScore,
-                        Answer = q.Answer,
-                        Score = q.Points,
-                        Explanation = q.Explanation,
-                        ImagePath = q.Question.ImagePath
-                    })
-                    .ToListAsync();
+                                                           .Where(q => q.StudentId == studentId &&
+                                                                       q.Question.GroupId == groupId)
+                                                           .Include(q => q.Question)
+                                                           .Select(q => new OpenQuestionReviewViewModel()
+                                                                        {
+                                                                            Text = q.Question.Text,
+                                                                            Id = q.Id,
+                                                                            CorrectAnswer = q.Question.Answer,
+                                                                            MaxScore = q.Question.MaxScore,
+                                                                            Answer = q.Answer,
+                                                                            Score = q.Points,
+                                                                            Explanation = q.Explanation,
+                                                                            ImagePath = q.Question.ImagePath
+                                                                        })
+                                                           .ToListAsync();
                 var closedQuestions = new List<ClosedQuestionReviewViewModel>();
                 var db = context.ClosedQuestionAnswers
-                    .Where(q => q.StudentId == studentId && q.Question.GroupId == groupId)
-                    .Include(q => q.Question);
+                                .Where(q => q.StudentId == studentId && q.Question.GroupId == groupId)
+                                .Include(q => q.Question);
                 foreach (var q in db)
                 {
                     var closedQuestionModel = new ClosedQuestionReviewViewModel()
-                    {
-                        Answers = q.Question.Answers.Split("&", System.StringSplitOptions.None),
-                        IsDeleted = false,
-                        Text = q.Question.Text,
-                        Id = q.Id,
-                        AnswerIndexes = ProccessAnswerIndexes(
-                            q.Question.Answers.Split("&", System.StringSplitOptions.None),
-                            q.AnswerIndexes),
-                        CorrectAnswers = q.Question.AnswerIndexes.Split("&", System.StringSplitOptions.None)
-                            .Select(int.Parse)
-                            .ToArray(),
-                        MaxScore = q.Question.MaxScore,
-                        ImagePath = q.Question.ImagePath
-                    };
+                                              {
+                                                  Answers = q.Question.Answers.Split("&",
+                                                      System.StringSplitOptions.None),
+                                                  IsDeleted = false,
+                                                  Text = q.Question.Text,
+                                                  Id = q.Id,
+                                                  AnswerIndexes = ProccessAnswerIndexes(
+                                                      q.Question.Answers.Split("&", System.StringSplitOptions.None),
+                                                      q.AnswerIndexes),
+                                                  CorrectAnswers = q
+                                                                   .Question.AnswerIndexes.Split("&",
+                                                                       System.StringSplitOptions.None)
+                                                                   .Select(int.Parse)
+                                                                   .ToArray(),
+                                                  MaxScore = q.Question.MaxScore,
+                                                  ImagePath = q.Question.ImagePath
+                                              };
                     closedQuestionModel.Score = CalculateClosedQuestionScore(closedQuestionModel.AnswerIndexes,
                         closedQuestionModel.CorrectAnswers,
                         closedQuestionModel.MaxScore);
                     closedQuestions.Add(closedQuestionModel);
                 }
 
-                TestGroup group = await context.TestGroups.FindAsync(groupId);
-
                 return new TestReviewViewModel()
-                {
-                    OpenQuestions = openQuestionsViewModels,
-                    ClosedQuestions = closedQuestions,
-                    Score = closedQuestions.Sum(q => q.Score)
-                            + openQuestionsViewModels.Sum(q => q.Score),
-                    QuestionOrder = group.QuestionsOrder
-                        .Split("|")
-                        .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
-                        .ToList()
-                };
+                       {
+                           OpenQuestions = openQuestionsViewModels,
+                           ClosedQuestions = closedQuestions,
+                           Score = closedQuestions.Sum(q => q.Score)
+                                   + openQuestionsViewModels.Sum(q => q.Score),
+                           QuestionOrder = testResult.Group.QuestionsOrder
+                                                     .Split("|")
+                                                     .Select(q => q == "O" ? QuestionType.Open : QuestionType.Closed)
+                                                     .ToList()
+                       };
             }
             catch (InvalidOperationException e)
             {
             }
 
             return new TestReviewViewModel()
-            {
-                OpenQuestions = new List<OpenQuestionReviewViewModel>(),
-                ClosedQuestions = new List<ClosedQuestionReviewViewModel>()
-            };
+                   {
+                       OpenQuestions = new List<OpenQuestionReviewViewModel>(),
+                       ClosedQuestions = new List<ClosedQuestionReviewViewModel>()
+                   };
         }
 
         public async Task<IEnumerable<TestResultsViewModel>> GetStudentsTestsResults(Guid studentId)
         {
             return await context.TestResults
-                .Include(tr => tr.Group)
-                .ThenInclude(g => g.Test)
-                .Where(t => t.StudentId == studentId)
-                .Select(t => ToResultsViewModel(t))
-                .ToListAsync();
+                                .Include(tr => tr.Group)
+                                .ThenInclude(g => g.Test)
+                                .Where(t => t.StudentId == studentId)
+                                .Select(t => ToResultsViewModel(t))
+                                .ToListAsync();
         }
 
         public async Task SubmitTestScore(Guid groupId, Guid studentId, TestReviewViewModel scoredTest)
         {
             var openQuestionAnswers = await context.OpenQuestionAnswers
-                .Include(q => q.Question)
-                .Where(q => q.StudentId == studentId
-                            && q.Question.GroupId == groupId)
-                .ToListAsync();
+                                                   .Include(q => q.Question)
+                                                   .Where(q => q.StudentId == studentId
+                                                               && q.Question.GroupId == groupId)
+                                                   .ToListAsync();
             foreach (var openQuestionAnswer in openQuestionAnswers)
             {
                 var scoredQuestion = scoredTest.OpenQuestions.FirstOrDefault(q => q.Id == openQuestionAnswer.Id);

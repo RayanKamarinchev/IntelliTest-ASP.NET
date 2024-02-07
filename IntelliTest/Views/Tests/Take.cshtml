@@ -1,5 +1,4 @@
 ﻿@using IntelliTest.Core.Models.Enums
-@using IntelliTest.Core.Models.Enums
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model IntelliTest.Core.Models.Tests.Groups.TestGroupSubmitViewModel
 @{
@@ -10,6 +9,9 @@
 }
 <div class="editMain">
     <div id="addAddMoreDiv">
+        <div class="group-show">
+            <h1 style="margin: 0">Група @Model.GroupNumber</h1>
+        </div>
         <div class="timer">
             <h1 id="timer" style="margin: 0">@mins.ToString("D2"):@sec.ToString("D2")</h1>
         </div>
@@ -22,13 +24,13 @@
                     if (Model.QuestionOrder[i] == QuestionType.Closed)
                     {
                         Model.ClosedQuestions[closedQuestionsIndex].Index = closedQuestionsIndex;
-                        <partial name="../Questions/Closed/ClosedQuestionTakePartialView" for="ClosedQuestions[closedQuestionsIndex]" />
+                        <partial name="../Questions/Closed/ClosedQuestionTakePartialView" for="ClosedQuestions[closedQuestionsIndex]"/>
                         closedQuestionsIndex++;
                     }
                     else
                     {
                         Model.OpenQuestions[openQuestionsIndex].Index = openQuestionsIndex;
-                        <partial name="../Questions/Open/OpenQuestionTakePartialView" for="OpenQuestions[openQuestionsIndex]" />
+                        <partial name="../Questions/Open/OpenQuestionTakePartialView" for="OpenQuestions[openQuestionsIndex]"/>
                         openQuestionsIndex++;
                     }
                 }
@@ -47,6 +49,7 @@
             let sec = @sec;
         let id = "@Model.Id";
         let studentId = "@(TempData.Peek("StudentId"))";
+        let groupId = "@Model.GroupId";
     </script>
     <script src="~/js/testTake.js" asp-append-version="true"></script>
     <script src="~/js/test.js" asp-append-version="true"></script>

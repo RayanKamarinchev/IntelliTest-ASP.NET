@@ -12,7 +12,6 @@ namespace IntelliTest.Core.Models.Tests
         public List<TestGroupViewModel> Groups { get; set; }
         public Guid GroupId { get; set; }
         public PublicityLevel PublicityLevel { get; set; }
-        public int Number { get; set; }
         public List<OpenQuestionViewModel>? OpenQuestions { get; set; }
         public List<ClosedQuestionViewModel>? ClosedQuestions { get; set; }
         public List<QuestionType>? QuestionsOrder { get; set; }

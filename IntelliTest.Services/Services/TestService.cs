@@ -23,22 +23,17 @@ namespace IntelliTest.Core.Services
             context = _context;
         }
 
+        private static Func<IEnumerable<TestGroup>, float> CalculateAverageScore = t => (float)Math.Round(
+            !t.Any() 
+                ? 0 
+                : t.Average(g => !g.TestResults.Any()
+                    ? 0 
+                    : g.TestResults.Average(tr => tr.Score)), 2);
+
         private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
                                                              {
-                                                                 AverageScore =
-                                                                     (float)Math.Round(
-                                                                         !t.Groups.Any(g => g.TestResults.Any())
-                                                                             ? 0
-                                                                             : t.Groups.Average(g =>
-                                                                                 g.TestResults.Average(r => r.Score)),
-                                                                         2),
-                                                                 Groups = t.Groups.Select(x => new TestGroup()
-                                                                     {
-                                                                         Id = x.Id,
-                                                                         ClosedQuestions = x.ClosedQuestions,
-                                                                         OpenQuestions = x.OpenQuestions,
-                                                                         QuestionsOrder = x.QuestionsOrder
-                                                                     }).ToArray(),
+                                                                 AverageScore = CalculateAverageScore(t.Groups),
+                                                                 Groups = t.Groups.ToList(),
                                                                  CreatedOn = t.CreatedOn,
                                                                  Description = t.Description,
                                                                  Grade = t.Grade,
@@ -119,7 +114,7 @@ namespace IntelliTest.Core.Services
                         : 0);
             }
 
-            var test = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
+            var dbTests = testQuery.Skip(query.ItemsPerPage * (query.CurrentPage - 1))
                                 .Take(query.ItemsPerPage)
                                 .Include(t => t.Groups)
                                 .ThenInclude(t => t.ClosedQuestions)
@@ -128,7 +123,7 @@ namespace IntelliTest.Core.Services
                                 .Include(t => t.Groups)
                                 .ThenInclude(g => g.TestResults)
                                 .Select(x => ToViewModel(x));
-            var tests = await test.ToListAsync();
+            var tests = await dbTests.ToListAsync();
             foreach (var t in tests)
             {
                 t.IsOwner = false;
@@ -298,7 +293,9 @@ namespace IntelliTest.Core.Services
                         QuestionOrder = ProcessQuestionOrder(model.QuestionsOrder),
                         Time = model.Time,
                         Title = model.TestTitle,
-                        Id = model.Id
+                        Id = model.TestId,
+                        GroupNumber = model.Number,
+                        GroupId = model.Id
                     };
             return t;
         }
@@ -312,7 +309,7 @@ namespace IntelliTest.Core.Services
                                     .ThenInclude(t => t.ClosedQuestions)
                                     .FirstOrDefaultAsync(t => t.Id == id);
 
-            var dbGroup = test.Groups.First(g => g.Number == model.Number);
+            var dbGroup = test.Groups.FirstOrDefault(g => g.Id == model.GroupId);
             dbGroup.OpenQuestions = dbGroup.OpenQuestions.Select(q => EditOpenQuestion(model.OpenQuestions, q))
                                            .Where(q => !string.IsNullOrEmpty(q.Text))
                                            .Union(model.OpenQuestions
@@ -587,6 +584,20 @@ namespace IntelliTest.Core.Services
                                            Number = g.Number
                                        })
                           .ToList();
+        }
+
+        public async Task<Guid> AddNewGroup(Guid testId, int lastGroupNumber)
+        {
+            TestGroup group = new TestGroup()
+                              {
+                                  Number = lastGroupNumber + 1,
+                                  TestId = testId,
+                                  QuestionsOrder = ""
+                              };
+            await context.TestGroups.AddAsync(group);
+            await context.SaveChangesAsync();
+
+            return group.Id;
         }
     }
 }
