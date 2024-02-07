@@ -11,6 +11,7 @@ using IntelliTest.Data.Enums;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.Caching.Memory;
 using static IntelliTest.Infrastructure.Constraints;
 using TestGroupSubmitViewModel = IntelliTest.Core.Models.Tests.Groups.TestGroupSubmitViewModel;
@@ -29,11 +30,11 @@ namespace IntelliTest.Controllers
         private readonly Random random = new Random();
 
         public TestsController(ITestService _testService, IMemoryCache _cache, IStudentService _studentService,
-                               IClassService _classService, ITestResultsService testResultsService, IWebHostEnvironment webHostEnvironment)
+            IClassService _classService, ITestResultsService testResultsService, IWebHostEnvironment webHostEnvironment)
         {
             testService = _testService;
             cache = _cache;
-            studentService = _studentService; 
+            studentService = _studentService;
             classService = _classService;
             this.testResultsService = testResultsService;
             this.webHostEnvironment = webHostEnvironment;
@@ -46,29 +47,35 @@ namespace IntelliTest.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting, int currentPage)
+        public async Task<IActionResult> Index(string SearchTerm, int Grade, Subject Subject, Sorting Sorting,
+            int currentPage)
         {
             if (User.IsAdmin())
             {
                 return RedirectToAction("Index", "Tests", new { area = AdminArea });
             }
+
             if (cache.TryGetValue(TestsCacheKey, out QueryModel<TestViewModel>? model) && false)
             {
             }
             else
             {
-                if (currentPage==0)
+                if (currentPage == 0)
                 {
                     currentPage = 1;
                 }
-                QueryModel<TestViewModel> query = new QueryModel<TestViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
-                model = await testService.GetAll((Guid?)TempData.Peek(TeacherId) ?? null, (Guid?)TempData.Peek(StudentId) ?? null, query);
+
+                QueryModel<TestViewModel> query =
+                    new QueryModel<TestViewModel>(SearchTerm, Grade, Subject, Sorting, currentPage);
+                model = await testService.GetAll((Guid?)TempData.Peek(TeacherId) ?? null,
+                    (Guid?)TempData.Peek(StudentId) ?? null, query);
                 //var cacheEntryOptions = new DistributedCacheEntryOptions()
                 //    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5));
                 cache.SetAsync(TestsCacheKey, model, cacheEntryOptions);
             }
+
             return View(model);
         }
 
@@ -82,35 +89,26 @@ namespace IntelliTest.Controllers
             return View("Index", model);
         }
 
-        //[Route("Tests/Edit/{testId}")]
-        //[HttpGet]
-        //[Authorize(Roles = "Teacher,Admin")]
-        //public async Task<IActionResult> GroupSelect(Guid testId)
-        //{
-        //    var test = await testService.GetById(testId);
-        //    PublicityLevel publicityLevel = test.PublicityLevel;
-        //    if (!await testService.TestExistsbyId(testId))
-        //    {
-        //        return NotFound();
-        //    }
+        [Route("Tests/Delete/{testId}/{groupId}")]
+        public async Task<IActionResult> DeleteGroup(Guid testId, Guid groupId)
+        {
+            bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek(TeacherId)) || User.IsAdmin();
+            if (!await testService.TestExistsbyId(testId)
+                || !await testService.GroupExistsbyId(groupId)
+                || !isCreator)
+            {
+                return NotFound();
+            }
+            var groups = await testService.GetGroupsByTest(testId);
 
-        //    if (publicityLevel == PublicityLevel.ClassOnly || publicityLevel == PublicityLevel.Private)
-        //    {
-        //        if (TempData.Peek(TeacherId) is null)
-        //        {
-        //            return RedirectToAction("Logout", "User");
-        //        }
+            if (groups.Count <= 1)
+            {
+                return BadRequest();
+            }
 
-        //        bool isCreator = await testService.IsTestCreator(testId, (Guid)TempData.Peek(TeacherId));
-        //        if (!isCreator)
-        //        {
-        //            return NotFound();
-        //        }
-        //    }
-
-        //    var groups = testService.GetGroupsByTest(testId);
-        //    return View("GroupSelect", groups);
-        //}
+            await testService.DeleteGroup(groupId);
+            return RedirectToAction("Edit", new {testId = testId});
+        }
 
         [Route("Tests/Edit/{testId}")]
         [Route("Tests/Edit/{testId}/{groupId}")]
@@ -125,7 +123,8 @@ namespace IntelliTest.Controllers
                 return NotFound();
             }
 
-            if (viewModel.PublicityLevel == PublicityLevel.ClassOnly || viewModel.PublicityLevel == PublicityLevel.Private)
+            if (viewModel.PublicityLevel == PublicityLevel.ClassOnly ||
+                viewModel.PublicityLevel == PublicityLevel.Private)
             {
                 //TODO potential bugs with TempData[testId]
                 if (TempData.Peek(TeacherId) is null)
@@ -160,6 +159,7 @@ namespace IntelliTest.Controllers
                     string path = Path.Combine(webHostEnvironment.WebRootPath, question.ImagePath);
                     System.IO.File.Delete(path);
                 }
+
                 string folder = "imgs/";
                 folder += Guid.NewGuid() + "_" + question.Image.FileName;
                 question.ImagePath = "/" + folder;
@@ -174,7 +174,7 @@ namespace IntelliTest.Controllers
             Guid groupId = await testService.AddNewGroup(testId, groupNumber);
             return RedirectToAction("Edit", new { testId = testId, groupId = groupId });
         }
-        
+
         [HttpPost]
         [Route("Tests/Edit/{testId}/{groupId}")]
         [Authorize(Roles = "Teacher,Admin")]
@@ -196,6 +196,7 @@ namespace IntelliTest.Controllers
             {
                 await SaveImage(question);
             }
+
             foreach (var question in model.ClosedQuestions)
             {
                 await SaveImage(question);
@@ -222,6 +223,7 @@ namespace IntelliTest.Controllers
             {
                 return true;
             }
+
             return closedQuestions.All(c => c.AnswerIndexes.Any(ai => ai));
         }
 
@@ -237,6 +239,7 @@ namespace IntelliTest.Controllers
             {
                 classes = new string[0];
             }
+
             TempData[Classes] = classes;
             return View("Create", new TestViewModel());
         }
@@ -258,6 +261,7 @@ namespace IntelliTest.Controllers
             {
                 return Unauthorized();
             }
+
             //model.Selected = new List<bool>();
             if (TempData.Peek(Classes) is null)
             {
@@ -267,8 +271,9 @@ namespace IntelliTest.Controllers
             string[] classNames = (string[])TempData.Peek(Classes);
             string[] selectedClasses = classNames.Where((c, i) => model.Selected[i]).ToArray();
 
-            Guid id = await testService.Create(model, (Guid?)TempData.Peek(TeacherId) ?? AdminTeacherId, selectedClasses);
-            return RedirectToAction("Edit", new {id = id});
+            Guid id = await testService.Create(model, (Guid?)TempData.Peek(TeacherId) ?? AdminTeacherId,
+                selectedClasses);
+            return RedirectToAction("Edit", new { id = id });
         }
 
         [HttpGet]
@@ -296,16 +301,16 @@ namespace IntelliTest.Controllers
             int index = random.Next(dbTest.Groups.Count);
             var group = dbTest.Groups.ToArray()[index];
             RawTestGroupViewModel model = new RawTestGroupViewModel()
-            {
-                ClosedQuestions = group.ClosedQuestions.ToList(),
-                OpenQuestions = group.OpenQuestions.ToList(),
-                Id = group.Id,
-                TestId = testId,
-                Number = group.Number,
-                QuestionsOrder = group.QuestionsOrder,
-                TestTitle = dbTest.Title,
-                Time = dbTest.Time
-            };
+                                          {
+                                              ClosedQuestions = group.ClosedQuestions.ToList(),
+                                              OpenQuestions = group.OpenQuestions.ToList(),
+                                              Id = group.Id,
+                                              TestId = testId,
+                                              Number = group.Number,
+                                              QuestionsOrder = group.QuestionsOrder,
+                                              TestTitle = dbTest.Title,
+                                              Time = dbTest.Time
+                                          };
             var test = testService.ToSubmit(model);
             TempData["OpenQuestionIds"] = test.OpenQuestions.Select(q => q.Id.ToString()).ToArray();
             TempData["ClosedQuestionIds"] = test.ClosedQuestions.Select(q => q.Id.ToString()).ToArray();
@@ -316,7 +321,7 @@ namespace IntelliTest.Controllers
         [HttpPost]
         [Route("Tests/Take/{testId}")]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> Take([FromBody]TestGroupSubmitViewModel model, Guid testId)
+        public async Task<IActionResult> Take([FromBody] TestGroupSubmitViewModel model, Guid testId)
         {
             if (!await testService.TestExistsbyId(testId))
             {
@@ -326,7 +331,7 @@ namespace IntelliTest.Controllers
             var studentId = (Guid)TempData.Peek(StudentId);
             if (await testService.IsTestTakenByStudentId(testId, studentId))
             {
-                return RedirectToAction("ReviewAnswers", new {testId = testId, studentId = studentId});
+                return RedirectToAction("ReviewAnswers", new { testId = testId, studentId = studentId });
             }
 
             Guid groupId = (Guid)TempData["GroupId"];
@@ -337,13 +342,16 @@ namespace IntelliTest.Controllers
             {
                 model.OpenQuestions[i].Id = new Guid(openQuestionIds[i]);
             }
+
             var closedQuestionIds = (string[])TempData["ClosedQuestionIds"];
             closedQuestionIds ??= new string[0];
             for (int i = 0; i < closedQuestionIds.Length; i++)
             {
                 model.ClosedQuestions[i].Id = new Guid(closedQuestionIds[i]);
             }
-            await testResultsService.SaveStudentTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId, groupId);
+
+            await testResultsService.SaveStudentTestAnswer(model.OpenQuestions, model.ClosedQuestions, studentId,
+                groupId);
 
             TempData[Message] = TestSubmitMsg;
             TempData.Remove("TestStarted");
@@ -366,6 +374,7 @@ namespace IntelliTest.Controllers
                 {
                     return Unauthorized();
                 }
+
                 if (!await testService.TestExistsbyId(testId))
                 {
                     return NotFound();
@@ -461,10 +470,12 @@ namespace IntelliTest.Controllers
             TempData["TestId"] = testId;
             return View("TestGrading", testResult);
         }
+
         [HttpPost]
         [Authorize(Roles = "Teacher,Admin")]
         [Route("Examiners/{testId}/{groupId}/{studentId}")]
-        public async Task<IActionResult> TestGrading(Guid testId, Guid groupId, Guid studentId, TestReviewViewModel scoredTest)
+        public async Task<IActionResult> TestGrading(Guid testId, Guid groupId, Guid studentId,
+            TestReviewViewModel scoredTest)
         {
             if (!await testService.IsTestCreator(testId, (Guid)TempData.Peek(TeacherId)))
             {
@@ -487,11 +498,11 @@ namespace IntelliTest.Controllers
             TempData.Remove("TestId");
             TempData["Message"] = "Успешно оценихте теста";
             return RedirectToRoute(new
-            {
-                controller = "Tests",
-                action = "ExaminersAll",
-                testId = testId
-            });
+                                   {
+                                       controller = "Tests",
+                                       action = "ExaminersAll",
+                                       testId = testId
+                                   });
         }
     }
 }

@@ -191,7 +191,7 @@ function handleSubmit(event) {
         data: JSON.stringify(res),
         success: function (response) {
             if (response === "redirect") {
-                window.location.href = `/Tests/Review/${id}/${groupId}/${studentId}`;
+                window.location.href = `/Tests/Review/${id}/${studentId}`;
             }
             $(body).html(response);
         }

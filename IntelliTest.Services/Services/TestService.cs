@@ -26,9 +26,12 @@ namespace IntelliTest.Core.Services
         private static Func<IEnumerable<TestGroup>, float> CalculateAverageScore = t => (float)Math.Round(
             !t.Any() 
                 ? 0 
-                : t.Average(g => !g.TestResults.Any()
-                    ? 0 
-                    : g.TestResults.Average(tr => tr.Score)), 2);
+                : t.Average(g => CalculateGroupAverageScore(g)), 2);
+
+        private static Func<TestGroup, float> CalculateGroupAverageScore = g => (float)Math.Round(
+            !g.TestResults.Any()
+                    ? 0
+                    : g.TestResults.Average(tr => tr.Score), 2);
 
         private Func<Test, TestViewModel> ToViewModel = t => new TestViewModel()
                                                              {
@@ -572,18 +575,19 @@ namespace IntelliTest.Core.Services
             return await Filter(testQuery, query, null, null);
         }
 
-        public List<TestGroupViewModel> GetGroupsByTest(Guid testId)
+        public async Task<List<TestGroupViewModel>> GetGroupsByTest(Guid testId)
         {
-            return context.TestGroups
+            return await context.TestGroups
+                                .Include(g=>g.TestResults)
                           .Where(g => g.TestId == testId)
                           .Select(g => new TestGroupViewModel()
                                        {
-                                           AverageScore = g.TestResults.Average(r => r.Score),
+                                           AverageScore = CalculateGroupAverageScore(g),
                                            Examiners = g.TestResults.Count(),
                                            Id = g.Id,
                                            Number = g.Number
                                        })
-                          .ToList();
+                          .ToListAsync();
         }
 
         public async Task<Guid> AddNewGroup(Guid testId, int lastGroupNumber)
@@ -598,6 +602,13 @@ namespace IntelliTest.Core.Services
             await context.SaveChangesAsync();
 
             return group.Id;
+        }
+
+        public async Task DeleteGroup(Guid groupId)
+        {
+            var item = await context.TestGroups.FindAsync(groupId);
+            context.TestGroups.Remove(item);
+            await context.SaveChangesAsync();
         }
     }
 }

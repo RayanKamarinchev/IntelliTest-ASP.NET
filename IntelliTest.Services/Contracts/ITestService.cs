@@ -29,7 +29,8 @@ namespace IntelliTest.Core.Contracts
         public Task<bool> IsTestCreator(Guid testId, Guid teacherId);
 
         Task<QueryModel<TestViewModel>> GetAllAdmin(QueryModel<TestViewModel> query);
-        List<TestGroupViewModel> GetGroupsByTest(Guid testId);
+        Task<List<TestGroupViewModel>> GetGroupsByTest(Guid testId);
         Task<Guid> AddNewGroup(Guid testId, int lastGroupNumber);
+        Task DeleteGroup(Guid groupId);
     }
 }

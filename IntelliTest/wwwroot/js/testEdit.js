@@ -527,3 +527,19 @@ function closedQuestionPartialView(question, answers, order, maxScore) {
 <button class="addImageToQuestionBtn btn btn-secondary" onclick="showImageUpload(this)" type="button">Покажи Изображение</button>
             `
 }
+
+function warn(testId, groupId) {
+    Swal.fire({
+        title: 'Сигурен ли си че искаш да изтриеш тази група?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Откажи'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/Tests/Delete/${testId}/${groupId}`;
+        }
+    })
+}
