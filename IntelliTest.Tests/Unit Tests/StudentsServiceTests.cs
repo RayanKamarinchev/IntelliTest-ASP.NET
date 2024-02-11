@@ -94,7 +94,7 @@ namespace IntelliTest.Tests.Unit_Tests
                              Email = s.User.Email,
                              Id = s.Id,
                              ImagePath = s.User.PhotoPath,
-                             TestResults = new List<decimal>(){0.0m}
+                             TestResults = new List<float>(){0.0f}
                          })
                          .ToList();
             var studentsTest = await studentService.getClassStudents(id);

@@ -446,7 +446,6 @@ namespace IntelliTest.Core.Services
         public async Task<QueryModel<TestViewModel>> TestsTakenByStudent(Guid studentId,
             QueryModel<TestViewModel> query)
         {
-            //TODO TestREsults
             var testsQuery = context.TestResults
                                     .Include(t => t.Group)
                                     .ThenInclude(g => g.Test)

@@ -1,6 +1,7 @@
 ﻿using IntelliTest.Core.Contracts;
 using IntelliTest.Core.Models.Questions;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions.Open;
 using IntelliTest.Core.Models.Tests;
 using IntelliTest.Core.Services;
 using IntelliTest.Data.Enums;
@@ -27,8 +28,9 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task ToEdit_Correct()
         {
             var testDb = await testService.GetById(id);
-            var test = testResultsService.ToEdit(testDb);
-            var real = new GroupEditViewModel()
+            var groupDb = await testService.GetGroupById(id);
+            var test = testResultsService.ToEdit(testDb, groupDb);
+            var real = new TestGroupEditViewModel()
             {
                 Description = "Test Test",
                 Grade = 8,
@@ -54,16 +56,16 @@ namespace IntelliTest.Tests.Unit_Tests
         [Test]
         public async Task AddTestAnswer_Correct()
         {
-            var OpenQuestions = new List<OpenQuestionViewModel>()
+            var OpenQuestions = new List<OpenQuestionSubmitViewModel>()
             {
-                new OpenQuestionViewModel()
+                new OpenQuestionSubmitViewModel()
                 {
                     MaxScore = 3,
                     Id = id,
                     Text = "Who are you",
                     Answer = "Its me, Mario"
                 },
-                new OpenQuestionViewModel()
+                new OpenQuestionSubmitViewModel()
                 {
                     Text = "How are you",
                     MaxScore = 1,
@@ -113,7 +115,7 @@ namespace IntelliTest.Tests.Unit_Tests
             Assert.AreEqual(1, res.Examiners);
             Assert.AreEqual(2, res.TestGroups[0].ClosedQuestions.FirstOrDefault().StudentAnswers[0][0]);
             Assert.AreEqual("its me mario", res.TestGroups[0].OpenQuestions.FirstOrDefault().StudentAnswers[0]);
-            Assert.AreEqual("Bad", res.TestGroups[0].OpenQuestions.ToList()[1].StudentAnswers[0]);
+            Assert.AreEqual("Ok", res.TestGroups[0].OpenQuestions.ToList()[1].StudentAnswers[0]);
         }
     }
 }

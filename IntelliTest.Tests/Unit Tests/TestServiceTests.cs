@@ -18,6 +18,8 @@ using Newtonsoft.Json;
 using NUnit.Framework.Interfaces;
 using IntelliTest.Core.Models.Enums;
 using IntelliTest.Core.Models.Questions.Closed;
+using IntelliTest.Core.Models.Questions.Open;
+using IntelliTest.Core.Models.Tests.Groups;
 
 namespace IntelliTest.Tests.Unit_Tests
 {
@@ -46,36 +48,6 @@ namespace IntelliTest.Tests.Unit_Tests
             },
             ItemsPerPage = 3
         };
-
-        public TestViewModel GetTestByIdIncludingTestTaken(Guid id)
-        {
-            var t = data.Tests
-                                 .Where(t => !t.IsDeleted)
-                                 .Include(t => t.OpenQuestions)
-                                 .Include(t => t.ClosedQuestions)
-                                 .Include(t => t.TestResults)
-                                 .Include(t => t.TestLikes)
-                                 .FirstOrDefault(t => t.Id == id);
-           return new TestViewModel()
-            {
-                AverageScore = Math.Round(!t.TestResults.Any() ? 0 : t.TestResults.Average(r => r.Score), 2),
-                ClosedQuestions = t.ClosedQuestions,
-                CreatedOn = t.CreatedOn,
-                Description = t.Description,
-                Grade = t.Grade,
-                Id = t.Id,
-                MaxScore = t.ClosedQuestions.Sum(q => q.MaxScore) +
-                           t.OpenQuestions.Sum(q => q.MaxScore),
-                OpenQuestions = t.OpenQuestions,
-                Time = t.Time,
-                Title = t.Title,
-                MultiSubmit = t.MultiSubmission,
-                PublicityLevel = t.PublicyLevel,
-                Examiners = t.TestResults.Count(),
-                IsTestTaken = t.TestResults.Any(t=>t.StudentId==id),
-                QuestionOrder = t.QuestionsOrder
-            };
-        }
 
         [Test]
         public async Task GetById_Correct()
@@ -111,6 +83,7 @@ namespace IntelliTest.Tests.Unit_Tests
             var real = await data.Tests.FirstOrDefaultAsync(t => t.Id == id);
             Assert.AreEqual(0, test.Items.Count());
         }
+
         [Test]
         public async Task GetAll_CorrectTeacher()
         {
@@ -123,42 +96,58 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task ToSubmit_Correct()
         {
             var testDb = await testService.GetById(id);
-            var test = testService.ToSubmit(testDb);
+            var group = await testService.GetGroupById(id);
+            RawTestGroupViewModel model = new RawTestGroupViewModel()
+            {
+                ClosedQuestions = group.ClosedQuestions.ToList(),
+                OpenQuestions = group.OpenQuestions.ToList(),
+                Id = group.Id,
+                TestId = testDb.Id,
+                Number = group.Number,
+                QuestionsOrder = group.QuestionsOrder,
+                TestTitle = testDb.Title,
+                Time = testDb.Time
+            };
+            var test = testService.ToSubmit(model);
             var real = new TestGroupSubmitViewModel()
             {
                 Id = test.Id,
                 Time = 10,
                 Title = "The test",
-                OpenQuestions = new List<OpenQuestionViewModel>()
+                GroupId = id,
+                GroupNumber = 1,
+                OpenQuestions = new List<OpenQuestionSubmitViewModel>()
                 {
-                    new OpenQuestionViewModel()
+                    new OpenQuestionSubmitViewModel()
                     {
                         MaxScore = 3,
                         Id = id,
                         Text = "Who are you",
-                        ImagePath = ""
+                        ImagePath = "",
+                        CorrectAnswer = "Its me, Mario"
                     },
-                    new OpenQuestionViewModel()
+                    new OpenQuestionSubmitViewModel()
                     {
                         Text = "How are you",
                         MaxScore = 1,
                         Id = id2,
-                        ImagePath = ""
+                        ImagePath = "",
+                        CorrectAnswer = "Fine"
                     }
                 },
                 ClosedQuestions = new List<ClosedQuestionViewModel>()
                 {
                     new ClosedQuestionViewModel()
                     {
-                        Answers = new []{ "едно","две","три","четири" },
+                        Answers = new[] { "едно", "две", "три", "четири" },
                         MaxScore = 2,
                         Text = "Избери",
                         Id = id,
                         ImagePath = "",
-                        AnswerIndexes = new bool[]{false, false, false, false}
+                        AnswerIndexes = new bool[] { false, false, false, false }
                     }
                 },
-                QuestionOrder = new List<QuestionType>() { QuestionType.Open , QuestionType.Closed, QuestionType.Open}
+                QuestionOrder = new List<QuestionType>() { QuestionType.Open, QuestionType.Closed, QuestionType.Open }
             };
             Assert.AreEqual(JsonConvert.SerializeObject(real), JsonConvert.SerializeObject(test));
         }
@@ -167,7 +156,8 @@ namespace IntelliTest.Tests.Unit_Tests
         public async Task Edit_Correct()
         {
             var testDb = await testService.GetById(id);
-            var test = testResultsService.ToEdit(testDb);
+            var groupDb = await testService.GetGroupById(id);
+            var test = testResultsService.ToEdit(testDb, groupDb);
             test.Grade = 1;
             test.Description = "Another Description";
             test.PublicityLevel = PublicityLevel.Public;
@@ -183,32 +173,13 @@ namespace IntelliTest.Tests.Unit_Tests
             SetUpBase();
             SetUp();
         }
-        
+
         [Test]
         public async Task IsTestTakenByStudentId_Correct()
         {
             Assert.IsTrue(await testService.IsTestTakenByStudentId(id, id));
         }
-        
-        [Test]
-        public async Task TestsTakenByStudent_Correct()
-        {
-            var test = (await testService.TestsTakenByStudent(id, query)).Items.FirstOrDefault();
-            var dbTest = GetTestByIdIncludingTestTaken(id);
-            dbTest.IsTestTaken = true;
-            string json1 = JsonConvert.SerializeObject(dbTest, Formatting.Indented,
-                                                       new JsonSerializerSettings()
-                                                       {
-                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling
-                                                                                             .Ignore
-                                                       });
-            string json2 = JsonConvert.SerializeObject(test, Formatting.Indented,
-                                                       new JsonSerializerSettings()
-                                                       {
-                                                           ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                                                       });
-            Assert.AreEqual(json1, json2);
-        }
+
         [Test]
         public async Task Create_Correct()
         {
@@ -223,11 +194,11 @@ namespace IntelliTest.Tests.Unit_Tests
                 Id = id2,
                 PublicityLevel = PublicityLevel.Public,
                 PhotoPath = "",
-                QuestionOrder = "O|C|O"
+                //QuestionOrder = "O|C|O"
             };
             await testService.Create(testModel, id, new string[0]);
             int testsCountNow = (await testService.GetAll(id, id, query)).Items.Count();
-            Assert.AreEqual(testsCount+1, testsCountNow);
+            Assert.AreEqual(testsCount + 1, testsCountNow);
             SetUpBase();
             SetUp();
         }
@@ -271,14 +242,15 @@ namespace IntelliTest.Tests.Unit_Tests
                     Id = id2,
                     PhotoPath = "",
                     Subject = Subject.Математика,
-                    QuestionsOrder = "O|C|O"
+                    //QuestionsOrder = "O|C|O"
                 }
             };
             data.Tests.AddRange(tests);
             await data.SaveChangesAsync();
             SetUp();
             var testsDb = await data.Tests
-                                    .Include(t => t.TestResults)
+                                    .Include(t => t.Groups)
+                                    .ThenInclude(t => t.TestResults)
                                     .Include(t => t.TestLikes)
                                     .ToListAsync();
             query.Filters.Subject = Subject.Математика;

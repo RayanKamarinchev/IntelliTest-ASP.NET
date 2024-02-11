@@ -13,10 +13,10 @@ namespace IntelliTest.Tests.Mocks
             {
                 var testServiceMock = new Mock<ITestResultsService>();
                 Guid id = Guid.Parse("c0b0d11d-cf99-4a2e-81a9-225d0b0c4e87");
-                testServiceMock.Setup(s => s.ToEdit(It.IsAny<TestViewModel>()))
+                testServiceMock.Setup(s => s.ToEdit(It.IsAny<TestViewModel>(), It.IsAny<RawTestGroupViewModel>()))
                                .Returns(new TestGroupEditViewModel());
                 testServiceMock.Setup(s => s.TestsTakenByClass(id))
-                               .ReturnsAsync(new List<TestGroupStatsViewModel>());
+                               .ReturnsAsync(new List<TestStatsViewModel>());
                 return testServiceMock.Object;
             }
         }

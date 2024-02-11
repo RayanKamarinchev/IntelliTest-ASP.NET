@@ -121,7 +121,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 Name = "Pesho Peshov",
                 Email = "student@gmail.com",
                 Id = id,
-                TestResults = new List<decimal>(){0.0m}
+                TestResults = new List<float>(){0.0f}
             };
             Assert.AreEqual(JsonConvert.SerializeObject(expectedStudent), JsonConvert.SerializeObject(firstClassStudent));
         }

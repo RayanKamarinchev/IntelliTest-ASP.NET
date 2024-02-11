@@ -112,10 +112,17 @@ namespace IntelliTest.Tests.Unit_Tests
                 Title = "The test",
                 PublicyLevel = PublicityLevel.TeachersOnly,
                 Id = id,
-                PhotoPath = "",
-                QuestionsOrder = "O|C|O"
+                PhotoPath = ""
             };
             data.Tests.Add(test);
+            var group = new TestGroup()
+            {
+                Id = id,
+                Number = 1,
+                Test = test,
+                QuestionsOrder = "O|C|O"
+            };
+            data.TestGroups.Add(group);
             var closedQuestions = new List<ClosedQuestion>()
             {
                 new ClosedQuestion()
@@ -123,7 +130,7 @@ namespace IntelliTest.Tests.Unit_Tests
                     Answers = "едно&две&три&четири",
                     AnswerIndexes = "1",
                     MaxScore = 2,
-                    Test = test,
+                    TestGroup = group,
                     Text = "Избери",
                     Id = id,
                     ImagePath = ""
@@ -136,7 +143,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 {
                     Text = "Who are you",
                     Answer = "Its me, Mario",
-                    Test = test,
+                    TestGroup = group,
                     MaxScore = 3,
                     Id = id,
                     ImagePath = ""
@@ -145,7 +152,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 {
                     Text = "How are you",
                     Answer = "Fine",
-                    Test = test,
+                    TestGroup = group,
                     MaxScore = 1,
                     Id = id2,
                     ImagePath = ""
@@ -182,7 +189,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 },
                 new OpenQuestionAnswer()
                 {
-                    Answer = "Bad",
+                    Answer = "Ok",
                     Student = student,
                     Question = openQuestionjs[1],
                     Id = id2,
@@ -248,7 +255,7 @@ namespace IntelliTest.Tests.Unit_Tests
                 Mark = Mark.Unmarked,
                 Score = 0,
                 StudentId = id,
-                TestId = id,
+                GroupId = id,
                 TakenOn = new DateTime(2023, 5, 21, 2, 42, 0)
             };
             data.TestResults.Add(testResult);

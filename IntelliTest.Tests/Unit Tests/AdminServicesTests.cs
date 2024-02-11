@@ -36,7 +36,6 @@ namespace IntelliTest.Tests.Unit_Tests
                 Time = 10,
                 Title = "test",
                 Id = privateItemsId,
-                QuestionsOrder = "",
                 PhotoPath = ""
             };
             data.AddAsync(privateTest);
