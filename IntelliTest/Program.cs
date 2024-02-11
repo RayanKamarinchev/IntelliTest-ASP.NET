@@ -11,8 +11,6 @@ using System.Text.Json.Serialization;
 using IntelliTest.Core.Hubs;
 using IntelliTest.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.EntityFrameworkCore.Migrations;
-using System.Xml.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +25,7 @@ builder.Services.AddCors(options =>
 });
 
 
-var connectionString = "Server=127.0.0.1;Database=IntelliTest;User=SA;Password=123456a@;MultipleActiveResultSets=true;";
+var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<IntelliTestDbContext>(options =>
                                                             options.UseSqlServer(connectionString)
                                                             ,ServiceLifetime.Transient);
