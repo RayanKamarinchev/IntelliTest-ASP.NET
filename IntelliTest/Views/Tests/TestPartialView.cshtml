@@ -2,7 +2,7 @@
 @model TestViewModel
 <div class="card card-margin">
     <div class="card-header no-border">
-        <h6 class="card-title">@Model.Title - @Model.Grade</h6>
+        <h6 class="card-title">@Model.Title - @Model.Grade клас</h6>
     </div>
     <div class="card-body pt-0">
         <div class="widget-49">
@@ -25,11 +25,11 @@
                 <li class="widget-49-meeting-item">
                     @if (User.IsTeacher() || User.IsAdmin())
                     {
-                        <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Изпитници: <strong>@Model.Examiners</strong></a>
+                        <a asp-action="ExaminersAll" asp-route-testId="@Model.Id" style="color: #727686; text-decoration: underline">Предали: <strong>@Model.Examiners</strong></a>
                     }
                     else
                     {
-                        <p>Изпитници: <strong>@Model.Examiners</strong></p>
+                        <p>Предали: <strong>@Model.Examiners</strong></p>
                     }
                 </li>
             </ol>

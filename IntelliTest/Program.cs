@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDbContext<IntelliTestDbContext>(options =>
                                                             options.UseSqlServer(connectionString)
-                                                            ,ServiceLifetime.Transient);
+                                                            ,ServiceLifetime.Singleton);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -74,15 +74,15 @@ builder.Services.AddControllers()
            options.AreaViewLocationFormats.Add("/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
        });
 
-builder.Services.AddTransient<IMessageService, MessageService>();
-builder.Services.AddTransient<IRoomService, RoomService>();
-builder.Services.AddTransient<ITestService, TestService>();
-builder.Services.AddTransient<ITestResultsService, TestResultsService>();
-builder.Services.AddTransient<ITeacherService, TeacherService>();
-builder.Services.AddTransient<ILessonService, LessonService>();
-builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddTransient<IClassService, ClassService>();
-builder.Services.AddTransient<IStudentService, StudentService>();
+builder.Services.AddSingleton<IMessageService, MessageService>();
+builder.Services.AddSingleton<IRoomService, RoomService>();
+builder.Services.AddSingleton<ITestService, TestService>();
+builder.Services.AddSingleton<ITestResultsService, TestResultsService>();
+builder.Services.AddSingleton<ITeacherService, TeacherService>();
+builder.Services.AddSingleton<ILessonService, LessonService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IClassService, ClassService>();
+builder.Services.AddSingleton<IStudentService, StudentService>();
 
 builder.Services.AddSignalR();
 

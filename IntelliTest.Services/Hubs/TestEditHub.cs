@@ -99,12 +99,20 @@ namespace IntelliTest.Core.Hubs
                         }
                         else if (question == "")
                         {
-                            question = res.Substring(3, res.Length - 3).Replace("\n", "");
+                            if (res.StartsWith("Q:"))
+                            {
+                                res = res.Substring(3, res.Length - 3);
+                            }
+                            question = res.Replace("\n", "");
                             res = "";
                         }
                         else
                         {
-                            res = res.Substring(3, res.Length - 3).Replace("\n", "");
+                            if (res.StartsWith("A:"))
+                            {
+                                res = res.Substring(3, res.Length - 3);
+                            }
+                            res = res.Replace("\n", "");
                             await Clients.Caller.SendAsync("Add", question, res);
                             res = "";
                             question = "";
