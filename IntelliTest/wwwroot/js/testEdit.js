@@ -262,6 +262,8 @@ function handleSubmit(event) {
     const data = new FormData(event.target);
 
     let formValues = Object.fromEntries(data.entries());
+    console.log(formValues)
+    return;
     let i = 0;
     let openQuestions = 0
     while (true) {

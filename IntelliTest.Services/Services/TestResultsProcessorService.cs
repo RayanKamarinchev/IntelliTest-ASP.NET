@@ -28,14 +28,19 @@ namespace IntelliTest.Core.Services
             this.openQuestionAnswers = openQuestionAnswers;
         }
 
+        private bool IsShortAnswer(string answer)
+        {
+            return Regex.Matches(answer, @"\w+")
+                        .Select(m => m.Value).Count() < 4;
+        }
+
         private async Task<Tuple<float, string>> CalculateOpenQuestionScore(string Answer, string RightAnswer, float MaxScore)
         {
-            if (Answer is null)
+            if (string.IsNullOrWhiteSpace(Answer))
             {
                 return new Tuple<float, string>(0, $"Правилният отговор е \"{RightAnswer}\"");
             }
-            if (Regex.Matches(RightAnswer, @"\w+")
-                     .Select(m => m.Value).Count() <= 4)
+            if (IsShortAnswer(RightAnswer))
             {
                 bool isCorrect = Regex.Matches(Answer, @"\w+")
                                       .Select(m => m.Value)

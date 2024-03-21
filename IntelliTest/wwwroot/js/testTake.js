@@ -52,7 +52,9 @@ function step() {
         sec += 60;
         min--;
     }
-    if ((min < 0 || sec <= 0) && !submitted) {
+    console.log(`${min}:${sec}`)
+    if ((min <= 0 && sec <= 0) && !submitted) {
+        debugger;
         $("form").trigger('submit');
     }
     timer.innerHTML = ("0" + min).slice(-2) + ":" + ("0" + sec).slice(-2);
